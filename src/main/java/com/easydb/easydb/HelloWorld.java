@@ -11,6 +11,6 @@ public class HelloWorld {
     @RequestMapping("/")
     @ResponseBody
     String home() {
-        return "Hello World2!";
+        return "Hello World3!";
     }
 }
