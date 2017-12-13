@@ -17,6 +17,7 @@ class SpaceSpec extends Specification {
     @Shared
     def space = Space.of("testSpace")
 
+    // robimy to
     def "should create bucket"() {
         when:
         space.createBucket("people", ["firstName", "lastName", "email"])
@@ -153,6 +154,6 @@ class SpaceSpec extends Specification {
         space.removeElement("people", "notExistingId")
 
         then:
-        thrown ElementDoesNotExistException()
+        thrown ElementDoesNotExistException
     }
 }
