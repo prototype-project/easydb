@@ -8,16 +8,12 @@ import com.easydb.easydb.domain.ElementDoesNotExistException
 import com.easydb.easydb.domain.ElementQueryDto
 import com.easydb.easydb.domain.ElementUpdateDto
 import com.easydb.easydb.domain.ElementUpdateFieldDto
-import com.easydb.easydb.domain.Space
-import spock.lang.Shared
 import spock.lang.Specification
 
 class SpaceSpec extends Specification {
 
-    @Shared
-    def space = Space.of("testSpace")
+    def space = SpaceConfig.createSpace();
 
-    // robimy to
     def "should create bucket"() {
         when:
         space.createBucket("people", ["firstName", "lastName", "email"])

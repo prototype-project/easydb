@@ -3,15 +3,19 @@ package com.easydb.easydb.domain;
 import java.util.List;
 
 public class Space {
-	public static Space of(String name) {
-		return new Space();
+	private final String name;
+	private final BucketRepository bucketRepository;
+
+	public Space(String name, BucketRepository bucketRepository) {
+		this.name = name;
+		this.bucketRepository = bucketRepository;
 	}
 
-	public Bucket createBucket(String name, List<String> fieldsNames) {
-		return new Bucket();
+	public void createBucket(String name, List<String> fieldsNames) {
+		bucketRepository.create(BucketDefinition.of(name, fieldsNames));
 	}
 
-	public boolean bucketExists(String p) {
+	public boolean bucketExists(String name) {
 		return true;
 	}
 
