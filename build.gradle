@@ -29,8 +29,20 @@ sourceSets {
 			srcDir "test"
 		}
 	}
+	integration {
+		java {
+			compileClasspath += main.output + test.output
+			runtimeClasspath += main.output + test.output
+			srcDir file('src/integration/groovy')
+		}
+		resources.srcDir file('src/integration/resources')
+	}
 }
 
+configurations {
+	integrationCompile.extendsFrom testCompile
+	integrationRuntime.extendsFrom testRuntime
+}
 
 dependencies {
 	compile 'org.springframework.boot:spring-boot-starter-web'
@@ -42,4 +54,16 @@ dependencies {
 	testCompile 'org.springframework.boot:spring-boot-starter-test'
 	testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
     testCompile group: 'com.github.fakemongo', name: 'fongo', version: '2.1.0'
+}
+
+task integrationTest(type: Test) {
+	testClassesDir = sourceSets.integration.output.classesDir
+	classpath = sourceSets.integration.runtimeClasspath
+}
+
+check.dependsOn integrationTest
+integrationTest.mustRunAfter test
+
+tasks.withType(Test) {
+	reports.html.destination = file("${reporting.baseDir}/${name}")
 }
