@@ -21,4 +21,9 @@ public class MongoBucketRepository implements BucketRepository {
 	public boolean exists(String name) {
 		return mongoTemplate.collectionExists(name);
 	}
+
+	@Override
+	public void remove(String name) {
+
+	}
 }

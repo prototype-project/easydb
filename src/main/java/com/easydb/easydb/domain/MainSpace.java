@@ -20,6 +20,7 @@ public class 	MainSpace implements Space {
 	}
 
 	public void removeBucket(String name) {
+		bucketRepository.remove(name);
 	}
 
 	public ElementQueryDto addElement(ElementCreateDto p) {

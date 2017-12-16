@@ -1,5 +1,6 @@
 package com.easydb.easydb.api;
 
+import com.easydb.easydb.domain.BucketExistsException;
 import com.easydb.easydb.domain.Space;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,11 @@ class SpaceController {
 
     @PostMapping(path = "/buckets")
     public ResponseEntity createBucket(@RequestBody BucketDefinitionDto bucketDefinition) {
-        space.createBucket(bucketDefinition.getName(), bucketDefinition.getFields());
+        try {
+            space.createBucket(bucketDefinition.getName(), bucketDefinition.getFields());
+        } catch (BucketExistsException e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity(HttpStatus.CREATED);
     }
 }
