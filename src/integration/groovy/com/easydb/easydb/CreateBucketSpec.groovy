@@ -7,6 +7,7 @@ import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.web.client.RestTemplate
 
@@ -25,12 +26,15 @@ class CreateBucketSpec extends BaseSpec {
         ])
 
         when:
-        restTemplate.exchange(localUrl('/api/v1/buckets'),
+        ResponseEntity response = restTemplate.exchange(localUrl('/api/v1/buckets'),
                 HttpMethod.POST, httpJsonEntity(bucketDefinition), Void.class)
 
 
         then:
         space.bucketExists('testBucket')
+
+        and:
+        response.statusCodeValue == 201
     }
 
     HttpHeaders headers() {
