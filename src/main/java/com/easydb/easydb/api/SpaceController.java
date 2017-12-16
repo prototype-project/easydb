@@ -25,4 +25,10 @@ class SpaceController {
         }
         return new ResponseEntity(HttpStatus.CREATED);
     }
+
+    @DeleteMapping(path = "/buckets/{name}")
+    public ResponseEntity deleteBucket(@PathVariable("name") String name ) {
+        space.removeBucket(name);
+        return new ResponseEntity(HttpStatus.OK);
+    }
 }

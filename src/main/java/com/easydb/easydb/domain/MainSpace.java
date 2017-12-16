@@ -16,7 +16,7 @@ public class 	MainSpace implements Space {
 	}
 
 	public boolean bucketExists(String name) {
-		return true;
+		return bucketRepository.exists(name);
 	}
 
 	public void removeBucket(String name) {
