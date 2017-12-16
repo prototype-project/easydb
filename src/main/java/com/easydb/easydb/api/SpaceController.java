@@ -1,5 +1,6 @@
 package com.easydb.easydb.api;
 
+import com.easydb.easydb.domain.BucketDoesNotExistException;
 import com.easydb.easydb.domain.BucketExistsException;
 import com.easydb.easydb.domain.Space;
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,11 @@ class SpaceController {
 
     @DeleteMapping(path = "/buckets/{name}")
     public ResponseEntity deleteBucket(@PathVariable("name") String name ) {
-        space.removeBucket(name);
+        try {
+            space.removeBucket(name);
+        } catch (BucketDoesNotExistException e) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity(HttpStatus.OK);
     }
 }

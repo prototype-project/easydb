@@ -1,6 +1,7 @@
 package com.easydb.easydb;
 
 import com.easydb.easydb.domain.BucketDefinition
+import com.easydb.easydb.domain.BucketDoesNotExistException
 import com.easydb.easydb.domain.BucketExistsException
 import com.easydb.easydb.domain.BucketRepository;
 
@@ -23,6 +24,8 @@ class InMemoryBucketRepository implements BucketRepository {
 
     @Override
     void remove(String name) {
+        if (!exists(name))
+            throw new BucketDoesNotExistException()
         buckets.remove(name)
     }
 }
