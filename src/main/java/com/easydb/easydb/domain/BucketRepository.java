@@ -7,4 +7,6 @@ public interface BucketRepository {
 	boolean exists(String name);
 
 	void remove(String name);
+
+	BucketElement insertElement(BucketElement element);
 }
