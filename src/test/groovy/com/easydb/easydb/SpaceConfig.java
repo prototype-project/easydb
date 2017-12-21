@@ -6,8 +6,8 @@ import com.github.fakemongo.Fongo;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 class SpaceConfig {
-	static final String SPACE_NAME = "testSpace";
-	static final String SERVER_NAME = "testServer";
+	private static final String SPACE_NAME = "testSpace";
+	private static final String SERVER_NAME = "testServer";
 
 	static MainSpace createSpace() {
 		Fongo fongo = new Fongo(SERVER_NAME);

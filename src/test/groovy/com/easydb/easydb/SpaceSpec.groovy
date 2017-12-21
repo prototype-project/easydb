@@ -56,7 +56,7 @@ class SpaceSpec extends Specification {
         given:
         space.createBucket("people", ["firstName", "lastName", "email"])
 
-        ElementCreateDto elementToCreate = ElementCreateDto.of("name",
+        ElementCreateDto elementToCreate = ElementCreateDto.of("bucketName",
                 ElementCreateFieldDto.create('firstName', 'John'),
                 ElementCreateFieldDto.create('lastName', 'Smith'),
                 ElementCreateFieldDto.create('email', 'john.smith@op.pl'))
@@ -72,7 +72,7 @@ class SpaceSpec extends Specification {
         given:
         space.createBucket("people", ["firstName", "lastName", "email"])
 
-        ElementCreateDto elementToCreate = ElementCreateDto.of("name",
+        ElementCreateDto elementToCreate = ElementCreateDto.of("bucketName",
                 ElementCreateFieldDto.create('firstName', 'John'),
                 ElementCreateFieldDto.create('lastName', 'Smith'),
                 ElementCreateFieldDto.create('email', 'john.smith@op.pl')
@@ -90,7 +90,7 @@ class SpaceSpec extends Specification {
         given:
         space.createBucket("people", ["firstName", "lastName", "email"])
 
-        ElementCreateDto elementToCreate = ElementCreateDto.of("name",
+        ElementCreateDto elementToCreate = ElementCreateDto.of("bucketName",
                 ElementCreateFieldDto.create('firstName', 'John'),
                 ElementCreateFieldDto.create('lastName', 'Smith'),
                 ElementCreateFieldDto.create('email', 'john.smith@op.pl'))
@@ -112,7 +112,7 @@ class SpaceSpec extends Specification {
         given:
         space.createBucket("people", ["firstName", "lastName", "email"])
 
-        ElementCreateDto elementToCreate = ElementCreateDto.of("name",
+        ElementCreateDto elementToCreate = ElementCreateDto.of("bucketName",
                 ElementCreateFieldDto.create('firstName', 'John'),
                 ElementCreateFieldDto.create('lastName', 'Smith'),
                 ElementCreateFieldDto.create('email', 'john.smith@op.pl'))
@@ -130,7 +130,7 @@ class SpaceSpec extends Specification {
         given:
         space.createBucket("people", ["firstName", "lastName", "email"])
 
-        ElementCreateDto elementToCreate = ElementCreateDto.of("name",
+        ElementCreateDto elementToCreate = ElementCreateDto.of("bucketName",
                 ElementCreateFieldDto.create('firstName', 'John'),
                 ElementCreateFieldDto.create('lastName', 'Smith'),
                 ElementCreateFieldDto.create('email', 'john.smith@op.pl'))

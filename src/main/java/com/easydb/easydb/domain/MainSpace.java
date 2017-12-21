@@ -2,7 +2,7 @@ package com.easydb.easydb.domain;
 
 import java.util.List;
 
-public class 	MainSpace implements Space {
+public class MainSpace implements Space {
 	private final String name;
 	private final BucketRepository bucketRepository;
 
@@ -23,8 +23,8 @@ public class 	MainSpace implements Space {
 		bucketRepository.remove(name);
 	}
 
-	public ElementQueryDto addElement(ElementCreateDto p) {
-		return null;
+	public ElementQueryDto addElement(ElementCreateDto element) {
+		return bucketRepository.create();
 	}
 
 	public ElementQueryDto getElement(String bucketName, String id) {

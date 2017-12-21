@@ -1,6 +1,8 @@
 package com.easydb.easydb.infrastructure;
 
 import com.easydb.easydb.domain.BucketDefinition;
+import com.easydb.easydb.domain.BucketDoesNotExistException;
+import com.easydb.easydb.domain.BucketExistsException;
 import com.easydb.easydb.domain.BucketRepository;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
@@ -14,6 +16,9 @@ public class MongoBucketRepository implements BucketRepository {
 
 	@Override
 	public void create(BucketDefinition bucketDefinition) {
+		if (exists(bucketDefinition.getName())) {
+			throw new BucketExistsException(bucketDefinition.getName());
+		}
 		mongoTemplate.createCollection(bucketDefinition.getName());
 	}
 
@@ -24,6 +29,9 @@ public class MongoBucketRepository implements BucketRepository {
 
 	@Override
 	public void remove(String name) {
-
+		if (!exists(name)) {
+			throw new BucketDoesNotExistException(name);
+		}
+		mongoTemplate.dropCollection(name);
 	}
 }
