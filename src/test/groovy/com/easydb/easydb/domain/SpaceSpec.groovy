@@ -1,14 +1,7 @@
-package com.easydb.easydb
+package com.easydb.easydb.domain
 
-import com.easydb.easydb.domain.BucketDoesNotExistException
-import com.easydb.easydb.domain.BucketExistsException
-import com.easydb.easydb.domain.ElementCreateDto
-import com.easydb.easydb.domain.ElementFieldDto
-import com.easydb.easydb.domain.ElementDoesNotExistException
-import com.easydb.easydb.domain.ElementQueryDto
-import com.easydb.easydb.domain.ElementUpdateDto
-import com.easydb.easydb.domain.ElementUpdateFieldDto
 import spock.lang.Specification
+
 
 class SpaceSpec extends Specification {
 
@@ -56,17 +49,21 @@ class SpaceSpec extends Specification {
         given:
         space.createBucket("people", ["firstName", "lastName", "email"])
 
-        ElementCreateDto elementToCreate = ElementCreateDto.of("bucketName", [
-                ElementFieldDto.create('firstName', 'John'),
-                ElementFieldDto.create('lastName', 'Smith'),
-                ElementFieldDto.create('email', 'john.smith@op.pl')
+        ElementCreateDto elementToCreate = ElementCreateDto.of("people", [
+                ElementFieldDto.of('firstName', 'John'),
+                ElementFieldDto.of('lastName', 'Smith'),
+                ElementFieldDto.of('email', 'john.smith@op.pl')
         ])
 
         when:
         ElementQueryDto createdElement = space.addElement(elementToCreate)
 
         then:
-        createdElement == space.getElement("people", createdElement.getId())
+        ElementQueryDto fromDb = space.getElement("people", createdElement.getId())
+        with(fromDb) {
+            id == createdElement.id
+            name == createdElement.name
+        }
     }
 
     def "should remove element from bucket"() {
@@ -74,9 +71,9 @@ class SpaceSpec extends Specification {
         space.createBucket("people", ["firstName", "lastName", "email"])
 
         ElementCreateDto elementToCreate = ElementCreateDto.of("bucketName", [
-                ElementFieldDto.create('firstName', 'John'),
-                ElementFieldDto.create('lastName', 'Smith'),
-                ElementFieldDto.create('email', 'john.smith@op.pl')
+                ElementFieldDto.of('firstName', 'John'),
+                ElementFieldDto.of('lastName', 'Smith'),
+                ElementFieldDto.of('email', 'john.smith@op.pl')
         ])
         ElementQueryDto createdElement = space.addElement(exampleElement)
 
@@ -92,9 +89,9 @@ class SpaceSpec extends Specification {
         space.createBucket("people", ["firstName", "lastName", "email"])
 
         ElementCreateDto elementToCreate = ElementCreateDto.of("bucketName", [
-                ElementFieldDto.create('firstName', 'John'),
-                ElementFieldDto.create('lastName', 'Smith'),
-                ElementFieldDto.create('email', 'john.smith@op.pl')
+                ElementFieldDto.of('firstName', 'John'),
+                ElementFieldDto.of('lastName', 'Smith'),
+                ElementFieldDto.of('email', 'john.smith@op.pl')
                 ])
 
         ElementQueryDto createdElement = space.addElement(elementToCreate)
@@ -115,9 +112,9 @@ class SpaceSpec extends Specification {
         space.createBucket("people", ["firstName", "lastName", "email"])
 
         ElementCreateDto elementToCreate = ElementCreateDto.of("bucketName", [
-                ElementFieldDto.create('firstName', 'John'),
-                ElementFieldDto.create('lastName', 'Smith'),
-                ElementFieldDto.create('email', 'john.smith@op.pl')
+                ElementFieldDto.of('firstName', 'John'),
+                ElementFieldDto.of('lastName', 'Smith'),
+                ElementFieldDto.of('email', 'john.smith@op.pl')
         ])
 
         ElementQueryDto createdElement = space.addElement(exampleElement)
@@ -134,9 +131,9 @@ class SpaceSpec extends Specification {
         space.createBucket("people", ["firstName", "lastName", "email"])
 
         ElementCreateDto elementToCreate = ElementCreateDto.of("bucketName", [
-                ElementFieldDto.create('firstName', 'John'),
-                ElementFieldDto.create('lastName', 'Smith'),
-                ElementFieldDto.create('email', 'john.smith@op.pl')
+                ElementFieldDto.of('firstName', 'John'),
+                ElementFieldDto.of('lastName', 'Smith'),
+                ElementFieldDto.of('email', 'john.smith@op.pl')
         ])
 
         ElementQueryDto createdElement = space.addElement(exampleElement)

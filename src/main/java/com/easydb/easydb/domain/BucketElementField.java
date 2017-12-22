@@ -10,15 +10,11 @@ class BucketElementField {
 		this.value = value;
 	}
 
-	static BucketElementField of(String name, String value) {
-		return new BucketElementField(name, value);
+	static BucketElementField of(ElementFieldDto elementFieldDto) {
+		return new BucketElementField(elementFieldDto.getName(), elementFieldDto.getValue());
 	}
 
-	String getName() {
-		return name;
-	}
-
-	String getValue() {
-		return value;
+	ElementFieldDto toDto() {
+		return ElementFieldDto.of(name, value);
 	}
 }

@@ -1,6 +1,5 @@
-package com.easydb.easydb;
+package com.easydb.easydb.domain;
 
-import com.easydb.easydb.domain.MainSpace;
 import com.easydb.easydb.infrastructure.MongoBucketRepository;
 import com.github.fakemongo.Fongo;
 import org.springframework.data.mongodb.core.MongoTemplate;

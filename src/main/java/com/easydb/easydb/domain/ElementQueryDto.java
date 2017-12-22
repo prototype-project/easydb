@@ -1,7 +1,6 @@
 package com.easydb.easydb.domain;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ElementQueryDto {
     private final String id;
@@ -14,13 +13,19 @@ public class ElementQueryDto {
         this.fields = fields;
     }
 
-    static ElementQueryDto of(BucketElement element) {
-        return new ElementQueryDto(
-                element.get
-                element.getName(),
-                element.getFields().stream()
-                        .map(it -> ElementFieldDto.of(it.getName(), it.getValue()))
-                        .collect(Collectors.toList())
-        )
+    static ElementQueryDto of(String id, String name, List<ElementFieldDto> fields) {
+        return new ElementQueryDto(id, name, fields);
+    }
+
+    String getId() {
+        return id;
+    }
+
+    String getName() {
+        return name;
+    }
+
+    List<ElementFieldDto> getFields() {
+        return fields;
     }
 }

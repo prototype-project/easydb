@@ -6,6 +6,8 @@ import com.easydb.easydb.domain.BucketElement;
 import com.easydb.easydb.domain.BucketExistsException;
 import com.easydb.easydb.domain.BucketRepository;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 
 public class MongoBucketRepository implements BucketRepository {
 
@@ -37,7 +39,13 @@ public class MongoBucketRepository implements BucketRepository {
 	}
 
 	@Override
-	public void insertElement(BucketElement element) {
-		mongoTemplate.save(element);
+	public BucketElement insertElement(BucketElement element) {
+		mongoTemplate.insert(element, element.getName());
+		return element;
+	}
+
+	@Override
+	public BucketElement getElement(String bucketName, String id) {
+		return mongoTemplate.findById(id, BucketElement.class, bucketName);
 	}
 }

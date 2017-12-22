@@ -14,7 +14,11 @@ public class ElementFieldDto {
 		return new ElementFieldDto(name, value);
 	}
 
-	BucketElementField toDomainField() {
-		return BucketElementField.of(name, value);
+	String getValue() {
+		return value;
+	}
+
+	String getName() {
+		return name;
 	}
 }

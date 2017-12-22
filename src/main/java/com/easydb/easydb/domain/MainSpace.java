@@ -24,12 +24,12 @@ public class MainSpace implements Space {
 	}
 
 	public ElementQueryDto addElement(ElementCreateDto element) {
-		BucketElement created = bucketRepository.insertElement(element.toDomainElement());
-		return ElementQueryDto.of(create);
+		BucketElement created = bucketRepository.insertElement(BucketElement.of(element));
+		return created.toQueryDto();
 	}
 
 	public ElementQueryDto getElement(String bucketName, String id) {
-		return null;
+		return bucketRepository.getElement(bucketName, id).toQueryDto();
 	}
 
 	public void removeElement(String bucketName, String elementId) {

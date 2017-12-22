@@ -9,4 +9,7 @@ public interface BucketRepository {
 	void remove(String name);
 
 	BucketElement insertElement(BucketElement element);
+
+	BucketElement getElement(String bucketName, String id);
+
 }
