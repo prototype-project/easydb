@@ -70,12 +70,12 @@ class SpaceSpec extends Specification {
         given:
         space.createBucket("people", ["firstName", "lastName", "email"])
 
-        ElementCreateDto elementToCreate = ElementCreateDto.of("bucketName", [
+        ElementCreateDto elementToCreate = ElementCreateDto.of("people", [
                 ElementFieldDto.of('firstName', 'John'),
                 ElementFieldDto.of('lastName', 'Smith'),
                 ElementFieldDto.of('email', 'john.smith@op.pl')
         ])
-        ElementQueryDto createdElement = space.addElement(exampleElement)
+        ElementQueryDto createdElement = space.addElement(elementToCreate)
 
         when:
         space.removeElement("people", createdElement.id)
@@ -88,7 +88,7 @@ class SpaceSpec extends Specification {
         given:
         space.createBucket("people", ["firstName", "lastName", "email"])
 
-        ElementCreateDto elementToCreate = ElementCreateDto.of("bucketName", [
+        ElementCreateDto elementToCreate = ElementCreateDto.of("people", [
                 ElementFieldDto.of('firstName', 'John'),
                 ElementFieldDto.of('lastName', 'Smith'),
                 ElementFieldDto.of('email', 'john.smith@op.pl')
@@ -97,7 +97,7 @@ class SpaceSpec extends Specification {
         ElementQueryDto createdElement = space.addElement(elementToCreate)
 
         ElementUpdateDto elementToUpdate = ElementUpdateDto.of("people", createdElement.id,
-                ElementUpdateFieldDto.create('lastName', 'Snow')
+                [ElementFieldDto.of('lastName', 'Snow')]
         )
 
         when:
@@ -111,39 +111,45 @@ class SpaceSpec extends Specification {
         given:
         space.createBucket("people", ["firstName", "lastName", "email"])
 
-        ElementCreateDto elementToCreate = ElementCreateDto.of("bucketName", [
+        ElementCreateDto elementToCreate = ElementCreateDto.of("people", [
                 ElementFieldDto.of('firstName', 'John'),
                 ElementFieldDto.of('lastName', 'Smith'),
                 ElementFieldDto.of('email', 'john.smith@op.pl')
         ])
 
-        ElementQueryDto createdElement = space.addElement(exampleElement)
+        ElementQueryDto createdElement = space.addElement(elementToCreate)
 
         when:
         ElementQueryDto elementFromBucket = space.getElement("people", createdElement.id)
 
         then:
-        createdElement == elementFromBucket
+        with(elementFromBucket) {
+            id == createdElement.id
+            name == createdElement.name
+        }
     }
 
     def "should get all elements from bucket"() {
         given:
         space.createBucket("people", ["firstName", "lastName", "email"])
 
-        ElementCreateDto elementToCreate = ElementCreateDto.of("bucketName", [
+        ElementCreateDto elementToCreate = ElementCreateDto.of("people", [
                 ElementFieldDto.of('firstName', 'John'),
                 ElementFieldDto.of('lastName', 'Smith'),
                 ElementFieldDto.of('email', 'john.smith@op.pl')
         ])
 
-        ElementQueryDto createdElement = space.addElement(exampleElement)
+        ElementQueryDto createdElement = space.addElement(elementToCreate)
 
         when:
         List<ElementQueryDto> elementsFromBucket = space.getAllElements("people")
 
         then:
         elementsFromBucket.size() == 1
-        elementsFromBucket[0] == createdElement
+        with(elementsFromBucket[0]) {
+            id == createdElement.id
+            name == createdElement.name
+        }
     }
 
     def "should throw error when removing nonexistent element"() {

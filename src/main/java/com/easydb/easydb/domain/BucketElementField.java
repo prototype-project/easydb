@@ -1,6 +1,6 @@
 package com.easydb.easydb.domain;
 
-class BucketElementField {
+public class BucketElementField {
 
 	private final String name;
 	private final String value;

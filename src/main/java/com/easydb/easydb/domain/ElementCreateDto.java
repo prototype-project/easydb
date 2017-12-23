@@ -17,7 +17,7 @@ public class ElementCreateDto {
 		return new ElementCreateDto(bucketName, fields);
 	}
 
-	String getName() {
+	String getBucketName() {
 		return bucketName;
 	}
 
