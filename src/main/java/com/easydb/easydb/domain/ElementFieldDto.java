@@ -10,15 +10,15 @@ public class ElementFieldDto {
 		this.value = value;
 	}
 
-	static ElementFieldDto of(String name, String value) {
+	public static ElementFieldDto of(String name, String value) {
 		return new ElementFieldDto(name, value);
 	}
 
-	String getValue() {
+	public String getValue() {
 		return value;
 	}
 
-	String getName() {
+	public String getName() {
 		return name;
 	}
 }

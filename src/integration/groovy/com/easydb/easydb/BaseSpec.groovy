@@ -45,7 +45,10 @@ abstract class BaseSpec extends Specification {
         ])
     }
     ResponseEntity sampleBucket() {
-        restTemplate.exchange(localUrl('/api/v1/buckets'),
-                HttpMethod.POST, httpJsonEntity(sampleBucketDefinition()), Void.class)
+        restTemplate.exchange(
+                localUrl('/api/v1/buckets'),
+                HttpMethod.POST,
+                httpJsonEntity(sampleBucketDefinition()),
+                Void.class)
     }
 }

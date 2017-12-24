@@ -12,6 +12,6 @@ class SpaceTestConfig {
     @Primary
     @Bean
     Space inMemorySpace() {
-        return new MainSpace('testSpace', new InMemoryBucketRepository())
+        return new InMemorySpace()
     }
 }

@@ -13,15 +13,15 @@ public class ElementCreateDto {
 		this.fields = fields;
 	}
 
-	static ElementCreateDto of(String bucketName, List<ElementFieldDto> fields) {
+	public static ElementCreateDto of(String bucketName, List<ElementFieldDto> fields) {
 		return new ElementCreateDto(bucketName, fields);
 	}
 
-	String getBucketName() {
+	public String getBucketName() {
 		return bucketName;
 	}
 
-	List<ElementFieldDto> getFields() {
+	public List<ElementFieldDto> getFields() {
 		return fields;
 	}
 }
