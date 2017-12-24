@@ -93,6 +93,21 @@ class CrudBucketSpec extends BaseSpec {
                 .collect(Collectors.toList())
     }
 
+    def "should get element from bucket"() {
+        given:
+        ResponseEntity<ElementQueryApiDto> addElementResponse = addSampleElement()
+
+        when:
+        ResponseEntity<ElementQueryApiDto> getElementResponse = restTemplate.exchange(
+                localUrl('/api/v1/buckets/people/' + addElementResponse.body.getId()),
+                HttpMethod.GET,
+                null,
+                ElementQueryApiDto.class)
+
+        then:
+        addElementResponse.body == getElementResponse.body
+    }
+
     ResponseEntity<ElementQueryApiDto> addSampleElement() {
         restTemplate.exchange(
                 localUrl('/api/v1/buckets/people'),
