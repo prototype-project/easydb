@@ -31,7 +31,7 @@ public class ElementQueryDto {
         return name;
     }
 
-    String getFieldValue(String fieldName) {
+    public String getFieldValue(String fieldName) {
         return fieldsAsMap.get(fieldName).getValue();
     }
 

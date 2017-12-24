@@ -39,8 +39,8 @@ class SpaceController {
     @ResponseStatus(value = HttpStatus.CREATED)
     public ElementQueryApiDto createElement(
             @PathVariable("bucketName") String bucketName,
-            @RequestBody ElementCreateApiDto toCreate) {
-        ElementQueryDto createdElement = space.addElement(toCreate.toDomainDto());
+            @RequestBody ElementOperationApiDto toCreate) {
+        ElementQueryDto createdElement = space.addElement(toCreate.toCreateDto());
         return ElementQueryApiDto.from(createdElement);
     }
 
@@ -50,5 +50,14 @@ class SpaceController {
             @PathVariable("bucketName") String bucketName,
             @PathVariable("elementId") String elementId) {
         space.removeElement(bucketName, elementId);
+    }
+
+    @PutMapping(path = "/buckets/{bucketName}/{elementId}")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void updateElement(
+            @PathVariable("bucketName") String bucketName,
+            @PathVariable("elementId") String elementId,
+            @RequestBody ElementOperationApiDto toUpdate) {
+        space.updateElement(toUpdate.toUpdateDto());
     }
 }

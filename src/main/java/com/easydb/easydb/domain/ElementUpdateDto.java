@@ -18,15 +18,15 @@ public class ElementUpdateDto {
 		return new ElementUpdateDto(bucketName, elementId, fields);
 	}
 
-	String getBucketName() {
+	public String getBucketName() {
 		return bucketName;
 	}
 
-	String getElementId() {
+	public String getElementId() {
 		return elementId;
 	}
 
-	List<ElementFieldDto> getFields() {
+	public List<ElementFieldDto> getFields() {
 		return fields;
 	}
 }

@@ -1,6 +1,5 @@
 package com.easydb.easydb;
 
-import com.easydb.easydb.domain.BucketDefinition
 import com.easydb.easydb.domain.BucketDoesNotExistException
 import com.easydb.easydb.domain.BucketExistsException
 import com.easydb.easydb.domain.ElementCreateDto
@@ -47,7 +46,9 @@ class InMemorySpace implements Space {
 
     @Override
     void updateElement(ElementUpdateDto toUpdate) {
-
+        elements.get(toUpdate.getBucketName()).remove(toUpdate.getElementId())
+        ElementQueryDto updatedElement = ElementQueryDto.of(toUpdate.getElementId(), toUpdate.getBucketName(), toUpdate.getFields())
+        elements.get(toUpdate.getBucketName()).put(toUpdate.getElementId(), updatedElement)
     }
 
     @Override

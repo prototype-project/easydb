@@ -2,15 +2,17 @@ package com.easydb.easydb.api;
 
 import com.easydb.easydb.domain.ElementCreateDto;
 import com.easydb.easydb.domain.ElementFieldDto;
+import com.easydb.easydb.domain.ElementUpdateDto;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ElementCreateApiDto {
+public class ElementOperationApiDto {
+    private String id; // nullable
     private String bucketName;
     private List<ElementFieldApiDto> fields;
 
-    public ElementCreateApiDto() {
+    public ElementOperationApiDto() {
     }
 
     public String getBucketName() {
@@ -29,8 +31,22 @@ public class ElementCreateApiDto {
         this.fields = fields;
     }
 
-    public ElementCreateDto toDomainDto() {
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public ElementCreateDto toCreateDto() {
         return ElementCreateDto.of(bucketName, fields.stream()
+                .map(it -> ElementFieldDto.of(it.getName(), it.getValue()))
+                .collect(Collectors.toList()));
+    }
+
+    public ElementUpdateDto toUpdateDto() {
+        return ElementUpdateDto.of(bucketName, id, fields.stream()
                 .map(it -> ElementFieldDto.of(it.getName(), it.getValue()))
                 .collect(Collectors.toList()));
     }

@@ -1,6 +1,7 @@
 package com.easydb.easydb
 
 import com.easydb.easydb.api.ElementQueryApiDto
+import com.easydb.easydb.domain.ElementQueryDto
 import com.easydb.easydb.domain.Space
 import groovy.json.JsonOutput
 import org.springframework.beans.factory.annotation.Autowired
@@ -53,6 +54,26 @@ class CrudBucketSpec extends BaseSpec {
         !space.elementExists('people', addElementResponse.body.getId())
     }
 
+    def "should update element"() {
+        given:
+        ResponseEntity<ElementQueryApiDto> addElementResponse = addSampleElement()
+
+        when:
+        ResponseEntity response = restTemplate.exchange(
+                localUrl('/api/v1/buckets/people/' + addElementResponse.body.getId()),
+                HttpMethod.PUT,
+                httpJsonEntity(sampleElementUpdate(addElementResponse.body.getId())),
+                Void.class)
+
+        then:
+        response.statusCodeValue == 200
+
+        and:
+        ElementQueryDto updatedElement = space.getElement('people', addElementResponse.body.getId())
+        updatedElement.getFieldValue('firstName') == 'john'
+        updatedElement.getFieldValue('lastName') == 'snow'
+    }
+
     ResponseEntity<ElementQueryApiDto> addSampleElement() {
         restTemplate.exchange(
                 localUrl('/api/v1/buckets/people'),
@@ -73,6 +94,23 @@ class CrudBucketSpec extends BaseSpec {
                         [
                                 name: 'lastName',
                                 value: 'smith'
+                        ]
+                ]
+        ])
+    }
+
+    def sampleElementUpdate(String elementId) {
+        JsonOutput.toJson([
+                id: elementId,
+                bucketName: 'people',
+                fields: [
+                        [
+                                name: 'firstName',
+                                value: 'john'
+                        ],
+                        [
+                                name: 'lastName',
+                                value: 'snow'
                         ]
                 ]
         ])
