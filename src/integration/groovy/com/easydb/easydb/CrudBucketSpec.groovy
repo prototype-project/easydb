@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.test.context.ContextConfiguration
 
 @ContextConfiguration(classes = [SpaceTestConfig])
-class AddElementToBucketSpec extends BaseSpec {
+class CrudBucketSpec extends BaseSpec {
     @Autowired
     Space space
 
@@ -17,13 +17,13 @@ class AddElementToBucketSpec extends BaseSpec {
         space.createBucket('people', ['firstName', 'lastName'])
     }
 
+    def cleanup() {
+        space.removeBucket('people')
+    }
+
     def "should add element to bucket"() {
         when:
-        ResponseEntity<ElementQueryApiDto> response = restTemplate.exchange(
-                localUrl('/api/v1/buckets/people'),
-                HttpMethod.POST,
-                httpJsonEntity(sampleElement()),
-                ElementQueryApiDto.class)
+        ResponseEntity<ElementQueryApiDto> response = addSampleElement()
 
         then:
         response.statusCodeValue == 201
@@ -33,6 +33,32 @@ class AddElementToBucketSpec extends BaseSpec {
 
         and:
         ElementQueryApiDto.from(space.getElement('people', response.body.getId())) == response.body
+    }
+
+    def "should remove element from bucket"() {
+        given:
+        ResponseEntity<ElementQueryApiDto> addElementResponse = addSampleElement()
+
+        when:
+        ResponseEntity deleteElementResponse = restTemplate.exchange(
+                localUrl('/api/v1/buckets/people/' + addElementResponse.body.getId()),
+                HttpMethod.DELETE,
+                null,
+                Void.class)
+
+        then:
+        deleteElementResponse.statusCodeValue == 200
+
+        and:
+        !space.elementExists('people', addElementResponse.body.getId())
+    }
+
+    ResponseEntity<ElementQueryApiDto> addSampleElement() {
+        restTemplate.exchange(
+                localUrl('/api/v1/buckets/people'),
+                HttpMethod.POST,
+                httpJsonEntity(sampleElement()),
+                ElementQueryApiDto.class)
     }
 
     // make is simpler in next sprint

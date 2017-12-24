@@ -37,7 +37,7 @@ class InMemorySpace implements Space {
 
     @Override
     void removeElement(String bucketName, String elementId) {
-
+        elements.get(bucketName).remove(elementId)
     }
 
     @Override
