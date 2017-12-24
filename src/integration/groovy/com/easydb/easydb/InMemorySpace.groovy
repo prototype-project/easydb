@@ -41,7 +41,7 @@ class InMemorySpace implements Space {
 
     @Override
     boolean elementExists(String bucketName, String elementId) {
-        return false
+        return getElement(bucketName, elementId) != null
     }
 
     @Override
@@ -52,8 +52,8 @@ class InMemorySpace implements Space {
     }
 
     @Override
-    List<ElementQueryDto> getAllElements(String name) {
-        return null
+    List<ElementQueryDto> getAllElements(String bucketName) {
+        return elements.get(bucketName).values().toList()
     }
 
     @Override

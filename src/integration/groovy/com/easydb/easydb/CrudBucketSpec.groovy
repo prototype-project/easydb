@@ -9,6 +9,8 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
 import org.springframework.test.context.ContextConfiguration
 
+import java.util.stream.Collectors
+
 @ContextConfiguration(classes = [SpaceTestConfig])
 class CrudBucketSpec extends BaseSpec {
     @Autowired
@@ -72,6 +74,23 @@ class CrudBucketSpec extends BaseSpec {
         ElementQueryDto updatedElement = space.getElement('people', addElementResponse.body.getId())
         updatedElement.getFieldValue('firstName') == 'john'
         updatedElement.getFieldValue('lastName') == 'snow'
+    }
+
+    def "should get all elements from bucket"() {
+        given:
+        ResponseEntity<ElementQueryApiDto> addElementResponse = addSampleElement()
+
+        when:
+        ResponseEntity<List<ElementQueryApiDto>> response = restTemplate.exchange(
+                localUrl('/api/v1/buckets/people'),
+                HttpMethod.GET,
+                null,
+                ElementQueryApiDto[].class)
+
+        then:
+        response.body == space.getAllElements('people').stream()
+                .map({it -> ElementQueryApiDto.from(it)})
+                .collect(Collectors.toList())
     }
 
     ResponseEntity<ElementQueryApiDto> addSampleElement() {

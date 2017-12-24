@@ -5,6 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping(value = "/api/v1")
 class SpaceController {
@@ -59,5 +62,13 @@ class SpaceController {
             @PathVariable("elementId") String elementId,
             @RequestBody ElementOperationApiDto toUpdate) {
         space.updateElement(toUpdate.toUpdateDto());
+    }
+
+    @GetMapping(path = "/buckets/{bucketName}")
+    @ResponseStatus(value = HttpStatus.OK)
+    public List<ElementQueryApiDto> getAllElements(@PathVariable("bucketName") String bucketName) {
+        return space.getAllElements(bucketName).stream()
+                .map(ElementQueryApiDto::from)
+                .collect(Collectors.toList());
     }
 }
