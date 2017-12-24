@@ -66,6 +66,10 @@ class SpaceSpec extends Specification {
         }
     }
 
+    def "should throw error when trying to add element to bucket with invalid fields"() {
+
+    }
+
     def "should remove element from bucket"() {
         given:
         space.createBucket("people", ["firstName", "lastName", "email"])
@@ -105,6 +109,18 @@ class SpaceSpec extends Specification {
 
         then:
         space.getElement("people", createdElement.id).getFieldValue("lastName") == "Snow"
+    }
+
+    def "should throw error when trying to update element in nonexistent bucket"() {
+
+    }
+
+    def "should throw error when trying to update nonexistent element"() {
+
+    }
+
+    def "should throw error when trying update dto does not match bucket definition"() {
+
     }
 
     def "should get element from bucket"() {
