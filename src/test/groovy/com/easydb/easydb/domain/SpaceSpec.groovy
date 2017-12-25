@@ -5,7 +5,7 @@ import spock.lang.Specification
 
 class SpaceSpec extends Specification {
 
-    def space = SpaceConfig.createSpace();
+    def space = SpaceConfig.createSpace()
 
     def "should create bucket"() {
         when:
@@ -139,7 +139,7 @@ class SpaceSpec extends Specification {
         thrown BucketDoesNotExistException
     }
 
-    def "should throw error when trying to update nonexistent element"() {
+    def "should throw exception when trying to update nonexistent element"() {
         given:
         space.createBucket("people")
 
@@ -184,6 +184,14 @@ class SpaceSpec extends Specification {
         }
     }
 
+    def "should throw exception when trying to get element from nonexistent bucket"() {
+
+    }
+
+    def "should throw exception when trying to get nonexistent element"() {
+
+    }
+
     def "should get all elements from bucket"() {
         given:
         space.createBucket("people")
@@ -205,5 +213,13 @@ class SpaceSpec extends Specification {
             id == createdElement.id
             name == createdElement.name
         }
+    }
+
+    def "should throw exception when trying to get elements from nonexistent bucket"() {
+
+    }
+
+    def "should return empty list when getting all elements from empty bucket"() {
+
     }
 }
