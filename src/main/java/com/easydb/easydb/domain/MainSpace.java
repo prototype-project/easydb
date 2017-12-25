@@ -55,6 +55,9 @@ public class MainSpace implements Space {
 
 	@Override
 	public void updateElement(ElementUpdateDto toUpdate) {
+		if (!bucketExists(toUpdate.getBucketName())) {
+			throw new BucketDoesNotExistException(toUpdate.getBucketName());
+		}
 		bucketRepository.updateElement(BucketElement.of(toUpdate));
 	}
 

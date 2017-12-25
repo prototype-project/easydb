@@ -116,14 +116,50 @@ class SpaceSpec extends Specification {
         space.getElement("people", createdElement.id).id == createdElement.id
     }
 
+    def "should throw exception when trying to update element in nonexistent bucket"() {
+        given:
+        space.createBucket("people")
 
+        and:
+        ElementCreateDto elementToCreate = ElementCreateDto.of("people", [
+                ElementFieldDto.of('firstName', 'John'),
+                ElementFieldDto.of('lastName', 'Smith'),
+                ElementFieldDto.of('email', 'john.smith@op.pl')])
 
-    def "should throw error when trying to update element in nonexistent bucket"() {
+        ElementQueryDto createdElement = space.addElement(elementToCreate)
 
+        and:
+        ElementUpdateDto elementToUpdate = ElementUpdateDto.of("nonexistentBucket", createdElement.id,
+                [ElementFieldDto.of('lastName', 'Snow')])
+
+        when:
+        space.updateElement(elementToUpdate)
+
+        then:
+        thrown BucketDoesNotExistException
     }
 
     def "should throw error when trying to update nonexistent element"() {
+        given:
+        space.createBucket("people")
 
+        and:
+        ElementCreateDto elementToCreate = ElementCreateDto.of("people", [
+                ElementFieldDto.of('firstName', 'John'),
+                ElementFieldDto.of('lastName', 'Smith'),
+                ElementFieldDto.of('email', 'john.smith@op.pl')])
+
+        space.addElement(elementToCreate)
+
+        and:
+        ElementUpdateDto elementToUpdate = ElementUpdateDto.of("people", 'nonexistentId',
+                [ElementFieldDto.of('lastName', 'Snow')])
+
+        when:
+        space.updateElement(elementToUpdate)
+
+        then:
+        thrown BucketElementDoesNotExistException
     }
 
     def "should get element from bucket"() {

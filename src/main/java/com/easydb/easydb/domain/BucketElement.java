@@ -2,6 +2,7 @@ package com.easydb.easydb.domain;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class BucketElement {
@@ -19,7 +20,7 @@ public class BucketElement {
 
 	static BucketElement of(ElementCreateDto elementCreateDto) {
 		return new BucketElement(
-				"sda",
+				UUID.randomUUID().toString(),
 				elementCreateDto.getBucketName(),
 				elementCreateDto.getFields().stream().map(BucketElementField::of).collect(Collectors.toList())
 		);
@@ -27,7 +28,7 @@ public class BucketElement {
 
 	public static BucketElement of(ElementUpdateDto elementToUpdate) {
 		return new BucketElement(
-				"sda",
+				elementToUpdate.getElementId(),
 				elementToUpdate.getBucketName(),
 				elementToUpdate.getFields().stream().map(BucketElementField::of).collect(Collectors.toList())
 		);
