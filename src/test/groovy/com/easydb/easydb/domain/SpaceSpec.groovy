@@ -26,7 +26,7 @@ class SpaceSpec extends Specification {
         !space.bucketExists("people")
     }
 
-    def "should throw error when trying to create bucket with non unique name"() {
+    def "should throw exception when trying to create bucket with non unique name"() {
         given:
         space.createBucket("people")
 
@@ -37,7 +37,7 @@ class SpaceSpec extends Specification {
         thrown BucketExistsException
     }
 
-    def "should throw error when trying to remove nonexistent bucket"() {
+    def "should throw exception when trying to remove nonexistent bucket"() {
         when:
         space.removeBucket("people")
 
@@ -84,28 +84,39 @@ class SpaceSpec extends Specification {
         !space.elementExists("people", createdElement.id)
     }
 
+    def "should throw exception when removing nonexistent element"() {
+        when:
+        space.removeElement("people", "notExistingId")
+
+        then:
+        thrown ElementDoesNotExistException
+    }
+
     def "should update element in bucket"() {
         given:
         space.createBucket("people")
 
+        and:
         ElementCreateDto elementToCreate = ElementCreateDto.of("people", [
                 ElementFieldDto.of('firstName', 'John'),
                 ElementFieldDto.of('lastName', 'Smith'),
-                ElementFieldDto.of('email', 'john.smith@op.pl')
-                ])
+                ElementFieldDto.of('email', 'john.smith@op.pl')])
 
         ElementQueryDto createdElement = space.addElement(elementToCreate)
 
+        and:
         ElementUpdateDto elementToUpdate = ElementUpdateDto.of("people", createdElement.id,
-                [ElementFieldDto.of('lastName', 'Snow')]
-        )
+                [ElementFieldDto.of('lastName', 'Snow')])
 
         when:
         space.updateElement(elementToUpdate)
 
         then:
         space.getElement("people", createdElement.id).getFieldValue("lastName") == "Snow"
+        space.getElement("people", createdElement.id).id == createdElement.id
     }
+
+
 
     def "should throw error when trying to update element in nonexistent bucket"() {
 
@@ -158,13 +169,5 @@ class SpaceSpec extends Specification {
             id == createdElement.id
             name == createdElement.name
         }
-    }
-
-    def "should throw error when removing nonexistent element"() {
-        when:
-        space.removeElement("people", "notExistingId")
-
-        then:
-        thrown ElementDoesNotExistException
     }
 }
