@@ -3,7 +3,7 @@ package com.easydb.easydb.domain;
 import java.util.List;
 
 public interface Space {
-    void createBucket(String name, List<String> fields);
+    void createBucket(String name);
 
     boolean bucketExists(String name);
 

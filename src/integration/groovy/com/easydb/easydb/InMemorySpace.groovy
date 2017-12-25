@@ -11,7 +11,7 @@ class InMemorySpace implements Space {
     Map<String, Map<String, ElementQueryDto>> elements = [:]
 
     @Override
-    void createBucket(String name, List<String> fields) {
+    void createBucket(String name) {
         if (bucketExists(name))
             throw new BucketExistsException("Bucket already exists")
         elements.put(name, new HashMap<String, ElementQueryDto>())

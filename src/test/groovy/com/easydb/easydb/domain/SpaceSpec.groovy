@@ -9,7 +9,7 @@ class SpaceSpec extends Specification {
 
     def "should create bucket"() {
         when:
-        space.createBucket("people", ["firstName", "lastName", "email"])
+        space.createBucket("people")
 
         then:
         space.bucketExists("people")
@@ -17,7 +17,7 @@ class SpaceSpec extends Specification {
 
     def "should remove bucket"() {
         given:
-        space.createBucket("people", ["firstName", "lastName", "email"])
+        space.createBucket("people")
 
         when:
         space.removeBucket("people")
@@ -28,10 +28,10 @@ class SpaceSpec extends Specification {
 
     def "should throw error when trying to create bucket with non unique name"() {
         given:
-        space.createBucket("people", ["firstName", "lastName", "email"])
+        space.createBucket("people")
 
         when:
-        space.createBucket("people", ["firstName", "lastName", "email"])
+        space.createBucket("people")
 
         then:
         thrown BucketExistsException
@@ -47,7 +47,7 @@ class SpaceSpec extends Specification {
 
     def "should add element to bucket"() {
         given:
-        space.createBucket("people", ["firstName", "lastName", "email"])
+        space.createBucket("people")
 
         ElementCreateDto elementToCreate = ElementCreateDto.of("people", [
                 ElementFieldDto.of('firstName', 'John'),
@@ -66,13 +66,9 @@ class SpaceSpec extends Specification {
         }
     }
 
-    def "should throw error when trying to add element to bucket with invalid fields"() {
-
-    }
-
     def "should remove element from bucket"() {
         given:
-        space.createBucket("people", ["firstName", "lastName", "email"])
+        space.createBucket("people")
 
         ElementCreateDto elementToCreate = ElementCreateDto.of("people", [
                 ElementFieldDto.of('firstName', 'John'),
@@ -90,7 +86,7 @@ class SpaceSpec extends Specification {
 
     def "should update element in bucket"() {
         given:
-        space.createBucket("people", ["firstName", "lastName", "email"])
+        space.createBucket("people")
 
         ElementCreateDto elementToCreate = ElementCreateDto.of("people", [
                 ElementFieldDto.of('firstName', 'John'),
@@ -119,13 +115,9 @@ class SpaceSpec extends Specification {
 
     }
 
-    def "should throw error when trying update dto does not match bucket definition"() {
-
-    }
-
     def "should get element from bucket"() {
         given:
-        space.createBucket("people", ["firstName", "lastName", "email"])
+        space.createBucket("people")
 
         ElementCreateDto elementToCreate = ElementCreateDto.of("people", [
                 ElementFieldDto.of('firstName', 'John'),
@@ -147,7 +139,7 @@ class SpaceSpec extends Specification {
 
     def "should get all elements from bucket"() {
         given:
-        space.createBucket("people", ["firstName", "lastName", "email"])
+        space.createBucket("people")
 
         ElementCreateDto elementToCreate = ElementCreateDto.of("people", [
                 ElementFieldDto.of('firstName', 'John'),

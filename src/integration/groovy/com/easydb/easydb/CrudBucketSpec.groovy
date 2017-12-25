@@ -17,7 +17,7 @@ class CrudBucketSpec extends BaseSpec {
     Space space
 
     def setup() {
-        space.createBucket('people', ['firstName', 'lastName'])
+        space.createBucket('people')
     }
 
     def cleanup() {

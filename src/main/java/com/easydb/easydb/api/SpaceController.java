@@ -21,7 +21,7 @@ class SpaceController {
     @PostMapping(path = "/buckets")
     public ResponseEntity createBucket(@RequestBody BucketDefinitionDto bucketDefinition) {
         try {
-            space.createBucket(bucketDefinition.getName(), bucketDefinition.getFields());
+            space.createBucket(bucketDefinition.getName());
         } catch (BucketExistsException e) {
             return new ResponseEntity(HttpStatus.BAD_REQUEST);
         }
