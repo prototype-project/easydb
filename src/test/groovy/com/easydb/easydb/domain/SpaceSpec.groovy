@@ -205,7 +205,14 @@ class SpaceSpec extends Specification {
     }
 
     def "should throw exception when trying to get nonexistent element"() {
+        given:
+        space.createBucket("people")
 
+        when:
+        space.getElement("people", "nonexistentId")
+
+        then:
+        thrown BucketElementDoesNotExistException
     }
 
     def "should get all elements from bucket"() {
