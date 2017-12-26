@@ -85,11 +85,14 @@ class SpaceSpec extends Specification {
     }
 
     def "should throw exception when removing nonexistent element"() {
+        given:
+        space.createBucket("people")
+
         when:
         space.removeElement("people", "notExistingId")
 
         then:
-        thrown ElementDoesNotExistException
+        thrown BucketElementDoesNotExistException
     }
 
     def "should update element in bucket"() {
@@ -118,18 +121,7 @@ class SpaceSpec extends Specification {
 
     def "should throw exception when trying to update element in nonexistent bucket"() {
         given:
-        space.createBucket("people")
-
-        and:
-        ElementCreateDto elementToCreate = ElementCreateDto.of("people", [
-                ElementFieldDto.of('firstName', 'John'),
-                ElementFieldDto.of('lastName', 'Smith'),
-                ElementFieldDto.of('email', 'john.smith@op.pl')])
-
-        ElementQueryDto createdElement = space.addElement(elementToCreate)
-
-        and:
-        ElementUpdateDto elementToUpdate = ElementUpdateDto.of("nonexistentBucket", createdElement.id,
+        ElementUpdateDto elementToUpdate = ElementUpdateDto.of("nonexistentBucket", "someId",
                 [ElementFieldDto.of('lastName', 'Snow')])
 
         when:
@@ -142,14 +134,6 @@ class SpaceSpec extends Specification {
     def "should throw exception when trying to update nonexistent element"() {
         given:
         space.createBucket("people")
-
-        and:
-        ElementCreateDto elementToCreate = ElementCreateDto.of("people", [
-                ElementFieldDto.of('firstName', 'John'),
-                ElementFieldDto.of('lastName', 'Smith'),
-                ElementFieldDto.of('email', 'john.smith@op.pl')])
-
-        space.addElement(elementToCreate)
 
         and:
         ElementUpdateDto elementToUpdate = ElementUpdateDto.of("people", 'nonexistentId',
@@ -185,20 +169,8 @@ class SpaceSpec extends Specification {
     }
 
     def "should throw exception when trying to get element from nonexistent bucket"() {
-        given:
-        space.createBucket("people")
-
-        and:
-        ElementCreateDto elementToCreate = ElementCreateDto.of("people", [
-                ElementFieldDto.of('firstName', 'John'),
-                ElementFieldDto.of('lastName', 'Smith'),
-                ElementFieldDto.of('email', 'john.smith@op.pl')
-        ])
-
-        ElementQueryDto createdElement = space.addElement(elementToCreate)
-
         when:
-        space.getElement("nonexistentBucket", createdElement.id)
+        space.getElement("nonexistentBucket", "someId")
 
         then:
         thrown BucketDoesNotExistException

@@ -35,20 +35,12 @@ public class MainSpace implements Space {
 
 	@Override
 	public ElementQueryDto getElement(String bucketName, String id) {
-		if (!bucketExists(bucketName)) {
-			throw new BucketDoesNotExistException(bucketName);
-		}
 		return bucketRepository.getElement(bucketName, id).toQueryDto();
 	}
 
 	@Override
 	public void removeElement(String bucketName, String elementId) {
-		try {
-			bucketRepository.removeElement(bucketName, elementId);
-		}
-		catch (BucketElementDoesNotExistException e) {
-			throw new ElementDoesNotExistException(bucketName, elementId);
-		}
+		bucketRepository.removeElement(bucketName, elementId);
 	}
 
 	@Override
@@ -58,17 +50,11 @@ public class MainSpace implements Space {
 
 	@Override
 	public void updateElement(ElementUpdateDto toUpdate) {
-		if (!bucketExists(toUpdate.getBucketName())) {
-			throw new BucketDoesNotExistException(toUpdate.getBucketName());
-		}
 		bucketRepository.updateElement(BucketElement.of(toUpdate));
 	}
 
 	@Override
 	public List<ElementQueryDto> getAllElements(String name) {
-		if (!bucketExists(name)) {
-			throw new BucketDoesNotExistException(name);
-		}
 		return bucketRepository.getAllElements(name).stream()
 				.map(BucketElement::toQueryDto)
 				.collect(Collectors.toList());

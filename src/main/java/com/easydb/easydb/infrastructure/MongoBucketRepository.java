@@ -10,6 +10,9 @@ import com.easydb.easydb.domain.ElementUpdateDto;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.mongodb.MongoCommandException;
+import org.springframework.data.mongodb.UncategorizedMongoDbException;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 public class MongoBucketRepository implements BucketRepository {
@@ -22,10 +25,11 @@ public class MongoBucketRepository implements BucketRepository {
 
 	@Override
 	public void create(BucketDefinition bucketDefinition) {
-		if (exists(bucketDefinition.getName())) {
+		try {
+			mongoTemplate.createCollection(bucketDefinition.getName());
+		} catch (UncategorizedMongoDbException e) { // TODO make it more specific
 			throw new BucketExistsException(bucketDefinition.getName());
 		}
-		mongoTemplate.createCollection(bucketDefinition.getName());
 	}
 
 	@Override
@@ -49,6 +53,9 @@ public class MongoBucketRepository implements BucketRepository {
 
 	@Override
 	public BucketElement getElement(String bucketName, String id) {
+		if (!exists(bucketName)) {
+			throw new BucketDoesNotExistException(bucketName);
+		}
 		PersistentBucketElement elementFromDb = getPersistentElement(bucketName, id);
 		return Optional.ofNullable(elementFromDb)
 				.map(PersistentBucketElement::toDomainElement)
@@ -84,6 +91,9 @@ public class MongoBucketRepository implements BucketRepository {
 
 	@Override
 	public List<BucketElement> getAllElements(String name) {
+		if (!exists(name)) {
+			throw new BucketDoesNotExistException(name);
+		}
 		return mongoTemplate.findAll(PersistentBucketElement.class, name).stream()
 				.map(PersistentBucketElement::toDomainElement)
 				.collect(Collectors.toList());
