@@ -239,10 +239,21 @@ class SpaceSpec extends Specification {
     }
 
     def "should throw exception when trying to get elements from nonexistent bucket"() {
+        when:
+        space.getAllElements("nonexistentBucket")
 
+        then:
+        thrown BucketDoesNotExistException
     }
 
     def "should return empty list when getting all elements from empty bucket"() {
+        given:
+        space.createBucket("people")
 
+        when:
+        List<ElementQueryDto> elementsFromBucket = space.getAllElements("people")
+
+        then:
+        elementsFromBucket.size() == 0
     }
 }

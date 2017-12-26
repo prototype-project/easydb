@@ -66,6 +66,9 @@ public class MainSpace implements Space {
 
 	@Override
 	public List<ElementQueryDto> getAllElements(String name) {
+		if (!bucketExists(name)) {
+			throw new BucketDoesNotExistException(name);
+		}
 		return bucketRepository.getAllElements(name).stream()
 				.map(BucketElement::toQueryDto)
 				.collect(Collectors.toList());
