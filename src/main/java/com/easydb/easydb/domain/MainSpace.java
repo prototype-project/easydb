@@ -35,6 +35,9 @@ public class MainSpace implements Space {
 
 	@Override
 	public ElementQueryDto getElement(String bucketName, String id) {
+		if (!bucketExists(bucketName)) {
+			throw new BucketDoesNotExistException(bucketName);
+		}
 		return bucketRepository.getElement(bucketName, id).toQueryDto();
 	}
 

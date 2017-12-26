@@ -185,7 +185,23 @@ class SpaceSpec extends Specification {
     }
 
     def "should throw exception when trying to get element from nonexistent bucket"() {
+        given:
+        space.createBucket("people")
 
+        and:
+        ElementCreateDto elementToCreate = ElementCreateDto.of("people", [
+                ElementFieldDto.of('firstName', 'John'),
+                ElementFieldDto.of('lastName', 'Smith'),
+                ElementFieldDto.of('email', 'john.smith@op.pl')
+        ])
+
+        ElementQueryDto createdElement = space.addElement(elementToCreate)
+
+        when:
+        space.getElement("nonexistentBucket", createdElement.id)
+
+        then:
+        thrown BucketDoesNotExistException
     }
 
     def "should throw exception when trying to get nonexistent element"() {
