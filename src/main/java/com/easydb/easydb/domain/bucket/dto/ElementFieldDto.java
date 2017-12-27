@@ -1,4 +1,4 @@
-package com.easydb.easydb.domain;
+package com.easydb.easydb.domain.bucket.dto;
 
 public class ElementFieldDto {
 

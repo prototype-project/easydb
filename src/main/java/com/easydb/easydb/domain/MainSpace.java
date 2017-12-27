@@ -1,5 +1,10 @@
 package com.easydb.easydb.domain;
 
+import com.easydb.easydb.domain.bucket.*;
+import com.easydb.easydb.domain.bucket.dto.ElementCreateDto;
+import com.easydb.easydb.domain.bucket.dto.ElementQueryDto;
+import com.easydb.easydb.domain.bucket.dto.ElementUpdateDto;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,7 +29,7 @@ public class MainSpace implements Space {
 
 	@Override
 	public ElementQueryDto addElement(ElementCreateDto element) {
-		BucketElement created = bucketRepository.insertElement(BucketElement.of(element));
+		Element created = bucketRepository.insertElement(Element.of(element));
 		return created.toQueryDto();
 	}
 
@@ -45,13 +50,13 @@ public class MainSpace implements Space {
 
 	@Override
 	public void updateElement(ElementUpdateDto toUpdate) {
-		bucketRepository.updateElement(BucketElement.of(toUpdate));
+		bucketRepository.updateElement(Element.of(toUpdate));
 	}
 
 	@Override
 	public List<ElementQueryDto> getAllElements(String name) {
 		return bucketRepository.getAllElements(name).stream()
-				.map(BucketElement::toQueryDto)
+				.map(Element::toQueryDto)
 				.collect(Collectors.toList());
 	}
 }

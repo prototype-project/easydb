@@ -1,7 +1,7 @@
 package com.easydb.easydb.api;
 
-import com.easydb.easydb.domain.ElementFieldDto;
-import com.easydb.easydb.domain.ElementQueryDto;
+import com.easydb.easydb.domain.bucket.dto.ElementFieldDto;
+import com.easydb.easydb.domain.bucket.dto.ElementQueryDto;
 import com.google.common.collect.ImmutableList;
 
 import java.util.Collections;

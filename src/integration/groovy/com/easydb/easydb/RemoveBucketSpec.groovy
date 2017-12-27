@@ -1,7 +1,7 @@
 package com.easydb.easydb
 
-import com.easydb.easydb.domain.ElementCreateDto
-import com.easydb.easydb.domain.ElementFieldDto
+import com.easydb.easydb.domain.bucket.dto.ElementCreateDto
+import com.easydb.easydb.domain.bucket.dto.ElementFieldDto
 import com.easydb.easydb.domain.Space
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.client.RestTemplate

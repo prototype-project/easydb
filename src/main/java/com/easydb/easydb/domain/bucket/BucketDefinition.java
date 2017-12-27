@@ -1,4 +1,4 @@
-package com.easydb.easydb.domain;
+package com.easydb.easydb.domain.bucket;
 
 public class BucketDefinition {
 	private final String name;

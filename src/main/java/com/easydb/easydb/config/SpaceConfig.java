@@ -1,6 +1,6 @@
 package com.easydb.easydb.config;
 
-import com.easydb.easydb.domain.BucketRepository;
+import com.easydb.easydb.domain.bucket.BucketRepository;
 import com.easydb.easydb.domain.MainSpace;
 import com.easydb.easydb.infrastructure.MongoBucketRepository;
 import org.springframework.context.annotation.Bean;

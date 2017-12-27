@@ -1,4 +1,4 @@
-package com.easydb.easydb.domain;
+package com.easydb.easydb.domain.bucket.dto;
 
 import com.google.common.collect.ImmutableMap;
 

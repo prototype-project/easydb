@@ -1,4 +1,4 @@
-package com.easydb.easydb.domain;
+package com.easydb.easydb.domain.bucket;
 
 import java.util.List;
 
@@ -8,15 +8,15 @@ public interface BucketRepository {
 
 	void remove(String name);
 
-	BucketElement insertElement(BucketElement element);
+	Element insertElement(Element element);
 
-	BucketElement getElement(String bucketName, String id);
+	Element getElement(String bucketName, String id);
 
 	void removeElement(String bucketName, String id);
 
 	boolean elementExists(String bucketName, String elementId);
 
-	void updateElement(BucketElement toUpdate);
+	void updateElement(Element toUpdate);
 
-	List<BucketElement> getAllElements(String name);
+	List<Element> getAllElements(String name);
 }

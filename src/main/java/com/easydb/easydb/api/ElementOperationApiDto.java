@@ -1,8 +1,8 @@
 package com.easydb.easydb.api;
 
-import com.easydb.easydb.domain.ElementCreateDto;
-import com.easydb.easydb.domain.ElementFieldDto;
-import com.easydb.easydb.domain.ElementUpdateDto;
+import com.easydb.easydb.domain.bucket.dto.ElementCreateDto;
+import com.easydb.easydb.domain.bucket.dto.ElementFieldDto;
+import com.easydb.easydb.domain.bucket.dto.ElementUpdateDto;
 
 import java.util.List;
 import java.util.stream.Collectors;

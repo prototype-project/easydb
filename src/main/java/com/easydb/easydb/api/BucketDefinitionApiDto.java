@@ -2,11 +2,11 @@ package com.easydb.easydb.api;
 
 import java.util.List;
 
-public class BucketDefinitionDto {
+public class BucketDefinitionApiDto {
     private String name;
     private List<String> fields;
 
-    public BucketDefinitionDto() {
+    public BucketDefinitionApiDto() {
     }
 
     public String getName() {

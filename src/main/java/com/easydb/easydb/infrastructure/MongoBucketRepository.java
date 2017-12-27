@@ -1,13 +1,13 @@
 package com.easydb.easydb.infrastructure;
 
-import com.easydb.easydb.domain.*;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.easydb.easydb.domain.bucket.BucketOrElementDoesNotExistException;
+import com.easydb.easydb.domain.bucket.BucketRepository;
+import com.easydb.easydb.domain.bucket.Element;
 import com.mongodb.WriteResult;
-import org.springframework.data.mongodb.UncategorizedMongoDbException;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -32,17 +32,17 @@ public class MongoBucketRepository implements BucketRepository {
 	}
 
 	@Override
-	public BucketElement insertElement(BucketElement element) {
+	public Element insertElement(Element element) {
 		mongoTemplate.insert(PersistentBucketElement.of(element), element.getBucketName());
 		return element;
 	}
 
 	@Override
-	public BucketElement getElement(String bucketName, String id) {
+	public Element getElement(String bucketName, String id) {
 		PersistentBucketElement elementFromDb = getPersistentElement(bucketName, id);
 		return Optional.ofNullable(elementFromDb)
 				.map(PersistentBucketElement::toDomainElement)
-				.orElseThrow(() -> new BucketElementDoesNotExistException(bucketName, id));
+				.orElseThrow(() -> new BucketOrElementDoesNotExistException(bucketName, id));
 	}
 
 	@Override
@@ -56,25 +56,25 @@ public class MongoBucketRepository implements BucketRepository {
 			getElement(bucketName, elementId);
 			return true;
 		}
-		catch (BucketElementDoesNotExistException e) {
+		catch (BucketOrElementDoesNotExistException e) {
 			return false;
 		}
 	}
 
 	@Override
-	public void updateElement(BucketElement toUpdate) {
+	public void updateElement(Element toUpdate) {
 		Query query = new Query();
 		query.addCriteria(Criteria.where("_id").is(toUpdate.getId()));
 		Update update = new Update();
 		update.set("fields", toUpdate.getFields());
 		WriteResult updateResult = mongoTemplate.updateFirst(query, update, toUpdate.getBucketName());
 		if (updateResult.getN() == 0) {
-			throw new BucketElementDoesNotExistException(toUpdate.getBucketName(), toUpdate.getId());
+			throw new BucketOrElementDoesNotExistException(toUpdate.getBucketName(), toUpdate.getId());
 		}
 	}
 
 	@Override
-	public List<BucketElement> getAllElements(String name) {
+	public List<Element> getAllElements(String name) {
 		return mongoTemplate.findAll(PersistentBucketElement.class, name).stream()
 				.map(PersistentBucketElement::toDomainElement)
 				.collect(Collectors.toList());

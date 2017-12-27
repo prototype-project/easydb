@@ -1,5 +1,9 @@
 package com.easydb.easydb.domain;
 
+import com.easydb.easydb.domain.bucket.dto.ElementCreateDto;
+import com.easydb.easydb.domain.bucket.dto.ElementQueryDto;
+import com.easydb.easydb.domain.bucket.dto.ElementUpdateDto;
+
 import java.util.List;
 
 public interface Space {

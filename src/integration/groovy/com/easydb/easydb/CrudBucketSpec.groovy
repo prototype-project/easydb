@@ -1,13 +1,12 @@
 package com.easydb.easydb
 
 import com.easydb.easydb.api.ElementQueryApiDto
-import com.easydb.easydb.domain.ElementQueryDto
+import com.easydb.easydb.domain.bucket.dto.ElementQueryDto
 import com.easydb.easydb.domain.Space
 import groovy.json.JsonOutput
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
-import org.springframework.test.context.ContextConfiguration
 
 import java.util.stream.Collectors
 

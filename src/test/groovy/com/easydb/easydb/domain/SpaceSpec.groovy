@@ -1,5 +1,10 @@
 package com.easydb.easydb.domain
 
+import com.easydb.easydb.domain.bucket.BucketOrElementDoesNotExistException
+import com.easydb.easydb.domain.bucket.dto.ElementCreateDto
+import com.easydb.easydb.domain.bucket.dto.ElementFieldDto
+import com.easydb.easydb.domain.bucket.dto.ElementQueryDto
+import com.easydb.easydb.domain.bucket.dto.ElementUpdateDto
 import spock.lang.Specification
 
 
@@ -85,7 +90,7 @@ class SpaceSpec extends Specification {
         space.updateElement(elementToUpdate)
 
         then:
-        thrown BucketElementDoesNotExistException
+        thrown BucketOrElementDoesNotExistException
     }
 
     def "should throw exception when trying to update nonexistent element"() {
@@ -102,7 +107,7 @@ class SpaceSpec extends Specification {
         space.updateElement(elementToUpdate)
 
         then:
-        thrown BucketElementDoesNotExistException
+        thrown BucketOrElementDoesNotExistException
     }
 
     def "should get element from bucket"() {
@@ -130,7 +135,7 @@ class SpaceSpec extends Specification {
         space.getElement("nonexistentBucket", "someId")
 
         then:
-        thrown BucketElementDoesNotExistException
+        thrown BucketOrElementDoesNotExistException
     }
 
     def "should throw exception when trying to get nonexistent element"() {
@@ -143,7 +148,7 @@ class SpaceSpec extends Specification {
         space.getElement("people", "nonexistentId")
 
         then:
-        thrown BucketElementDoesNotExistException
+        thrown BucketOrElementDoesNotExistException
     }
 
     def "should get all elements from bucket"() {
