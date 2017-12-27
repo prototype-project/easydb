@@ -1,13 +1,11 @@
 package com.easydb.easydb
 
-import groovy.json.JsonOutput
+import com.easydb.easydb.config.SpaceConfig
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.web.client.RestTemplate
 import spock.lang.Specification
@@ -16,7 +14,7 @@ import spock.lang.Specification
         classes = [EasydbApplication],
         properties = "application.environment=integration",
         webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ContextConfiguration
+@ContextConfiguration(classes = [SpaceConfig])
 abstract class BaseSpec extends Specification {
 
     RestTemplate restTemplate = new RestTemplate()
