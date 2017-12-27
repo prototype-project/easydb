@@ -18,6 +18,6 @@ class SpaceTestConfig {
         MongoBucketRepository bucketRepository = new MongoBucketRepository(
                 new MongoTemplate(fongo.getMongo(), SPACE_NAME));
 
-        return new MainSpace(SPACE_NAME, bucketRepository);
+        return new MainSpace(bucketRepository);
     }
 }

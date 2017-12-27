@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 public class SpaceConfig {
     @Bean
     MainSpace space(BucketRepository bucketRepository) {
-        return new MainSpace("someSpace", bucketRepository);
+        return new MainSpace(bucketRepository);
     }
 
     @Bean

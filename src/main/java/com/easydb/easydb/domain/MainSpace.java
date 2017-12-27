@@ -9,11 +9,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class MainSpace implements Space {
-	private final String name;
 	private final BucketRepository bucketRepository;
 
-	public MainSpace(String name, BucketRepository bucketRepository) {
-		this.name = name;
+	public MainSpace(BucketRepository bucketRepository) {
 		this.bucketRepository = bucketRepository;
 	}
 
