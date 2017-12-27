@@ -1,5 +1,6 @@
 package com.easydb.easydb
 
+import com.easydb.easydb.space.SpaceTestConfig
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpEntity

@@ -12,7 +12,7 @@ class PersistentBucketElement {
 
 	@Id
 	private final String id;
-	private final String bucketName;
+	private final String bucketName; // TODO remove it
 	private final List<ElementField> fields;
 
 	private PersistentBucketElement(String id, String bucketName, List<ElementField> fields) {

@@ -1,4 +1,4 @@
-package com.easydb.easydb
+package com.easydb.easydb.space
 
 import com.easydb.easydb.domain.MainSpace
 import com.easydb.easydb.infrastructure.MongoBucketRepository

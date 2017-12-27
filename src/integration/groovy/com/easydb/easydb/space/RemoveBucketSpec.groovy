@@ -1,5 +1,6 @@
-package com.easydb.easydb
+package com.easydb.easydb.space
 
+import com.easydb.easydb.BaseSpec
 import com.easydb.easydb.domain.bucket.dto.ElementCreateDto
 import com.easydb.easydb.domain.bucket.dto.ElementFieldDto
 import com.easydb.easydb.domain.Space
