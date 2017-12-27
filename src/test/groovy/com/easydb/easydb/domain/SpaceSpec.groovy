@@ -5,7 +5,7 @@ import spock.lang.Specification
 
 class SpaceSpec extends Specification {
 
-    def space = SpaceConfig.createSpace()
+    def space = SpaceTestConfig.createSpace()
 
     def "should remove bucket"() {
         given:

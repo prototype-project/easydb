@@ -14,7 +14,7 @@ import spock.lang.Specification
         classes = [EasydbApplication],
         properties = "application.environment=integration",
         webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ContextConfiguration(classes = [SpaceConfig])
+@ContextConfiguration(classes = [SpaceTestConfig])
 abstract class BaseSpec extends Specification {
 
     RestTemplate restTemplate = new RestTemplate()

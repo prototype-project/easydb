@@ -4,7 +4,7 @@ import com.easydb.easydb.infrastructure.MongoBucketRepository;
 import com.github.fakemongo.Fongo;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-class SpaceConfig {
+class SpaceTestConfig {
 	private static final String SPACE_NAME = "testSpace";
 	private static final String SERVER_NAME = "testServer";
 
