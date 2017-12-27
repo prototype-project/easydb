@@ -20,11 +20,7 @@ class SpaceController {
 
     @DeleteMapping(path = "/buckets/{bucketName}")
     public ResponseEntity deleteBucket(@PathVariable("bucketName") String bucketName) {
-        try {
-            space.removeBucket(bucketName);
-        } catch (BucketDoesNotExistException e) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }
+        space.removeBucket(bucketName);
         return new ResponseEntity(HttpStatus.OK);
     }
 
