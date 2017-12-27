@@ -11,14 +11,9 @@ import org.springframework.test.context.ContextConfiguration
 
 import java.util.stream.Collectors
 
-@ContextConfiguration(classes = [SpaceTestConfig])
 class CrudBucketSpec extends BaseSpec {
     @Autowired
     Space space
-
-    def setup() {
-        space.createBucket('people')
-    }
 
     def cleanup() {
         space.removeBucket('people')

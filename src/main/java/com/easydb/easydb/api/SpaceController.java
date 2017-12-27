@@ -18,16 +18,6 @@ class SpaceController {
         this.space = space;
     }
 
-    @PostMapping(path = "/buckets")
-    public ResponseEntity createBucket(@RequestBody BucketDefinitionDto bucketDefinition) {
-        try {
-            space.createBucket(bucketDefinition.getName());
-        } catch (BucketExistsException e) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity(HttpStatus.CREATED);
-    }
-
     @DeleteMapping(path = "/buckets/{bucketName}")
     public ResponseEntity deleteBucket(@PathVariable("bucketName") String bucketName) {
         try {

@@ -1,19 +1,17 @@
 package com.easydb.easydb.infrastructure;
 
-import com.easydb.easydb.domain.BucketDefinition;
-import com.easydb.easydb.domain.BucketDoesNotExistException;
-import com.easydb.easydb.domain.BucketElement;
-import com.easydb.easydb.domain.BucketElementDoesNotExistException;
-import com.easydb.easydb.domain.BucketExistsException;
-import com.easydb.easydb.domain.BucketRepository;
-import com.easydb.easydb.domain.ElementUpdateDto;
+import com.easydb.easydb.domain.*;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.mongodb.MongoCommandException;
+import com.mongodb.WriteResult;
 import org.springframework.data.mongodb.UncategorizedMongoDbException;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 
 public class MongoBucketRepository implements BucketRepository {
 
@@ -24,24 +22,12 @@ public class MongoBucketRepository implements BucketRepository {
 	}
 
 	@Override
-	public void create(BucketDefinition bucketDefinition) {
-		try {
-			mongoTemplate.createCollection(bucketDefinition.getName());
-		} catch (UncategorizedMongoDbException e) { // TODO make it more specific
-			throw new BucketExistsException(bucketDefinition.getName());
-		}
-	}
-
-	@Override
 	public boolean exists(String name) {
 		return mongoTemplate.collectionExists(name);
 	}
 
 	@Override
 	public void remove(String name) {
-		if (!exists(name)) {
-			throw new BucketDoesNotExistException(name);
-		}
 		mongoTemplate.dropCollection(name);
 	}
 
@@ -53,9 +39,6 @@ public class MongoBucketRepository implements BucketRepository {
 
 	@Override
 	public BucketElement getElement(String bucketName, String id) {
-		if (!exists(bucketName)) {
-			throw new BucketDoesNotExistException(bucketName);
-		}
 		PersistentBucketElement elementFromDb = getPersistentElement(bucketName, id);
 		return Optional.ofNullable(elementFromDb)
 				.map(PersistentBucketElement::toDomainElement)
@@ -64,9 +47,6 @@ public class MongoBucketRepository implements BucketRepository {
 
 	@Override
 	public void removeElement(String bucketName, String id) {
-		if (!elementExists(bucketName, id)) {
-			throw new BucketElementDoesNotExistException(bucketName, id);
-		}
 		mongoTemplate.remove(getPersistentElement(bucketName, id), bucketName);
 	}
 
@@ -83,17 +63,18 @@ public class MongoBucketRepository implements BucketRepository {
 
 	@Override
 	public void updateElement(BucketElement toUpdate) {
-		if (!elementExists(toUpdate.getBucketName(), toUpdate.getId())) {
+		Query query = new Query();
+		query.addCriteria(Criteria.where("_id").is(toUpdate.getId()));
+		Update update = new Update();
+		update.set("fields", toUpdate.getFields());
+		WriteResult updateResult = mongoTemplate.updateFirst(query, update, toUpdate.getBucketName());
+		if (updateResult.getN() == 0) {
 			throw new BucketElementDoesNotExistException(toUpdate.getBucketName(), toUpdate.getId());
 		}
-		mongoTemplate.save(PersistentBucketElement.of(toUpdate), toUpdate.getBucketName());
 	}
 
 	@Override
 	public List<BucketElement> getAllElements(String name) {
-		if (!exists(name)) {
-			throw new BucketDoesNotExistException(name);
-		}
 		return mongoTemplate.findAll(PersistentBucketElement.class, name).stream()
 				.map(PersistentBucketElement::toDomainElement)
 				.collect(Collectors.toList());
@@ -102,5 +83,4 @@ public class MongoBucketRepository implements BucketRepository {
 	private PersistentBucketElement getPersistentElement(String bucketName, String id) {
 		return mongoTemplate.findById(id, PersistentBucketElement.class, bucketName);
 	}
-
 }

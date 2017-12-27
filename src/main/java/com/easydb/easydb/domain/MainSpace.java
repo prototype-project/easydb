@@ -13,11 +13,6 @@ public class MainSpace implements Space {
 	}
 
 	@Override
-	public void createBucket(String name) {
-		bucketRepository.create(BucketDefinition.of(name));
-	}
-
-	@Override
 	public boolean bucketExists(String name) {
 		return bucketRepository.exists(name);
 	}

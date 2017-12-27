@@ -15,5 +15,4 @@ class SpaceConfig {
 
 		return new MainSpace(SPACE_NAME, bucketRepository);
 	}
-
 }

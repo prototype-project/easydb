@@ -37,18 +37,4 @@ abstract class BaseSpec extends Specification {
     HttpEntity httpJsonEntity(String jsonBody) {
         new HttpEntity<String>(jsonBody, headers())
     }
-
-    String sampleBucketDefinition() {
-        JsonOutput.toJson([
-                name: 'testBucket',
-                fields: ['field1', 'field2']
-        ])
-    }
-    ResponseEntity sampleBucket() {
-        restTemplate.exchange(
-                localUrl('/api/v1/buckets'),
-                HttpMethod.POST,
-                httpJsonEntity(sampleBucketDefinition()),
-                Void.class)
-    }
 }

@@ -4,8 +4,6 @@ import java.util.List;
 
 public interface BucketRepository {
 
-	void create(BucketDefinition bucketDefinition);
-
 	boolean exists(String name);
 
 	void remove(String name);

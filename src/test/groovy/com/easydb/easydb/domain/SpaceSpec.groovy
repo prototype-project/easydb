@@ -7,17 +7,11 @@ class SpaceSpec extends Specification {
 
     def space = SpaceConfig.createSpace()
 
-    def "should create bucket"() {
-        when:
-        space.createBucket("people")
-
-        then:
-        space.bucketExists("people")
-    }
-
     def "should remove bucket"() {
         given:
-        space.createBucket("people")
+        space.addElement(ElementCreateDto.of("people", [
+                ElementFieldDto.of("firstName", "John")
+        ]))
 
         when:
         space.removeBucket("people")
@@ -26,29 +20,8 @@ class SpaceSpec extends Specification {
         !space.bucketExists("people")
     }
 
-    def "should throw exception when trying to create bucket with non unique name"() {
-        given:
-        space.createBucket("people")
-
-        when:
-        space.createBucket("people")
-
-        then:
-        thrown BucketExistsException
-    }
-
-    def "should throw exception when trying to remove nonexistent bucket"() {
-        when:
-        space.removeBucket("people")
-
-        then:
-        thrown BucketDoesNotExistException
-    }
-
     def "should add element to bucket"() {
         given:
-        space.createBucket("people")
-
         ElementCreateDto elementToCreate = ElementCreateDto.of("people", [
                 ElementFieldDto.of('firstName', 'John'),
                 ElementFieldDto.of('lastName', 'Smith'),
@@ -68,8 +41,6 @@ class SpaceSpec extends Specification {
 
     def "should remove element from bucket"() {
         given:
-        space.createBucket("people")
-
         ElementCreateDto elementToCreate = ElementCreateDto.of("people", [
                 ElementFieldDto.of('firstName', 'John'),
                 ElementFieldDto.of('lastName', 'Smith'),
@@ -84,22 +55,8 @@ class SpaceSpec extends Specification {
         !space.elementExists("people", createdElement.id)
     }
 
-    def "should throw exception when removing nonexistent element"() {
-        given:
-        space.createBucket("people")
-
-        when:
-        space.removeElement("people", "notExistingId")
-
-        then:
-        thrown BucketElementDoesNotExistException
-    }
-
     def "should update element in bucket"() {
         given:
-        space.createBucket("people")
-
-        and:
         ElementCreateDto elementToCreate = ElementCreateDto.of("people", [
                 ElementFieldDto.of('firstName', 'John'),
                 ElementFieldDto.of('lastName', 'Smith'),
@@ -128,16 +85,18 @@ class SpaceSpec extends Specification {
         space.updateElement(elementToUpdate)
 
         then:
-        thrown BucketDoesNotExistException
+        thrown BucketElementDoesNotExistException
     }
 
     def "should throw exception when trying to update nonexistent element"() {
         given:
-        space.createBucket("people")
+        space.addElement(ElementCreateDto.of("people", [
+                ElementFieldDto.of("firstName", "John")
+        ]))
 
         and:
         ElementUpdateDto elementToUpdate = ElementUpdateDto.of("people", 'nonexistentId',
-                [ElementFieldDto.of('lastName', 'Snow')])
+                [ElementFieldDto.of('firstName', 'Snow')])
 
         when:
         space.updateElement(elementToUpdate)
@@ -148,8 +107,6 @@ class SpaceSpec extends Specification {
 
     def "should get element from bucket"() {
         given:
-        space.createBucket("people")
-
         ElementCreateDto elementToCreate = ElementCreateDto.of("people", [
                 ElementFieldDto.of('firstName', 'John'),
                 ElementFieldDto.of('lastName', 'Smith'),
@@ -173,12 +130,14 @@ class SpaceSpec extends Specification {
         space.getElement("nonexistentBucket", "someId")
 
         then:
-        thrown BucketDoesNotExistException
+        thrown BucketElementDoesNotExistException
     }
 
     def "should throw exception when trying to get nonexistent element"() {
         given:
-        space.createBucket("people")
+        space.addElement(ElementCreateDto.of("people", [
+                ElementFieldDto.of("firstName", "John")
+        ]))
 
         when:
         space.getElement("people", "nonexistentId")
@@ -189,8 +148,6 @@ class SpaceSpec extends Specification {
 
     def "should get all elements from bucket"() {
         given:
-        space.createBucket("people")
-
         ElementCreateDto elementToCreate = ElementCreateDto.of("people", [
                 ElementFieldDto.of('firstName', 'John'),
                 ElementFieldDto.of('lastName', 'Smith'),
@@ -210,17 +167,22 @@ class SpaceSpec extends Specification {
         }
     }
 
-    def "should throw exception when trying to get elements from nonexistent bucket"() {
+    def "should return empty list when trying to get elements from nonexistent bucket"() {
         when:
-        space.getAllElements("nonexistentBucket")
+        List<ElementQueryDto> elementsFromBucket = space.getAllElements("people")
 
         then:
-        thrown BucketDoesNotExistException
+        elementsFromBucket.size() == 0
     }
 
     def "should return empty list when getting all elements from empty bucket"() {
         given:
-        space.createBucket("people")
+        ElementQueryDto addedElement = space.addElement(ElementCreateDto.of("people", [
+                ElementFieldDto.of("firstName", "John")
+        ]))
+
+        and:
+        space.removeElement("people", addedElement.getId())
 
         when:
         List<ElementQueryDto> elementsFromBucket = space.getAllElements("people")
