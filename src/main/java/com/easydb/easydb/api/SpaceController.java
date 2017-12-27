@@ -13,30 +13,30 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/api/v1")
 class SpaceController {
 
-    Space space;
+    private Space space;
 
-    SpaceController(Space space) {
+    private SpaceController(Space space) {
         this.space = space;
     }
 
     @DeleteMapping(path = "/buckets/{bucketName}")
-    public ResponseEntity deleteBucket(@PathVariable("bucketName") String bucketName) {
+    ResponseEntity deleteBucket(@PathVariable("bucketName") String bucketName) {
         space.removeBucket(bucketName);
         return new ResponseEntity(HttpStatus.OK);
     }
 
     @PostMapping(path = "/buckets/{bucketName}")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public ElementQueryApiDto addElement(
+    ElementQueryApiDto addElement(
             @PathVariable("bucketName") String bucketName,
             @RequestBody ElementOperationApiDto toCreate) {
-        ElementQueryDto createdElement = space.addElement(toCreate.toCreateDto());
+        ElementQueryDto createdElement = space.addElement(toCreate.toCreateDto(bucketName));
         return ElementQueryApiDto.from(createdElement);
     }
 
     @DeleteMapping(path = "/buckets/{bucketName}/{elementId}")
     @ResponseStatus(value = HttpStatus.OK)
-    public void deleteElement(
+    void deleteElement(
             @PathVariable("bucketName") String bucketName,
             @PathVariable("elementId") String elementId) {
         space.removeElement(bucketName, elementId);
@@ -44,16 +44,16 @@ class SpaceController {
 
     @PutMapping(path = "/buckets/{bucketName}/{elementId}")
     @ResponseStatus(value = HttpStatus.OK)
-    public void updateElement(
+    void updateElement(
             @PathVariable("bucketName") String bucketName,
             @PathVariable("elementId") String elementId,
             @RequestBody ElementOperationApiDto toUpdate) {
-        space.updateElement(toUpdate.toUpdateDto());
+        space.updateElement(toUpdate.toUpdateDto(bucketName, elementId));
     }
 
     @GetMapping(path = "/buckets/{bucketName}")
     @ResponseStatus(value = HttpStatus.OK)
-    public List<ElementQueryApiDto> getAllElements(@PathVariable("bucketName") String bucketName) {
+    List<ElementQueryApiDto> getAllElements(@PathVariable("bucketName") String bucketName) {
         return space.getAllElements(bucketName).stream()
                 .map(ElementQueryApiDto::from)
                 .collect(Collectors.toList());
@@ -61,7 +61,7 @@ class SpaceController {
 
     @GetMapping(path = "/buckets/{bucketName}/{elementId}")
     @ResponseStatus(value = HttpStatus.OK)
-    public ElementQueryApiDto getElement(
+    ElementQueryApiDto getElement(
             @PathVariable("bucketName") String bucketName,
             @PathVariable("elementId") String elementId) {
         return ElementQueryApiDto.from(space.getElement(bucketName, elementId));

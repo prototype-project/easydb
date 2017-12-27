@@ -59,7 +59,7 @@ class CrudBucketSpec extends BaseSpec {
         ResponseEntity response = restTemplate.exchange(
                 localUrl('/api/v1/buckets/people/' + addElementResponse.body.getId()),
                 HttpMethod.PUT,
-                httpJsonEntity(sampleElementUpdate(addElementResponse.body.getId())),
+                httpJsonEntity(sampleElementUpdate()),
                 Void.class)
 
         then:
@@ -108,7 +108,7 @@ class CrudBucketSpec extends BaseSpec {
         restTemplate.exchange(
                 localUrl('/api/v1/buckets/people/' + 'someId'),
                 HttpMethod.PUT,
-                httpJsonEntity(sampleElementUpdate('someId')),
+                httpJsonEntity(sampleElementUpdate()),
                 Void.class)
 
         then:
@@ -126,7 +126,7 @@ class CrudBucketSpec extends BaseSpec {
         restTemplate.exchange(
                 localUrl('/api/v1/buckets/people/' + 'nonexistentId'),
                 HttpMethod.PUT,
-                httpJsonEntity(sampleElementUpdate('nonexistentId')),
+                httpJsonEntity(sampleElementUpdate()),
                 Void.class)
 
         then:
@@ -180,7 +180,6 @@ class CrudBucketSpec extends BaseSpec {
     // make is simpler in next sprint
     def sampleElement() {
         JsonOutput.toJson([
-                bucketName: 'people',
                 fields: [
                         [
                                 name: 'firstName',
@@ -194,10 +193,8 @@ class CrudBucketSpec extends BaseSpec {
         ])
     }
 
-    def sampleElementUpdate(String elementId) {
+    def sampleElementUpdate() {
         JsonOutput.toJson([
-                id: elementId,
-                bucketName: 'people',
                 fields: [
                         [
                                 name: 'firstName',
