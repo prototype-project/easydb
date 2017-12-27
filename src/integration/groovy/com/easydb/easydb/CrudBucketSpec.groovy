@@ -7,6 +7,7 @@ import groovy.json.JsonOutput
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
+import org.springframework.web.client.HttpClientErrorException
 
 import java.util.stream.Collectors
 
@@ -100,6 +101,72 @@ class CrudBucketSpec extends BaseSpec {
 
         then:
         addElementResponse.body == getElementResponse.body
+    }
+
+    def "should return 404 when trying to update element in nonexistent bucket"() {
+        when:
+        restTemplate.exchange(
+                localUrl('/api/v1/buckets/people/' + 'someId'),
+                HttpMethod.PUT,
+                httpJsonEntity(sampleElementUpdate('someId')),
+                Void.class)
+
+        then:
+        HttpClientErrorException ex = thrown()
+
+        and:
+        ex.rawStatusCode == 404
+    }
+
+    def "should return 404 when trying to update nonexistent element"() {
+        given:
+        addSampleElement()
+
+        when:
+        restTemplate.exchange(
+                localUrl('/api/v1/buckets/people/' + 'nonexistentId'),
+                HttpMethod.PUT,
+                httpJsonEntity(sampleElementUpdate('nonexistentId')),
+                Void.class)
+
+        then:
+        HttpClientErrorException ex = thrown()
+
+        and:
+        ex.rawStatusCode == 404
+    }
+
+    def "should return 404 when trying to get element from nonexistent bucket"() {
+        when:
+        restTemplate.exchange(
+                localUrl('/api/v1/buckets/people/' + 'someId'),
+                HttpMethod.GET,
+                null,
+                ElementQueryApiDto.class)
+
+        then:
+        HttpClientErrorException ex = thrown()
+
+        and:
+        ex.rawStatusCode == 404
+    }
+
+    def "should return 404 when trying to get nonexistent element"() {
+        given:
+        addSampleElement()
+
+        when:
+        restTemplate.exchange(
+                localUrl('/api/v1/buckets/people/' + 'nonexistentId'),
+                HttpMethod.GET,
+                null,
+                ElementQueryApiDto.class)
+
+        then:
+        HttpClientErrorException ex = thrown()
+
+        and:
+        ex.rawStatusCode == 404
     }
 
     ResponseEntity<ElementQueryApiDto> addSampleElement() {
