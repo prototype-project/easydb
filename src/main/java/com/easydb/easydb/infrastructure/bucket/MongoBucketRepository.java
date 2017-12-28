@@ -1,4 +1,4 @@
-package com.easydb.easydb.infrastructure;
+package com.easydb.easydb.infrastructure.bucket;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,7 +41,7 @@ public class MongoBucketRepository implements BucketRepository {
 	public Element getElement(String bucketName, String id) {
 		PersistentBucketElement elementFromDb = getPersistentElement(bucketName, id);
 		return Optional.ofNullable(elementFromDb)
-				.map(PersistentBucketElement::toDomainElement)
+				.map(it -> it.toDomainElement(bucketName))
 				.orElseThrow(() -> new BucketOrElementDoesNotExistException(bucketName, id));
 	}
 
@@ -74,9 +74,9 @@ public class MongoBucketRepository implements BucketRepository {
 	}
 
 	@Override
-	public List<Element> getAllElements(String name) {
-		return mongoTemplate.findAll(PersistentBucketElement.class, name).stream()
-				.map(PersistentBucketElement::toDomainElement)
+	public List<Element> getAllElements(String bucketName) {
+		return mongoTemplate.findAll(PersistentBucketElement.class, bucketName).stream()
+				.map(it -> it.toDomainElement(bucketName))
 				.collect(Collectors.toList());
 	}
 

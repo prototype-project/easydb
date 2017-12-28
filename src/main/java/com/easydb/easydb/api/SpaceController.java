@@ -3,7 +3,6 @@ package com.easydb.easydb.api;
 import com.easydb.easydb.domain.*;
 import com.easydb.easydb.domain.bucket.dto.ElementQueryDto;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,9 +19,9 @@ class SpaceController {
     }
 
     @DeleteMapping(path = "/buckets/{bucketName}")
-    ResponseEntity deleteBucket(@PathVariable("bucketName") String bucketName) {
+    @ResponseStatus(value = HttpStatus.OK)
+    void deleteBucket(@PathVariable("bucketName") String bucketName) {
         space.removeBucket(bucketName);
-        return new ResponseEntity(HttpStatus.OK);
     }
 
     @PostMapping(path = "/buckets/{bucketName}")

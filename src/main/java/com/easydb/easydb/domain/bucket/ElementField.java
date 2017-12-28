@@ -24,7 +24,7 @@ public class ElementField {
 		return value;
 	}
 
-	public ElementFieldDto toDto() {
+	ElementFieldDto toDto() {
 		return ElementFieldDto.of(name, value);
 	}
 }

@@ -13,7 +13,6 @@ public class Element {
 
 	private final String id;
 	private final String bucketName;
-
 	private final List<ElementField> fields;
 
 	private Element(String id, String bucketName, List<ElementField> fields) {
@@ -22,9 +21,9 @@ public class Element {
 		this.fields = ImmutableList.copyOf(fields);
 	}
 
-	public static Element of(ElementCreateDto elementCreateDto) {
+	public static Element of(String id, ElementCreateDto elementCreateDto) {
 		return new Element(
-				UUID.randomUUID().toString(),
+				id,
 				elementCreateDto.getBucketName(),
 				elementCreateDto.getFields().stream().map(ElementField::of).collect(Collectors.toList())
 		);

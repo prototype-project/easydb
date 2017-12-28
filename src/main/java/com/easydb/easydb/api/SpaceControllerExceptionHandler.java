@@ -12,6 +12,6 @@ public class SpaceControllerExceptionHandler extends ResponseEntityExceptionHand
 
     @ExceptionHandler(value = {BucketOrElementDoesNotExistException.class})
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    protected void handleBucketOrElementDoesNotExistException() {
+    void handleBucketOrElementDoesNotExistException() {
     }
 }

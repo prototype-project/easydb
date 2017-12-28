@@ -1,6 +1,6 @@
 package com.easydb.easydb.domain;
 
-import com.easydb.easydb.infrastructure.MongoBucketRepository;
+import com.easydb.easydb.infrastructure.bucket.MongoBucketRepository;
 import com.github.fakemongo.Fongo;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
@@ -13,6 +13,8 @@ class SpaceTestConfig {
 		MongoBucketRepository bucketRepository = new MongoBucketRepository(
 				new MongoTemplate(fongo.getMongo(), SPACE_NAME));
 
-		return new MainSpace(bucketRepository);
+		UUIDProvider uuidProvider = new UUIDProvider();
+
+		return new MainSpace(bucketRepository, uuidProvider);
 	}
 }

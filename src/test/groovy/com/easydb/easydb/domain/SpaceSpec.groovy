@@ -40,7 +40,7 @@ class SpaceSpec extends Specification {
         ElementQueryDto fromDb = space.getElement("people", createdElement.getId())
         with(fromDb) {
             id == createdElement.id
-            name == createdElement.name
+            bucketName == createdElement.bucketName
         }
     }
 
@@ -126,7 +126,7 @@ class SpaceSpec extends Specification {
         then:
         with(elementFromBucket) {
             id == createdElement.id
-            name == createdElement.name
+            bucketName == createdElement.bucketName
         }
     }
 
@@ -168,7 +168,7 @@ class SpaceSpec extends Specification {
         elementsFromBucket.size() == 1
         with(elementsFromBucket[0]) {
             id == createdElement.id
-            name == createdElement.name
+            bucketName == createdElement.bucketName
         }
     }
 

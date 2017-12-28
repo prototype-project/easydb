@@ -10,9 +10,11 @@ import java.util.stream.Collectors;
 
 public class MainSpace implements Space {
 	private final BucketRepository bucketRepository;
+	private final UUIDProvider uuidProvider;
 
-	public MainSpace(BucketRepository bucketRepository) {
+	public MainSpace(BucketRepository bucketRepository, UUIDProvider uuidProvider) {
 		this.bucketRepository = bucketRepository;
+		this.uuidProvider = uuidProvider;
 	}
 
 	@Override
@@ -27,7 +29,7 @@ public class MainSpace implements Space {
 
 	@Override
 	public ElementQueryDto addElement(ElementCreateDto element) {
-		Element created = bucketRepository.insertElement(Element.of(element));
+		Element created = bucketRepository.insertElement(Element.of(uuidProvider.generateUUID(), element));
 		return created.toQueryDto();
 	}
 

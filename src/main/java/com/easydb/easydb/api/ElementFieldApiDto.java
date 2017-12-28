@@ -1,32 +1,28 @@
 package com.easydb.easydb.api;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 
 public class ElementFieldApiDto implements Comparable<ElementFieldApiDto> {
-    private String name;
-    private String value;
+    private final String name;
+    private final String value;
 
-    public ElementFieldApiDto(String name, String value) {
+    @JsonCreator
+    ElementFieldApiDto(
+            @JsonProperty("name") String name,
+            @JsonProperty("value") String value) {
         this.name = name;
         this.value = value;
     }
-
-    public ElementFieldApiDto() {}
 
     public String getName() {
         return name;
     }
 
+
     public String getValue() {
         return value;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
     }
 
     @Override

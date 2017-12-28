@@ -2,6 +2,8 @@ package com.easydb.easydb.api;
 
 import com.easydb.easydb.domain.bucket.dto.ElementFieldDto;
 import com.easydb.easydb.domain.bucket.dto.ElementQueryDto;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 
 import java.util.Collections;
@@ -14,39 +16,27 @@ public class ElementQueryApiDto {
     private String bucketName;
     private List<ElementFieldApiDto> fields;
 
-    public ElementQueryApiDto(String id, String bucketName, List<ElementFieldApiDto> fields) {
+    @JsonCreator
+    private ElementQueryApiDto(
+            @JsonProperty("id") String id,
+            @JsonProperty("bucketName") String bucketName,
+            @JsonProperty("fields") List<ElementFieldApiDto> fields) {
         this.id = id;
         this.bucketName = bucketName;
-        this.fields = fields;
-        Collections.sort(this.fields);
-        this.fields = ImmutableList.copyOf(this.fields);
-    }
-
-    public ElementQueryApiDto() {
+        Collections.sort(fields);
+        this.fields = ImmutableList.copyOf(fields);
     }
 
     public String getBucketName() {
         return bucketName;
     }
 
-    public void setBucketName(String bucketName) {
-        this.bucketName = bucketName;
-    }
-
     public List<ElementFieldApiDto> getFields() {
         return fields;
     }
 
-    public void setFields(List<ElementFieldApiDto> fields) {
-        this.fields = fields;
-    }
-
     public String getId() {
         return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public static ElementQueryApiDto from(ElementQueryDto elementQueryDto) {
@@ -55,7 +45,7 @@ public class ElementQueryApiDto {
                 .map(it -> new ElementFieldApiDto(it.getName(), it.getValue()))
                 .collect(Collectors.toList());
         return new ElementQueryApiDto(elementQueryDto.getId(),
-                elementQueryDto.getName(), apiFields);
+                elementQueryDto.getBucketName(), apiFields);
     }
 
     @Override

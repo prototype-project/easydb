@@ -9,12 +9,12 @@ import java.util.stream.Collectors;
 
 public class ElementQueryDto {
     private final String id;
-    private final String name;
+    private final String bucketName;
     private final Map<String, ElementFieldDto> fieldsAsMap;
 
-    private ElementQueryDto(String id, String name, List<ElementFieldDto> fields) {
+    private ElementQueryDto(String id, String bucketName, List<ElementFieldDto> fields) {
         this.id = id;
-        this.name = name;
+        this.bucketName = bucketName;
         this.fieldsAsMap = ImmutableMap.copyOf(fields.stream().collect(
                 Collectors.toMap(ElementFieldDto::getName, it -> it)));
     }
@@ -27,8 +27,8 @@ public class ElementQueryDto {
         return id;
     }
 
-    public String getName() {
-        return name;
+    public String getBucketName() {
+        return bucketName;
     }
 
     public String getFieldValue(String fieldName) {
