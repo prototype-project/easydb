@@ -4,7 +4,6 @@ import com.easydb.easydb.domain.MainSpace
 import com.easydb.easydb.domain.UUIDProvider
 import com.easydb.easydb.infrastructure.bucket.MongoBucketRepository
 import com.github.fakemongo.Fongo
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.data.mongodb.core.MongoTemplate
