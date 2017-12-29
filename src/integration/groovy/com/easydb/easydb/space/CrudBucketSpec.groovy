@@ -13,6 +13,7 @@ import org.springframework.web.client.HttpClientErrorException
 import java.util.stream.Collectors
 
 class CrudBucketSpec extends BaseSpec {
+
     @Autowired
     Space space
 
