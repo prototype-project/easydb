@@ -23,7 +23,7 @@ public class SpaceConfig {
     }
 
     @Bean
-    MongoBucketRepository bucketRepository(Mongo mongo, @Value("${space.name}") String spaceName) {
-        return new MongoBucketRepository(new MongoTemplate(mongo, spaceName));
+    MongoBucketRepository bucketRepository(MongoTemplate mongoTemplate) {
+        return new MongoBucketRepository(mongoTemplate);
     }
 }
