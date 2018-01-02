@@ -12,6 +12,10 @@ class SpaceSpec extends Specification {
 
     def space = SpaceTestConfig.createSpace()
 
+    def cleanup() {
+        space.removeBucket("people")
+    }
+
     def "should remove bucket"() {
         given:
         space.addElement(ElementCreateDto.of("people", [

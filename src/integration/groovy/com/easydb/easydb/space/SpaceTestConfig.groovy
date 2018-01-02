@@ -1,7 +1,7 @@
 package com.easydb.easydb.space
 
-import com.easydb.easydb.domain.MainSpace
-import com.easydb.easydb.domain.UUIDProvider
+import com.easydb.easydb.infrastructure.space.MainSpace
+import com.easydb.easydb.infrastructure.space.UUIDProvider
 import com.easydb.easydb.infrastructure.bucket.MongoBucketRepository
 import com.github.fakemongo.Fongo
 import com.mongodb.Mongo
@@ -31,7 +31,7 @@ class SpaceTestConfig {
                 new MongoTemplate(mongo, SPACE_NAME))
         UUIDProvider uuidProvider = new UUIDProvider();
 
-        return new MainSpace(bucketRepository, uuidProvider);
+        return new MainSpace("spaceName", bucketRepository, uuidProvider);
     }
 
     @Bean

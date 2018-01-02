@@ -1,7 +1,7 @@
 package com.easydb.easydb.api;
 
-import com.easydb.easydb.domain.*;
 import com.easydb.easydb.domain.bucket.dto.ElementQueryDto;
+import com.easydb.easydb.domain.space.Space;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 

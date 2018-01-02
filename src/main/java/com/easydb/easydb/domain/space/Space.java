@@ -1,4 +1,4 @@
-package com.easydb.easydb.domain;
+package com.easydb.easydb.domain.space;
 
 import com.easydb.easydb.domain.bucket.dto.ElementCreateDto;
 import com.easydb.easydb.domain.bucket.dto.ElementQueryDto;

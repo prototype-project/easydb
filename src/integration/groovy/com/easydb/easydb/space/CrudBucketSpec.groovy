@@ -3,7 +3,7 @@ package com.easydb.easydb.space
 import com.easydb.easydb.BaseSpec
 import com.easydb.easydb.api.ElementQueryApiDto
 import com.easydb.easydb.domain.bucket.dto.ElementQueryDto
-import com.easydb.easydb.domain.Space
+import com.easydb.easydb.domain.space.Space
 import groovy.json.JsonOutput
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod

@@ -3,7 +3,7 @@ package com.easydb.easydb.space
 import com.easydb.easydb.BaseSpec
 import com.easydb.easydb.domain.bucket.dto.ElementCreateDto
 import com.easydb.easydb.domain.bucket.dto.ElementFieldDto
-import com.easydb.easydb.domain.Space
+import com.easydb.easydb.domain.space.Space
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.client.RestTemplate
 

@@ -1,5 +1,6 @@
-package com.easydb.easydb.domain;
+package com.easydb.easydb.infrastructure.space;
 
+import com.easydb.easydb.domain.space.Space;
 import com.easydb.easydb.domain.bucket.*;
 import com.easydb.easydb.domain.bucket.dto.ElementCreateDto;
 import com.easydb.easydb.domain.bucket.dto.ElementQueryDto;
@@ -9,10 +10,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class MainSpace implements Space {
+	private final String name;
 	private final BucketRepository bucketRepository;
 	private final UUIDProvider uuidProvider;
 
-	public MainSpace(BucketRepository bucketRepository, UUIDProvider uuidProvider) {
+	public MainSpace(
+			String name,
+			BucketRepository bucketRepository,
+			UUIDProvider uuidProvider) {
+		this.name = name;
 		this.bucketRepository = bucketRepository;
 		this.uuidProvider = uuidProvider;
 	}
