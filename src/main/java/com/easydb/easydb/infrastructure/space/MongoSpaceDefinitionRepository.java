@@ -16,6 +16,9 @@ public class MongoSpaceDefinitionRepository implements SpaceDefinitionRepository
 
     @Override
     public SpaceDefinition save(SpaceDefinitionCreateDto toSave) {
+        if (exists(toSave.getSpaceName())) {
+            throw new SpaceNameNotUniqueException();
+        }
         mongoTemplate.insert(PersistentSpaceDefinition.of(toSave), SPACE_COLLECTION_NAME);
         return SpaceDefinition.of(toSave.getSpaceName());
     }
