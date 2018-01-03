@@ -15,12 +15,12 @@ public class MongoSpaceDefinitionRepository implements SpaceDefinitionRepository
     }
 
     @Override
-    public SpaceDefinition save(SpaceDefinitionCreateDto toSave) {
+    public SpaceDefinitionQueryDto save(SpaceDefinitionCreateDto toSave) {
         if (exists(toSave.getSpaceName())) {
             throw new SpaceNameNotUniqueException();
         }
         mongoTemplate.insert(PersistentSpaceDefinition.of(toSave), SPACE_COLLECTION_NAME);
-        return SpaceDefinition.of(toSave.getSpaceName());
+        return SpaceDefinitionQueryDto.of(toSave.getSpaceName());
     }
 
     @Override
@@ -39,6 +39,11 @@ public class MongoSpaceDefinitionRepository implements SpaceDefinitionRepository
         return Optional.ofNullable(persistentSpaceDefinition)
                 .map(it -> SpaceDefinitionQueryDto.of(it.toDomain()))
                 .orElseThrow(() -> new SpaceDoesNotExist(spaceName));
+    }
+
+    @Override
+    public void remove(String spaceName) {
+        mongoTemplate.remove(getPersistentElement(spaceName), SPACE_COLLECTION_NAME);
     }
 
     private PersistentSpaceDefinition getPersistentElement(String spaceName) {
