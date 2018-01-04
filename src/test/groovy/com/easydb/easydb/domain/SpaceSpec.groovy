@@ -6,10 +6,8 @@ import com.easydb.easydb.domain.bucket.dto.ElementFieldDto
 import com.easydb.easydb.domain.bucket.dto.ElementQueryDto
 import com.easydb.easydb.domain.bucket.dto.ElementUpdateDto
 import com.easydb.easydb.domain.space.Space
-import com.easydb.easydb.domain.space.SpaceDefinition
 import com.easydb.easydb.domain.space.SpaceDefinitionCreateDto
 import com.easydb.easydb.domain.space.SpaceDefinitionQueryDto
-import com.easydb.easydb.domain.space.SpaceFactory
 import spock.lang.Shared
 import spock.lang.Specification
 

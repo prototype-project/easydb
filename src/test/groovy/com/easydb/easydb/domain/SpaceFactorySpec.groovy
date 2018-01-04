@@ -11,6 +11,10 @@ class SpaceFactorySpec extends Specification {
     SpaceFactory spaceFactory = SpaceTestConfig.SPACE_FACTORY
     SpaceDefinitionRepository spaceDefinitionRepository = SpaceTestConfig.SPACE_DEFINITION_REPOSITORY
 
+    def cleanup() {
+        spaceDefinitionRepository.remove("testSpace")
+    }
+
     def "should build space"() {
         given:
         SpaceDefinitionQueryDto spaceDefinition = spaceDefinitionRepository.save(SpaceDefinitionCreateDto.of("testSpace"))
