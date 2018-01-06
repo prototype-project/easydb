@@ -1,7 +1,7 @@
 package com.easydb.easydb.api;
 
-import com.easydb.easydb.domain.bucket.dto.ElementFieldDto;
-import com.easydb.easydb.domain.bucket.dto.ElementQueryDto;
+import com.easydb.easydb.domain.bucket.Element;
+import com.easydb.easydb.domain.bucket.ElementField;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
@@ -39,13 +39,12 @@ public class ElementQueryApiDto {
         return id;
     }
 
-    public static ElementQueryApiDto from(ElementQueryDto elementQueryDto) {
-        List<ElementFieldDto> fields = elementQueryDto.getFields();
+    public static ElementQueryApiDto from(Element domainElement) {
+        List<ElementField> fields = domainElement.getFields();
         List<ElementFieldApiDto> apiFields = fields.stream()
                 .map(it -> new ElementFieldApiDto(it.getName(), it.getValue()))
                 .collect(Collectors.toList());
-        return new ElementQueryApiDto(elementQueryDto.getId(),
-                elementQueryDto.getBucketName(), apiFields);
+        return new ElementQueryApiDto(domainElement.getId(), domainElement.getBucketName(), apiFields);
     }
 
     @Override

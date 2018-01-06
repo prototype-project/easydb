@@ -2,7 +2,7 @@ package com.easydb.easydb.space
 
 import com.easydb.easydb.BaseSpec
 import com.easydb.easydb.api.ElementQueryApiDto
-import com.easydb.easydb.domain.bucket.dto.ElementQueryDto
+import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.space.Space
 import groovy.json.JsonOutput
 import org.springframework.beans.factory.annotation.Autowired
@@ -68,7 +68,7 @@ class CrudBucketSpec extends BaseSpec {
         response.statusCodeValue == 200
 
         and:
-        ElementQueryDto updatedElement = space.getElement('people', addElementResponse.body.getId())
+        Element updatedElement = space.getElement('people', addElementResponse.body.getId())
         updatedElement.getFieldValue('firstName') == 'john'
         updatedElement.getFieldValue('lastName') == 'snow'
     }

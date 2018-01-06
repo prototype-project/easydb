@@ -1,7 +1,8 @@
 package com.easydb.easydb.api;
 
-import com.easydb.easydb.domain.bucket.dto.ElementQueryDto;
+import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.space.Space;
+import com.easydb.easydb.infrastructure.space.UUIDProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,10 +13,12 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/api/v1")
 class SpaceController {
 
-    private Space space;
+    private final Space space;
+    private final UUIDProvider uuidProvider;
 
-    private SpaceController(Space space) {
+    private SpaceController(Space space, UUIDProvider uuidProvider) {
         this.space = space;
+        this.uuidProvider = uuidProvider;
     }
 
     @DeleteMapping(path = "/buckets/{bucketName}")
@@ -29,8 +32,9 @@ class SpaceController {
     ElementQueryApiDto addElement(
             @PathVariable("bucketName") String bucketName,
             @RequestBody ElementOperationApiDto toCreate) {
-        ElementQueryDto createdElement = space.addElement(toCreate.toCreateDto(bucketName));
-        return ElementQueryApiDto.from(createdElement);
+        Element element = toCreate.toDomain(uuidProvider.generateUUID(), bucketName);
+        space.addElement(element);
+        return ElementQueryApiDto.from(element);
     }
 
     @DeleteMapping(path = "/buckets/{bucketName}/{elementId}")
@@ -47,7 +51,7 @@ class SpaceController {
             @PathVariable("bucketName") String bucketName,
             @PathVariable("elementId") String elementId,
             @RequestBody ElementOperationApiDto toUpdate) {
-        space.updateElement(toUpdate.toUpdateDto(bucketName, elementId));
+        space.updateElement(toUpdate.toDomain(elementId, bucketName));
     }
 
     @GetMapping(path = "/buckets/{bucketName}")

@@ -1,10 +1,10 @@
 package com.easydb.easydb.domain
 
 import com.easydb.easydb.domain.space.Space
-import com.easydb.easydb.domain.space.SpaceDefinitionCreateDto
-import com.easydb.easydb.domain.space.SpaceDefinitionQueryDto
+import com.easydb.easydb.domain.space.SpaceDefinition
 import com.easydb.easydb.domain.space.SpaceDefinitionRepository
 import com.easydb.easydb.domain.space.SpaceFactory
+import com.easydb.easydb.domain.space.dto.SpaceDefinitionDto
 import spock.lang.Specification
 
 class SpaceFactorySpec extends Specification {
@@ -17,7 +17,9 @@ class SpaceFactorySpec extends Specification {
 
     def "should build space"() {
         given:
-        SpaceDefinitionQueryDto spaceDefinition = spaceDefinitionRepository.save(SpaceDefinitionCreateDto.of("testSpace"))
+        SpaceDefinition spaceDefinition = SpaceDefinition.of("testSpace")
+
+        spaceDefinition = spaceDefinitionRepository.save(spaceDefinition)
 
         when:
         Space space = spaceFactory.buildSpace(spaceDefinition)

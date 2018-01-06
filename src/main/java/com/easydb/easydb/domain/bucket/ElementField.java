@@ -1,6 +1,5 @@
 package com.easydb.easydb.domain.bucket;
 
-import com.easydb.easydb.domain.bucket.dto.ElementFieldDto;
 
 public class ElementField {
 
@@ -12,8 +11,8 @@ public class ElementField {
 		this.value = value;
 	}
 
-	public static ElementField of(ElementFieldDto elementFieldDto) {
-		return new ElementField(elementFieldDto.getName(), elementFieldDto.getValue());
+	public static ElementField of(String name, String value) {
+		return new ElementField(name, value);
 	}
 
 	public String getName() {
@@ -22,9 +21,5 @@ public class ElementField {
 
 	public String getValue() {
 		return value;
-	}
-
-	ElementFieldDto toDto() {
-		return ElementFieldDto.of(name, value);
 	}
 }

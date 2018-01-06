@@ -16,8 +16,7 @@ class SpaceTestConfig {
 	static Fongo FONGO = new Fongo(SERVER_NAME)
 	static BucketRepository BUCKET_REPOSITORY = new MongoBucketRepository(
 			new MongoTemplate(FONGO.getMongo(), DB_NAME))
-	static 	UUIDProvider UUID_PROVIDER = new UUIDProvider()
-	static SpaceFactory SPACE_FACTORY = new MainSpaceFactory(UUID_PROVIDER, BUCKET_REPOSITORY)
+	static SpaceFactory SPACE_FACTORY = new MainSpaceFactory(BUCKET_REPOSITORY)
 	static SpaceDefinitionRepository SPACE_DEFINITION_REPOSITORY = new MongoSpaceDefinitionRepository(
 			new MongoTemplate(FONGO.getMongo(), DB_NAME))
 }

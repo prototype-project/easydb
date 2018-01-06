@@ -10,13 +10,13 @@ public interface BucketRepository {
 
 	Element insertElement(Element element);
 
-	Element getElement(String bucketName, String id);
+	Element getElement(String bucketName, String id) throws BucketOrElementDoesNotExistException;
 
 	void removeElement(String bucketName, String id);
 
 	boolean elementExists(String bucketName, String elementId);
 
-	void updateElement(Element toUpdate);
+	void updateElement(Element toUpdate) throws BucketOrElementDoesNotExistException;
 
 	List<Element> getAllElements(String name);
 }

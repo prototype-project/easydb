@@ -1,9 +1,6 @@
-package com.easydb.easydb.domain
+package com.easydb.easydb.domain.space
 
-import com.easydb.easydb.domain.space.SpaceDefinitionCreateDto
-import com.easydb.easydb.domain.space.SpaceDefinitionQueryDto
-import com.easydb.easydb.domain.space.SpaceDefinitionRepository
-import com.easydb.easydb.domain.space.SpaceNameNotUniqueException
+import com.easydb.easydb.domain.SpaceTestConfig
 import spock.lang.Specification
 
 class SpaceDefinitionRepositorySpec extends Specification {
@@ -17,7 +14,7 @@ class SpaceDefinitionRepositorySpec extends Specification {
 
     def "should create space"() {
         when:
-        spaceRepository.save(SpaceDefinitionCreateDto.of(TEST_SPACE))
+        spaceRepository.save(SpaceDefinition.of(TEST_SPACE))
 
         then:
         spaceRepository.exists(TEST_SPACE)
@@ -33,7 +30,7 @@ class SpaceDefinitionRepositorySpec extends Specification {
 
     def "should remove space definition"() {
         given:
-        spaceRepository.save(SpaceDefinitionCreateDto.of(TEST_SPACE))
+        spaceRepository.save(SpaceDefinition.of(TEST_SPACE))
 
         when:
         spaceRepository.remove(TEST_SPACE)
@@ -44,21 +41,21 @@ class SpaceDefinitionRepositorySpec extends Specification {
 
     def "should return space definition"() {
         given:
-        spaceRepository.save(SpaceDefinitionCreateDto.of(TEST_SPACE))
+        spaceRepository.save(SpaceDefinition.of(TEST_SPACE))
 
         when:
-        SpaceDefinitionQueryDto spaceDefinitionQueryDto = spaceRepository.get(TEST_SPACE)
+        SpaceDefinition spaceDefinition = spaceRepository.get(TEST_SPACE)
 
         then:
-        spaceDefinitionQueryDto.spaceName == TEST_SPACE
+        spaceDefinition.spaceName == TEST_SPACE
     }
 
     def "should return error when space name is not unique"() {
         given:
-        spaceRepository.save(SpaceDefinitionCreateDto.of(TEST_SPACE))
+        spaceRepository.save(SpaceDefinition.of(TEST_SPACE))
 
         when:
-        spaceRepository.save(SpaceDefinitionCreateDto.of(TEST_SPACE))
+        spaceRepository.save(SpaceDefinition.of(TEST_SPACE))
 
         then:
         thrown SpaceNameNotUniqueException

@@ -20,7 +20,6 @@ public class ElementFieldApiDto implements Comparable<ElementFieldApiDto> {
         return name;
     }
 
-
     public String getValue() {
         return value;
     }
