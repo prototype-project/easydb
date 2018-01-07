@@ -4,55 +4,64 @@ import com.easydb.easydb.domain.space.Space;
 import com.easydb.easydb.domain.bucket.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SpaceService implements Space {
-	private final String name;
+	private final String spaceName;
 	private final BucketRepository bucketRepository;
 
 	public SpaceService(
-			String name,
+			String spaceName,
 			BucketRepository bucketRepository) {
-		this.name = name;
+		this.spaceName = spaceName;
 		this.bucketRepository = bucketRepository;
 	}
 
 	@Override
-	public boolean bucketExists(String name) {
-		return bucketRepository.exists(name);
+	public boolean bucketExists(String bucketName) {
+		return bucketRepository.exists(getBucketName(bucketName));
 	}
 
 	@Override
-	public void removeBucket(String name) {
-		bucketRepository.remove(name);
+	public void removeBucket(String bucketName) {
+		bucketRepository.remove(getBucketName(bucketName));
 	}
 
 	@Override
 	public void addElement(Element element) {
-		bucketRepository.insertElement(element);
+		bucketRepository.insertElement(
+				Element.of(element.getId(), getBucketName(element.getBucketName()), element.getFields()));
 	}
 
 	@Override
 	public Element getElement(String bucketName, String id) {
-		return bucketRepository.getElement(bucketName, id);
+		Element element = bucketRepository.getElement(getBucketName(bucketName), id);
+		return Element.of(element.getId(), bucketName, element.getFields());
 	}
 
 	@Override
 	public void removeElement(String bucketName, String elementId) {
-		bucketRepository.removeElement(bucketName, elementId);
+		bucketRepository.removeElement(getBucketName(bucketName), elementId);
 	}
 
 	@Override
 	public boolean elementExists(String bucketName, String elementId) {
-		return bucketRepository.elementExists(bucketName, elementId);
+		return bucketRepository.elementExists(getBucketName(bucketName), elementId);
 	}
 
 	@Override
 	public void updateElement(Element toUpdate) {
-		bucketRepository.updateElement(toUpdate);
+		bucketRepository.updateElement(Element.of(toUpdate.getId(), getBucketName(toUpdate.getBucketName()), toUpdate.getFields()));
 	}
 
 	@Override
-	public List<Element> getAllElements(String name) {
-		return bucketRepository.getAllElements(name);
+	public List<Element> getAllElements(String bucketName) {
+		return bucketRepository.getAllElements(getBucketName(bucketName)).stream()
+				.map(it -> Element.of(it.getId(), bucketName, it.getFields()))
+				.collect(Collectors.toList());
+	}
+
+	private String getBucketName(String bucketName) {
+		return spaceName + ":" + bucketName;
 	}
 }
