@@ -15,14 +15,19 @@ import static com.easydb.easydb.domain.ElementTestBuilder.builder
 class SpaceSpec extends Specification {
 
     public static final String TEST_BUCKET_NAME = "people"
+    public static final String TEST_SPACE = "testSpace"
 
     @Shared
     Space space
 
     def setupSpec() {
-        SpaceDefinition spaceDefinition = SpaceDefinition.of("testSpace")
+        SpaceDefinition spaceDefinition = SpaceDefinition.of(TEST_SPACE)
         SpaceTestConfig.SPACE_DEFINITION_REPOSITORY.save(spaceDefinition)
         space = SpaceTestConfig.SPACE_FACTORY.buildSpace(spaceDefinition)
+    }
+
+    def cleanupSpec() {
+        SpaceTestConfig.SPACE_DEFINITION_REPOSITORY.remove(TEST_SPACE)
     }
 
     def cleanup() {
