@@ -9,20 +9,10 @@ import spock.lang.Specification
 
 class SpaceFactorySpec extends Specification {
     SpaceFactory spaceFactory = SpaceTestConfig.SPACE_FACTORY
-    SpaceDefinitionRepository spaceDefinitionRepository = SpaceTestConfig.SPACE_DEFINITION_REPOSITORY
-
-    def cleanup() {
-        spaceDefinitionRepository.remove("testSpace")
-    }
 
     def "should build space"() {
-        given:
-        SpaceDefinition spaceDefinition = SpaceDefinition.of("testSpace")
-
-        spaceDefinition = spaceDefinitionRepository.save(spaceDefinition)
-
         when:
-        Space space = spaceFactory.buildSpace(spaceDefinition)
+        Space space = spaceFactory.buildSpace(SpaceDefinition.of("testSpace"))
 
         then:
         space != null

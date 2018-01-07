@@ -6,7 +6,6 @@ import com.easydb.easydb.domain.space.SpaceFactory;
 import com.easydb.easydb.infrastructure.bucket.MongoBucketRepository
 import com.easydb.easydb.infrastructure.space.MainSpaceFactory;
 import com.easydb.easydb.infrastructure.space.MongoSpaceDefinitionRepository;
-import com.easydb.easydb.infrastructure.space.UUIDProvider;
 import com.github.fakemongo.Fongo;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
