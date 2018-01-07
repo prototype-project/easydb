@@ -2,8 +2,8 @@ package com.easydb.easydb.space
 
 import com.easydb.easydb.BaseSpec
 import com.easydb.easydb.api.ElementQueryApiDto
-import com.easydb.easydb.domain.bucket.dto.ElementQueryDto
-import com.easydb.easydb.domain.Space
+import com.easydb.easydb.domain.bucket.Element
+import com.easydb.easydb.domain.space.Space
 import groovy.json.JsonOutput
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
@@ -30,9 +30,6 @@ class CrudBucketSpec extends BaseSpec {
 
         and:
         response.body == ElementQueryApiDto.from(space.getElement('people', response.body.getId()))
-
-        and:
-        ElementQueryApiDto.from(space.getElement('people', response.body.getId())) == response.body
     }
 
     def "should remove element from bucket"() {
@@ -68,7 +65,7 @@ class CrudBucketSpec extends BaseSpec {
         response.statusCodeValue == 200
 
         and:
-        ElementQueryDto updatedElement = space.getElement('people', addElementResponse.body.getId())
+        Element updatedElement = space.getElement('people', addElementResponse.body.getId())
         updatedElement.getFieldValue('firstName') == 'john'
         updatedElement.getFieldValue('lastName') == 'snow'
     }

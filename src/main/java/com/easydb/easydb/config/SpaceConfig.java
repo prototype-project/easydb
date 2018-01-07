@@ -1,11 +1,9 @@
 package com.easydb.easydb.config;
 
-import com.easydb.easydb.domain.UUIDProvider;
+import com.easydb.easydb.infrastructure.space.UUIDProvider;
 import com.easydb.easydb.domain.bucket.BucketRepository;
-import com.easydb.easydb.domain.MainSpace;
+import com.easydb.easydb.infrastructure.space.SpaceService;
 import com.easydb.easydb.infrastructure.bucket.MongoBucketRepository;
-import com.mongodb.Mongo;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -18,8 +16,8 @@ public class SpaceConfig {
     }
 
     @Bean
-    MainSpace space(BucketRepository bucketRepository, UUIDProvider uuidProvider) {
-        return new MainSpace(bucketRepository, uuidProvider);
+    SpaceService space(BucketRepository bucketRepository) {
+        return new SpaceService("someName", bucketRepository);
     }
 
     @Bean

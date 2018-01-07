@@ -1,9 +1,9 @@
-package com.easydb.easydb.domain;
+package com.easydb.easydb.infrastructure.space;
 
 import java.util.UUID;
 
 public class UUIDProvider {
-	String generateUUID() {
+	public String generateUUID() {
 		return UUID.randomUUID().toString();
 	}
 }

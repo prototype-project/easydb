@@ -10,7 +10,7 @@ public class ElementFieldApiDto implements Comparable<ElementFieldApiDto> {
 
     @JsonCreator
     ElementFieldApiDto(
-            @JsonProperty("name") String name,
+            @JsonProperty("spaceName") String name,
             @JsonProperty("value") String value) {
         this.name = name;
         this.value = value;
@@ -19,7 +19,6 @@ public class ElementFieldApiDto implements Comparable<ElementFieldApiDto> {
     public String getName() {
         return name;
     }
-
 
     public String getValue() {
         return value;

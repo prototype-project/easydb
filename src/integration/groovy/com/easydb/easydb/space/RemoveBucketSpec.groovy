@@ -1,11 +1,12 @@
 package com.easydb.easydb.space
 
 import com.easydb.easydb.BaseSpec
-import com.easydb.easydb.domain.bucket.dto.ElementCreateDto
-import com.easydb.easydb.domain.bucket.dto.ElementFieldDto
-import com.easydb.easydb.domain.Space
+import com.easydb.easydb.domain.ElementTestBuilder
+import com.easydb.easydb.domain.bucket.Element
+import com.easydb.easydb.domain.space.Space
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.client.RestTemplate
+
 
 class RemoveBucketSpec extends BaseSpec {
     RestTemplate restTemplate = new RestTemplate()
@@ -15,14 +16,13 @@ class RemoveBucketSpec extends BaseSpec {
 
     def "should remove bucket"() {
         given:
-        space.addElement(ElementCreateDto.of("people", [
-                ElementFieldDto.of("firstName", "John")
-        ]))
+        Element toCreate = ElementTestBuilder.builder().build()
+        space.addElement(toCreate)
 
         when:
-        restTemplate.delete(localUrl('/api/v1/buckets/testBucket'))
+        restTemplate.delete(localUrl('/api/v1/buckets/people'))
 
         then:
-        !space.bucketExists('testBucket')
+        !space.bucketExists('people')
     }
 }
