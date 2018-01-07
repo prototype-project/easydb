@@ -4,7 +4,7 @@ import com.easydb.easydb.domain.space.Space
 import com.easydb.easydb.domain.space.SpaceDefinition
 import com.easydb.easydb.domain.space.SpaceDefinitionRepository
 import com.easydb.easydb.domain.space.SpaceFactory
-import com.easydb.easydb.domain.space.dto.SpaceDefinitionDto
+
 import spock.lang.Specification
 
 class SpaceFactorySpec extends Specification {

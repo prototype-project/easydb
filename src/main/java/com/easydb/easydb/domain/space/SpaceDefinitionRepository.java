@@ -5,7 +5,7 @@ public interface SpaceDefinitionRepository {
 
     boolean exists(String spaceName);
 
-    SpaceDefinition get(String spaceName) throws SpaceDoesNotExist;
+    SpaceDefinition get(String spaceName) throws SpaceDoesNotExistException;
 
     void remove(String spaceName);
 }

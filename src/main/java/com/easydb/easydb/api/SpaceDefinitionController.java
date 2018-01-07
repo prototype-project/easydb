@@ -1,7 +1,6 @@
 package com.easydb.easydb.api;
 
 import com.easydb.easydb.domain.space.SpaceDefinition;
-import com.easydb.easydb.domain.space.dto.SpaceDefinitionDto;
 import com.easydb.easydb.domain.space.SpaceDefinitionRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "api/v1/space-definitions/")
+@RequestMapping(value = "/api/v1/spaces/")
 class SpaceDefinitionController {
 
 	private final SpaceDefinitionRepository spaceDefinitionRepository;

@@ -30,9 +30,6 @@ class CrudBucketSpec extends BaseSpec {
 
         and:
         response.body == ElementQueryApiDto.from(space.getElement('people', response.body.getId()))
-
-        and:
-        ElementQueryApiDto.from(space.getElement('people', response.body.getId())) == response.body
     }
 
     def "should remove element from bucket"() {

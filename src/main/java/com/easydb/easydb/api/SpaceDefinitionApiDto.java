@@ -9,7 +9,7 @@ class SpaceDefinitionApiDto {
 	private final String spaceName;
 
 	@JsonCreator
-	SpaceDefinitionApiDto(String spaceName) {
+	SpaceDefinitionApiDto(@JsonProperty("spaceName") String spaceName) {
 		this.spaceName = spaceName;
 	}
 

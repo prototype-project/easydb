@@ -2,7 +2,7 @@ package com.easydb.easydb.infrastructure.space;
 
 import com.easydb.easydb.domain.space.SpaceDefinition;
 import com.easydb.easydb.domain.space.SpaceDefinitionRepository;
-import com.easydb.easydb.domain.space.SpaceDoesNotExist;
+import com.easydb.easydb.domain.space.SpaceDoesNotExistException;
 import com.easydb.easydb.domain.space.SpaceNameNotUniqueException;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
@@ -30,17 +30,17 @@ public class MongoSpaceDefinitionRepository implements SpaceDefinitionRepository
         try {
             get(spaceName);
             return true;
-        } catch (SpaceDoesNotExist e) {
+        } catch (SpaceDoesNotExistException e) {
             return false;
         }
     }
 
     @Override
-    public SpaceDefinition get(String spaceName) throws SpaceDoesNotExist{
+    public SpaceDefinition get(String spaceName) throws SpaceDoesNotExistException {
         PersistentSpaceDefinition persistentSpaceDefinition = getPersistentElement(spaceName);
         return Optional.ofNullable(persistentSpaceDefinition)
                 .map(PersistentSpaceDefinition::toDomain)
-                .orElseThrow(() -> new SpaceDoesNotExist(spaceName));
+                .orElseThrow(() -> new SpaceDoesNotExistException(spaceName));
     }
 
     @Override
