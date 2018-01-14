@@ -2,6 +2,9 @@ package com.easydb.easydb.api;
 
 import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.space.Space;
+import com.easydb.easydb.domain.space.SpaceDefinition;
+import com.easydb.easydb.domain.space.SpaceDefinitionRepository;
+import com.easydb.easydb.domain.space.SpaceFactory;
 import com.easydb.easydb.infrastructure.space.UUIDProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -13,60 +16,83 @@ import java.util.stream.Collectors;
 @RequestMapping(value = "/api/v1")
 class SpaceController {
 
-    private final Space space;
+    private final SpaceFactory spaceFactory;
+    private final SpaceDefinitionRepository spaceDefinitionRepository;
     private final UUIDProvider uuidProvider;
 
-    private SpaceController(Space space, UUIDProvider uuidProvider) {
-        this.space = space;
+    private SpaceController(
+            SpaceFactory spaceFactory,
+            UUIDProvider uuidProvider,
+            SpaceDefinitionRepository spaceDefinitionRepository) {
+        this.spaceFactory = spaceFactory;
         this.uuidProvider = uuidProvider;
+        this.spaceDefinitionRepository = spaceDefinitionRepository;
     }
 
-    @DeleteMapping(path = "/buckets/{bucketName}")
+    @DeleteMapping(path = "/{spaceName}/{bucketName}")
     @ResponseStatus(value = HttpStatus.OK)
-    void deleteBucket(@PathVariable("bucketName") String bucketName) {
+    void deleteBucket(@PathVariable("spaceName") String spaceName, @PathVariable("bucketName") String bucketName) {
+        SpaceDefinition spaceDefinition = spaceDefinitionRepository.get(spaceName);
+        Space space = spaceFactory.buildSpace(spaceDefinition);
         space.removeBucket(bucketName);
     }
 
-    @PostMapping(path = "/buckets/{bucketName}")
+    @PostMapping(path = "/{spaceName}/{bucketName}")
     @ResponseStatus(value = HttpStatus.CREATED)
     ElementQueryApiDto addElement(
+            @PathVariable("spaceName") String spaceName,
             @PathVariable("bucketName") String bucketName,
             @RequestBody ElementOperationApiDto toCreate) {
         Element element = toCreate.toDomain(uuidProvider.generateUUID(), bucketName);
+        SpaceDefinition spaceDefinition = spaceDefinitionRepository.get(spaceName);
+        Space space = spaceFactory.buildSpace(spaceDefinition);
         space.addElement(element);
         return ElementQueryApiDto.from(element);
     }
 
-    @DeleteMapping(path = "/buckets/{bucketName}/{elementId}")
+    @DeleteMapping(path = "/{spaceName}/{bucketName}/{elementId}")
     @ResponseStatus(value = HttpStatus.OK)
     void deleteElement(
+            @PathVariable("spaceName") String spaceName,
             @PathVariable("bucketName") String bucketName,
             @PathVariable("elementId") String elementId) {
+        SpaceDefinition spaceDefinition = spaceDefinitionRepository.get(spaceName);
+        Space space = spaceFactory.buildSpace(spaceDefinition);
         space.removeElement(bucketName, elementId);
     }
 
-    @PutMapping(path = "/buckets/{bucketName}/{elementId}")
+    @PutMapping(path = "/{spaceName}/{bucketName}/{elementId}")
     @ResponseStatus(value = HttpStatus.OK)
     void updateElement(
+            @PathVariable("spaceName") String spaceName,
             @PathVariable("bucketName") String bucketName,
             @PathVariable("elementId") String elementId,
             @RequestBody ElementOperationApiDto toUpdate) {
+        SpaceDefinition spaceDefinition = spaceDefinitionRepository.get(spaceName);
+        Space space = spaceFactory.buildSpace(spaceDefinition);
         space.updateElement(toUpdate.toDomain(elementId, bucketName));
     }
 
-    @GetMapping(path = "/buckets/{bucketName}")
+    @GetMapping(path = "/{spaceName}/{bucketName}")
     @ResponseStatus(value = HttpStatus.OK)
-    List<ElementQueryApiDto> getAllElements(@PathVariable("bucketName") String bucketName) {
+    List<ElementQueryApiDto> getAllElements(
+            @PathVariable("spaceName") String spaceName,
+            @PathVariable("bucketName") String bucketName) {
+        SpaceDefinition spaceDefinition = spaceDefinitionRepository.get(spaceName);
+        Space space = spaceFactory.buildSpace(spaceDefinition);
         return space.getAllElements(bucketName).stream()
                 .map(ElementQueryApiDto::from)
                 .collect(Collectors.toList());
     }
 
-    @GetMapping(path = "/buckets/{bucketName}/{elementId}")
+    @GetMapping(path = "/{spaceName}/{bucketName}/{elementId}")
     @ResponseStatus(value = HttpStatus.OK)
     ElementQueryApiDto getElement(
+            @PathVariable("spaceName") String spaceName,
             @PathVariable("bucketName") String bucketName,
             @PathVariable("elementId") String elementId) {
+        SpaceDefinition spaceDefinition = spaceDefinitionRepository.get(spaceName);
+        Space space = spaceFactory.buildSpace(spaceDefinition);
         return ElementQueryApiDto.from(space.getElement(bucketName, elementId));
     }
 }
