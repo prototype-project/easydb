@@ -4,21 +4,40 @@ import com.easydb.easydb.BaseSpec
 import com.easydb.easydb.api.ElementQueryApiDto
 import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.space.Space
+import com.easydb.easydb.domain.space.SpaceDefinition
+import com.easydb.easydb.domain.space.SpaceDefinitionRepository
+import com.easydb.easydb.domain.space.SpaceFactory
 import groovy.json.JsonOutput
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.HttpClientErrorException
+import spock.lang.Shared
 
 import java.util.stream.Collectors
 
 class CrudBucketSpec extends BaseSpec {
 
     @Autowired
+    SpaceFactory spaceFactory
+
+    @Autowired
+    SpaceDefinitionRepository spaceDefinitionRepository
+
     Space space
 
+    String TEST_SPACE_NAME = "testSpace"
+    String TEST_BUCKET_NAME = "testBucket"
+
+    def setup() {
+        SpaceDefinition spaceDefinition = SpaceDefinition.of(TEST_SPACE_NAME)
+        spaceDefinitionRepository.save(spaceDefinition)
+        space = spaceFactory.buildSpace(spaceDefinition)
+    }
+
     def cleanup() {
-        space.removeBucket('people')
+        space.removeBucket(TEST_BUCKET_NAME)
+        spaceDefinitionRepository.remove(TEST_SPACE_NAME) // TODO remove all buckets when removing definition
     }
 
     def "should add element to bucket"() {
@@ -29,7 +48,7 @@ class CrudBucketSpec extends BaseSpec {
         response.statusCodeValue == 201
 
         and:
-        response.body == ElementQueryApiDto.from(space.getElement('people', response.body.getId()))
+        response.body == ElementQueryApiDto.from(space.getElement(TEST_BUCKET_NAME, response.body.getId()))
     }
 
     def "should remove element from bucket"() {
@@ -38,7 +57,7 @@ class CrudBucketSpec extends BaseSpec {
 
         when:
         ResponseEntity deleteElementResponse = restTemplate.exchange(
-                localUrl('/api/v1/buckets/people/' + addElementResponse.body.getId()),
+                localUrl('/api/v1/' + TEST_SPACE_NAME + '/'+ TEST_BUCKET_NAME + '/' + addElementResponse.body.getId()),
                 HttpMethod.DELETE,
                 null,
                 Void.class)
@@ -47,7 +66,7 @@ class CrudBucketSpec extends BaseSpec {
         deleteElementResponse.statusCodeValue == 200
 
         and:
-        !space.elementExists('people', addElementResponse.body.getId())
+        !space.elementExists(TEST_BUCKET_NAME, addElementResponse.body.getId())
     }
 
     def "should update element"() {
@@ -56,7 +75,7 @@ class CrudBucketSpec extends BaseSpec {
 
         when:
         ResponseEntity response = restTemplate.exchange(
-                localUrl('/api/v1/buckets/people/' + addElementResponse.body.getId()),
+                localUrl('/api/v1/' + TEST_SPACE_NAME + '/'+ TEST_BUCKET_NAME + '/' + addElementResponse.body.getId()),
                 HttpMethod.PUT,
                 httpJsonEntity(sampleElementUpdate()),
                 Void.class)
@@ -65,7 +84,7 @@ class CrudBucketSpec extends BaseSpec {
         response.statusCodeValue == 200
 
         and:
-        Element updatedElement = space.getElement('people', addElementResponse.body.getId())
+        Element updatedElement = space.getElement(TEST_BUCKET_NAME, addElementResponse.body.getId())
         updatedElement.getFieldValue('firstName') == 'john'
         updatedElement.getFieldValue('lastName') == 'snow'
     }
@@ -76,13 +95,13 @@ class CrudBucketSpec extends BaseSpec {
 
         when:
         ResponseEntity<List<ElementQueryApiDto>> response = restTemplate.exchange(
-                localUrl('/api/v1/buckets/people'),
+                localUrl('/api/v1/' + TEST_SPACE_NAME + '/'+ TEST_BUCKET_NAME),
                 HttpMethod.GET,
                 null,
                 ElementQueryApiDto[].class)
 
         then:
-        response.body == space.getAllElements('people').stream()
+        response.body == space.getAllElements(TEST_BUCKET_NAME).stream()
                 .map({it -> ElementQueryApiDto.from(it)})
                 .collect(Collectors.toList())
     }
@@ -93,7 +112,7 @@ class CrudBucketSpec extends BaseSpec {
 
         when:
         ResponseEntity<ElementQueryApiDto> getElementResponse = restTemplate.exchange(
-                localUrl('/api/v1/buckets/people/' + addElementResponse.body.getId()),
+                localUrl('/api/v1/' + TEST_SPACE_NAME + '/'+ TEST_BUCKET_NAME + '/' + addElementResponse.body.getId()),
                 HttpMethod.GET,
                 null,
                 ElementQueryApiDto.class)
@@ -105,7 +124,7 @@ class CrudBucketSpec extends BaseSpec {
     def "should return 404 when trying to update element in nonexistent bucket"() {
         when:
         restTemplate.exchange(
-                localUrl('/api/v1/buckets/people/' + 'someId'),
+                localUrl('/api/v1/' + TEST_SPACE_NAME + '/'+ TEST_BUCKET_NAME + '/' + 'someId'),
                 HttpMethod.PUT,
                 httpJsonEntity(sampleElementUpdate()),
                 Void.class)
@@ -123,7 +142,7 @@ class CrudBucketSpec extends BaseSpec {
 
         when:
         restTemplate.exchange(
-                localUrl('/api/v1/buckets/people/' + 'nonexistentId'),
+                localUrl('/api/v1/' + TEST_SPACE_NAME + '/'+ TEST_BUCKET_NAME + '/' + 'nonexistentId'),
                 HttpMethod.PUT,
                 httpJsonEntity(sampleElementUpdate()),
                 Void.class)
@@ -138,7 +157,7 @@ class CrudBucketSpec extends BaseSpec {
     def "should return 404 when trying to get element from nonexistent bucket"() {
         when:
         restTemplate.exchange(
-                localUrl('/api/v1/buckets/people/' + 'someId'),
+                localUrl('/api/v1/' + TEST_SPACE_NAME + '/'+ TEST_BUCKET_NAME + '/' + 'someId'),
                 HttpMethod.GET,
                 null,
                 ElementQueryApiDto.class)
@@ -156,7 +175,7 @@ class CrudBucketSpec extends BaseSpec {
 
         when:
         restTemplate.exchange(
-                localUrl('/api/v1/buckets/people/' + 'nonexistentId'),
+                localUrl('/api/v1/' + TEST_SPACE_NAME + '/'+ TEST_BUCKET_NAME + '/' + 'nonexistentId'),
                 HttpMethod.GET,
                 null,
                 ElementQueryApiDto.class)
@@ -170,7 +189,7 @@ class CrudBucketSpec extends BaseSpec {
 
     ResponseEntity<ElementQueryApiDto> addSampleElement() {
         restTemplate.exchange(
-                localUrl('/api/v1/buckets/people'),
+                localUrl('/api/v1/' + TEST_SPACE_NAME + '/'+ TEST_BUCKET_NAME),
                 HttpMethod.POST,
                 httpJsonEntity(sampleElement()),
                 ElementQueryApiDto.class)
