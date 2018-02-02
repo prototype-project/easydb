@@ -33,7 +33,7 @@ public class ElementFieldApiDto implements Comparable<ElementFieldApiDto> {
     public int compareTo(ElementFieldApiDto o) {
         return name.compareTo(o.name);
     }
-    int a = (int) 4;
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) {
