@@ -2,14 +2,13 @@ package com.easydb.easydb.api;
 
 import com.easydb.easydb.domain.space.SpaceDefinition;
 import com.easydb.easydb.domain.space.SpaceDefinitionRepository;
+import com.easydb.easydb.infrastructure.space.UUIDProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,18 +17,20 @@ import org.springframework.web.bind.annotation.RestController;
 class SpaceDefinitionController {
 
 	private final SpaceDefinitionRepository spaceDefinitionRepository;
+	private final UUIDProvider uuidProvider;
 
-
-	SpaceDefinitionController(SpaceDefinitionRepository spaceDefinitionRepository) {
+	SpaceDefinitionController(SpaceDefinitionRepository spaceDefinitionRepository,
+	                          UUIDProvider uuidProvider) {
 		this.spaceDefinitionRepository = spaceDefinitionRepository;
+		this.uuidProvider = uuidProvider;
 	}
 
 	@PostMapping
-	@ResponseBody
 	@ResponseStatus(value = HttpStatus.CREATED)
-	SpaceDefinitionApiDto createSpace(@RequestBody SpaceDefinitionApiDto createDto) {
-		spaceDefinitionRepository.save(createDto.toDomain());
-		return createDto;
+	SpaceDefinitionApiDto createSpace() {
+		SpaceDefinition spaceDefinition = SpaceDefinition.of(uuidProvider.generateUUID());
+		spaceDefinitionRepository.save(spaceDefinition);
+		return new SpaceDefinitionApiDto(spaceDefinition.getSpaceName());
 	}
 
 	@DeleteMapping(path = "/{spaceName}")
@@ -39,7 +40,6 @@ class SpaceDefinitionController {
 	}
 
 	@GetMapping(path = "/{spaceName}")
-	@ResponseBody
 	SpaceDefinitionApiDto getSpace(@PathVariable("spaceName") String spaceName) {
 		SpaceDefinition fromDb = spaceDefinitionRepository.get(spaceName);
 		return new SpaceDefinitionApiDto(fromDb.getSpaceName());

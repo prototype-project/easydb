@@ -4,23 +4,15 @@ package com.easydb.easydb.space;
 import com.easydb.easydb.BaseSpec
 import com.easydb.easydb.api.SpaceDefinitionApiDto;
 import com.easydb.easydb.domain.space.SpaceDefinitionRepository
-import groovy.json.JsonOutput;
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.HttpClientErrorException
 
 
 class CrudSpaceDefinitionSpec extends BaseSpec {
-	static String SPACE_NAME = "daniel_proto"
-
 	@Autowired
 	SpaceDefinitionRepository definitionRepository
-
-	def cleanup() {
-		definitionRepository.remove(SPACE_NAME)
-	}
 
 	def "should create new space"() {
 		when:
@@ -29,31 +21,19 @@ class CrudSpaceDefinitionSpec extends BaseSpec {
 		then:
 		response.statusCode == HttpStatus.CREATED
 		with (response.body) {
-			spaceName == SPACE_NAME
+			spaceName != null
 		}
-	}
-
-	def "should return 400 if trying to create already existing space"() {
-		given:
-		addSampleSpace()
-
-		when:
-		addSampleSpace()
-
-		then:
-		def response = thrown(HttpClientErrorException)
-		response.statusCode == HttpStatus.BAD_REQUEST
 	}
 
 	def "should remove space"() {
 		given:
-		addSampleSpace()
+		String spaceName = addSampleSpace().getBody().spaceName
 
 		when:
-		restTemplate.delete(localUrl("/api/v1/spaces/" + SPACE_NAME))
+		restTemplate.delete(localUrl("/api/v1/spaces/" + spaceName))
 
 		and:
-		restTemplate.getForEntity(localUrl("/api/v1/spaces/" + SPACE_NAME), SpaceDefinitionApiDto)
+		restTemplate.getForEntity(localUrl("/api/v1/spaces/" + spaceName), SpaceDefinitionApiDto)
 
 		then:
 		def response = thrown(HttpClientErrorException)
@@ -62,24 +42,22 @@ class CrudSpaceDefinitionSpec extends BaseSpec {
 
 	def "should get space"() {
 		given:
-		addSampleSpace()
+		String spaceName = addSampleSpace().getBody().spaceName
 
 		when:
 		ResponseEntity<SpaceDefinitionApiDto> response = restTemplate.getForEntity(
-				localUrl("/api/v1/spaces/" + SPACE_NAME), SpaceDefinitionApiDto)
+				localUrl("/api/v1/spaces/" + spaceName), SpaceDefinitionApiDto)
 
 		then:
 		response.statusCode == HttpStatus.OK
 
-		with(response.body) {
-			spaceName == SPACE_NAME
-		}
+		response.body.spaceName == spaceName
 	}
 
 	def "should return 404 when get not existing space"() {
 		when:
 		restTemplate.getForEntity(
-				localUrl("/api/v1/spaces/" + SPACE_NAME), SpaceDefinitionApiDto)
+				localUrl("/api/v1/spaces/notexisting"), SpaceDefinitionApiDto)
 
 		then:
 		def response = thrown(HttpClientErrorException)
@@ -87,16 +65,9 @@ class CrudSpaceDefinitionSpec extends BaseSpec {
 	}
 
 	private ResponseEntity<SpaceDefinitionApiDto> addSampleSpace() {
-		restTemplate.exchange(
+		restTemplate.postForEntity(
 				localUrl("/api/v1/spaces/"),
-				HttpMethod.POST,
-				httpJsonEntity(sampleSpaceJson()),
+				Void,
 				SpaceDefinitionApiDto.class)
-	}
-
-	private static def sampleSpaceJson() {
-		return JsonOutput.toJson([
-		        "spaceName": SPACE_NAME
-		])
 	}
 }

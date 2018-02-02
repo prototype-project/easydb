@@ -10,7 +10,7 @@ public class SpaceService implements Space {
 	private final String spaceName;
 	private final BucketRepository bucketRepository;
 
-	public SpaceService(
+	SpaceService(
 			String spaceName,
 			BucketRepository bucketRepository) {
 		this.spaceName = spaceName;

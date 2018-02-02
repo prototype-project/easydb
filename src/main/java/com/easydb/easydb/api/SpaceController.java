@@ -6,6 +6,7 @@ import com.easydb.easydb.domain.space.SpaceDefinition;
 import com.easydb.easydb.domain.space.SpaceDefinitionRepository;
 import com.easydb.easydb.domain.space.SpaceFactory;
 import com.easydb.easydb.infrastructure.space.UUIDProvider;
+import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,7 +43,7 @@ class SpaceController {
     ElementQueryApiDto addElement(
             @PathVariable("spaceName") String spaceName,
             @PathVariable("bucketName") String bucketName,
-            @RequestBody ElementOperationApiDto toCreate) {
+            @RequestBody @Valid ElementOperationApiDto toCreate) {
         Element element = toCreate.toDomain(uuidProvider.generateUUID(), bucketName);
         SpaceDefinition spaceDefinition = spaceDefinitionRepository.get(spaceName);
         Space space = spaceFactory.buildSpace(spaceDefinition);
@@ -67,7 +68,7 @@ class SpaceController {
             @PathVariable("spaceName") String spaceName,
             @PathVariable("bucketName") String bucketName,
             @PathVariable("elementId") String elementId,
-            @RequestBody ElementOperationApiDto toUpdate) {
+            @RequestBody @Valid ElementOperationApiDto toUpdate) {
         SpaceDefinition spaceDefinition = spaceDefinitionRepository.get(spaceName);
         Space space = spaceFactory.buildSpace(spaceDefinition);
         space.updateElement(toUpdate.toDomain(elementId, bucketName));
