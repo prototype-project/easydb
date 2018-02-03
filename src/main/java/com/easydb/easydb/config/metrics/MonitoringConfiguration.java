@@ -22,7 +22,10 @@ import org.springframework.context.annotation.Configuration;
 @EnableMetrics
 public class MonitoringConfiguration extends MetricsConfigurerAdapter {
 
-	@Value("${monitoring.graphite.host}")
+	@Value("${monitoring.enabled:false}")
+	private boolean enabled;
+
+	@Value("${monitoring.graphite.host:}")
 	private String graphiteHost;
 
 	@Value("${monitoring.graphite.port:2003}")
@@ -39,10 +42,12 @@ public class MonitoringConfiguration extends MetricsConfigurerAdapter {
 
 	@Override
 	public void configureReporters(MetricRegistry metricRegistry) {
-		GraphiteReporter graphiteReporter = getGraphiteReporterBuilder(metricRegistry).build(getGraphite());
-		registerReporter(graphiteReporter);
-		graphiteReporter.start(graphiteAmountOfTimeBetweenPollsMillis,
-				TimeUnit.MILLISECONDS);
+		if (enabled) {
+			GraphiteReporter graphiteReporter = getGraphiteReporterBuilder(metricRegistry).build(getGraphite());
+			registerReporter(graphiteReporter);
+			graphiteReporter.start(graphiteAmountOfTimeBetweenPollsMillis,
+					TimeUnit.MILLISECONDS);
+		}
 	}
 
 	@Override
