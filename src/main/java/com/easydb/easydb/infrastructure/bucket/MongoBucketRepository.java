@@ -1,5 +1,6 @@
 package com.easydb.easydb.infrastructure.bucket;
 
+import com.easydb.easydb.domain.bucket.BucketQuery;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -74,13 +75,26 @@ public class MongoBucketRepository implements BucketRepository {
 	}
 
 	@Override
-	public List<Element> getAllElements(String bucketName) {
-		return mongoTemplate.findAll(PersistentBucketElement.class, bucketName).stream()
-				.map(it -> it.toDomainElement(bucketName))
+	public List<Element> filterElements(BucketQuery query) {
+		Query mongoQuery = fromBucketQuery(query);
+		return mongoTemplate.find(mongoQuery, PersistentBucketElement.class, query.getName()).stream()
+				.map(it -> it.toDomainElement(query.getName()))
 				.collect(Collectors.toList());
+	}
+
+	@Override
+	public long getNumberOfElements(String bucketName) {
+		return mongoTemplate.count(new Query(), PersistentBucketElement.class, bucketName);
 	}
 
 	private PersistentBucketElement getPersistentElement(String bucketName, String id) {
 		return mongoTemplate.findById(id, PersistentBucketElement.class, bucketName);
+	}
+
+	private Query fromBucketQuery(BucketQuery bucketQuery) {
+		Query query = new Query();
+		query.limit(bucketQuery.getLimit());
+		query.skip(bucketQuery.getOffset());
+		return query;
 	}
 }

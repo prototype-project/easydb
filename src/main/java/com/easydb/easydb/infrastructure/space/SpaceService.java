@@ -51,14 +51,24 @@ public class SpaceService implements Space {
 
 	@Override
 	public void updateElement(Element toUpdate) {
-		bucketRepository.updateElement(Element.of(toUpdate.getId(), getBucketName(toUpdate.getBucketName()), toUpdate.getFields()));
+		bucketRepository.updateElement(
+				Element.of(toUpdate.getId(), getBucketName(toUpdate.getBucketName()), toUpdate.getFields()));
 	}
 
 	@Override
-	public List<Element> getAllElements(String bucketName) {
-		return bucketRepository.getAllElements(getBucketName(bucketName)).stream()
-				.map(it -> Element.of(it.getId(), bucketName, it.getFields()))
+	public List<Element> filterElements(BucketQuery query) {
+		return bucketRepository.filterElements(rebuildToProperSpaceName(query)).stream()
+				.map(it -> Element.of(it.getId(), query.getName(), it.getFields()))
 				.collect(Collectors.toList());
+	}
+
+	@Override
+	public long getNumberOfElements(String bucketName) {
+		return bucketRepository.getNumberOfElements(getBucketName(bucketName));
+	}
+
+	private BucketQuery rebuildToProperSpaceName(BucketQuery query) {
+		return BucketQuery.of(getBucketName(query.getName()), query.getLimit(), query.getOffset());
 	}
 
 	private String getBucketName(String bucketName) {

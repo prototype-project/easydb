@@ -1,6 +1,5 @@
 package com.easydb.easydb.space;
 
-
 import com.easydb.easydb.BaseSpec
 import com.easydb.easydb.api.SpaceDefinitionApiDto;
 import com.easydb.easydb.domain.space.SpaceDefinitionRepository
@@ -11,6 +10,7 @@ import org.springframework.web.client.HttpClientErrorException
 
 
 class CrudSpaceDefinitionSpec extends BaseSpec {
+
 	@Autowired
 	SpaceDefinitionRepository definitionRepository
 

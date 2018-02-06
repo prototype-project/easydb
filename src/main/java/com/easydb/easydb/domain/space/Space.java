@@ -1,5 +1,6 @@
 package com.easydb.easydb.domain.space;
 
+import com.easydb.easydb.domain.bucket.BucketQuery;
 import com.easydb.easydb.domain.bucket.Element;
 
 import java.util.List;
@@ -19,5 +20,7 @@ public interface Space {
 
 	void updateElement(Element toUpdate);
 
-	List<Element> getAllElements(String name);
+	List<Element> filterElements(BucketQuery query);
+
+	long getNumberOfElements(String bucketName);
 }
