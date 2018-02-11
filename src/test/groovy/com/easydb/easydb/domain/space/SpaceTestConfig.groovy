@@ -1,8 +1,6 @@
-package com.easydb.easydb.domain
+package com.easydb.easydb.domain.space
 
 import com.easydb.easydb.domain.bucket.BucketRepository;
-import com.easydb.easydb.domain.space.SpaceDefinitionRepository;
-import com.easydb.easydb.domain.space.SpaceFactory;
 import com.easydb.easydb.infrastructure.bucket.MongoBucketRepository
 import com.easydb.easydb.infrastructure.space.MainSpaceFactory;
 import com.easydb.easydb.infrastructure.space.MongoSpaceDefinitionRepository;

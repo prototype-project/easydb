@@ -1,6 +1,5 @@
 package com.easydb.easydb.space;
 
-
 import com.easydb.easydb.BaseSpec
 import com.easydb.easydb.api.SpaceDefinitionApiDto;
 import com.easydb.easydb.domain.space.SpaceDefinitionRepository
@@ -11,6 +10,7 @@ import org.springframework.web.client.HttpClientErrorException
 
 
 class CrudSpaceDefinitionSpec extends BaseSpec {
+
 	@Autowired
 	SpaceDefinitionRepository definitionRepository
 
@@ -62,12 +62,5 @@ class CrudSpaceDefinitionSpec extends BaseSpec {
 		then:
 		def response = thrown(HttpClientErrorException)
 		response.statusCode == HttpStatus.NOT_FOUND
-	}
-
-	private ResponseEntity<SpaceDefinitionApiDto> addSampleSpace() {
-		restTemplate.postForEntity(
-				localUrl("/api/v1/spaces/"),
-				Void,
-				SpaceDefinitionApiDto.class)
 	}
 }

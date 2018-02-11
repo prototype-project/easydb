@@ -1,11 +1,9 @@
-package com.easydb.easydb.domain
+package com.easydb.easydb.domain.space
 
 import com.easydb.easydb.domain.bucket.BucketOrElementDoesNotExistException
+import com.easydb.easydb.domain.bucket.BucketQuery
 import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.bucket.ElementField
-
-import com.easydb.easydb.domain.space.Space
-import com.easydb.easydb.domain.space.SpaceDefinition
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -166,7 +164,7 @@ class SpaceSpec extends Specification {
         space.addElement(toCreate)
 
         when:
-        List<Element> elementsFromBucket = space.getAllElements(TEST_BUCKET_NAME)
+        List<Element> elementsFromBucket = space.filterElements(getDefaultBucketQuery())
 
         then:
         elementsFromBucket.size() == 1
@@ -178,7 +176,7 @@ class SpaceSpec extends Specification {
 
     def "should return empty list when trying to get elements from nonexistent bucket"() {
         when:
-        List<Element> elementsFromBucket = space.getAllElements(TEST_BUCKET_NAME)
+        List<Element> elementsFromBucket = space.filterElements(getDefaultBucketQuery())
 
         then:
         elementsFromBucket.size() == 0
@@ -194,9 +192,23 @@ class SpaceSpec extends Specification {
         space.removeElement(TEST_BUCKET_NAME, toCreate.getId())
 
         when:
-        List<Element> elementsFromBucket = space.getAllElements(TEST_BUCKET_NAME)
+        List<Element> elementsFromBucket = space.filterElements(getDefaultBucketQuery())
 
         then:
         elementsFromBucket.size() == 0
+    }
+
+    def "should return number of elements in bucket"() {
+        given:
+        space.addElement(builder().build())
+        space.addElement(builder().build())
+
+        expect:
+        space.getNumberOfElements(TEST_BUCKET_NAME) == 2
+
+    }
+
+    static BucketQuery getDefaultBucketQuery() {
+        return BucketQuery.of(TEST_BUCKET_NAME, 20, 0);
     }
 }

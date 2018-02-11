@@ -1,6 +1,5 @@
 package com.easydb.easydb.domain.space
 
-import com.easydb.easydb.domain.SpaceTestConfig
 import spock.lang.Specification
 
 class SpaceDefinitionRepositorySpec extends Specification {

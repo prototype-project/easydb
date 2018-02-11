@@ -1,11 +1,13 @@
 package com.easydb.easydb.api;
 
+import com.easydb.easydb.domain.bucket.BucketQuery;
 import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.space.Space;
 import com.easydb.easydb.domain.space.SpaceDefinition;
 import com.easydb.easydb.domain.space.SpaceDefinitionRepository;
 import com.easydb.easydb.domain.space.SpaceFactory;
 import com.easydb.easydb.infrastructure.space.UUIDProvider;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -76,14 +78,23 @@ class SpaceController {
 
     @GetMapping(path = "/{spaceName}/{bucketName}")
     @ResponseStatus(value = HttpStatus.OK)
-    List<ElementQueryApiDto> getAllElements(
+    PaginatedElementsApiDto filterElements(
             @PathVariable("spaceName") String spaceName,
-            @PathVariable("bucketName") String bucketName) {
+            @PathVariable("bucketName") String bucketName,
+            @RequestParam(value = "limit", defaultValue = "20") int limit,
+            @RequestParam(value = "offset", defaultValue = "0") int offset,
+            HttpServletRequest request) {
         SpaceDefinition spaceDefinition = spaceDefinitionRepository.get(spaceName);
         Space space = spaceFactory.buildSpace(spaceDefinition);
-        return space.getAllElements(bucketName).stream()
+
+        BucketQuery query = BucketQuery.of(bucketName, limit, offset);
+        List<ElementQueryApiDto> results = space.filterElements(query).stream()
                 .map(ElementQueryApiDto::from)
                 .collect(Collectors.toList());
+
+        return PaginatedElementsApiDto.of(
+                getNextPageLink(space.getNumberOfElements(bucketName), limit, offset, request),
+                results);
     }
 
     @GetMapping(path = "/{spaceName}/{bucketName}/{elementId}")
@@ -95,5 +106,15 @@ class SpaceController {
         SpaceDefinition spaceDefinition = spaceDefinitionRepository.get(spaceName);
         Space space = spaceFactory.buildSpace(spaceDefinition);
         return ElementQueryApiDto.from(space.getElement(bucketName, elementId));
+    }
+
+    private static String getNextPageLink(long numberOfElements, int limit, int offset,
+                                          HttpServletRequest request) {
+        return numberOfElements - (offset + limit) > 0 ?
+                String.format("%s?limit=%d&offset=%d", getUrlFromRequest(request), limit, offset + limit) : null;
+    }
+
+    private static String getUrlFromRequest(HttpServletRequest request) {
+        return request.getRequestURL().toString();
     }
 }

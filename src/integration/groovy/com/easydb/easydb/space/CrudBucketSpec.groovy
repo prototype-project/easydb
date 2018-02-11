@@ -2,6 +2,8 @@ package com.easydb.easydb.space
 
 import com.easydb.easydb.BaseSpec
 import com.easydb.easydb.api.ElementQueryApiDto
+import com.easydb.easydb.api.PaginatedElementsApiDto
+import com.easydb.easydb.domain.bucket.BucketQuery
 import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.space.Space
 import com.easydb.easydb.domain.space.SpaceDefinition
@@ -12,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.HttpClientErrorException
-import spock.lang.Shared
 
 import java.util.stream.Collectors
 
@@ -91,17 +92,18 @@ class CrudBucketSpec extends BaseSpec {
 
     def "should get all elements from bucket"() {
         given:
-        ResponseEntity<ElementQueryApiDto> addElementResponse = addSampleElement()
+        addSampleElement()
 
         when:
         ResponseEntity<List<ElementQueryApiDto>> response = restTemplate.exchange(
                 localUrl('/api/v1/' + TEST_SPACE_NAME + '/'+ TEST_BUCKET_NAME),
                 HttpMethod.GET,
                 null,
-                ElementQueryApiDto[].class)
+                PaginatedElementsApiDto.class)
 
         then:
-        response.body == space.getAllElements(TEST_BUCKET_NAME).stream()
+        BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, 20, 0)
+        response.body.results == space.filterElements(query).stream()
                 .map({it -> ElementQueryApiDto.from(it)})
                 .collect(Collectors.toList())
     }
@@ -187,16 +189,12 @@ class CrudBucketSpec extends BaseSpec {
         ex.rawStatusCode == 404
     }
 
-    ResponseEntity<ElementQueryApiDto> addSampleElement() {
-        restTemplate.exchange(
-                localUrl('/api/v1/' + TEST_SPACE_NAME + '/'+ TEST_BUCKET_NAME),
-                HttpMethod.POST,
-                httpJsonEntity(sampleElement()),
-                ElementQueryApiDto.class)
+    private ResponseEntity<ElementQueryApiDto> addSampleElement() {
+        addSampleElement(TEST_SPACE_NAME, TEST_BUCKET_NAME, sampleElement())
     }
 
     // make is simpler in next sprint
-    def sampleElement() {
+    private def sampleElement() {
         JsonOutput.toJson([
                 fields: [
                         [
@@ -211,7 +209,7 @@ class CrudBucketSpec extends BaseSpec {
         ])
     }
 
-    def sampleElementUpdate() {
+    private def sampleElementUpdate() {
         JsonOutput.toJson([
                 fields: [
                         [

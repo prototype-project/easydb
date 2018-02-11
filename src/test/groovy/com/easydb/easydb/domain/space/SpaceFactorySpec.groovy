@@ -1,9 +1,4 @@
-package com.easydb.easydb.domain
-
-import com.easydb.easydb.domain.space.Space
-import com.easydb.easydb.domain.space.SpaceDefinition
-import com.easydb.easydb.domain.space.SpaceDefinitionRepository
-import com.easydb.easydb.domain.space.SpaceFactory
+package com.easydb.easydb.domain.space
 
 import spock.lang.Specification
 

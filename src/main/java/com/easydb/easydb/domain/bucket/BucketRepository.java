@@ -18,5 +18,7 @@ public interface BucketRepository {
 
 	void updateElement(Element toUpdate) throws BucketOrElementDoesNotExistException;
 
-	List<Element> getAllElements(String name);
+	List<Element> filterElements(BucketQuery query);
+
+	long getNumberOfElements(String bucketName);
 }
