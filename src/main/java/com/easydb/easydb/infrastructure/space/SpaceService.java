@@ -58,7 +58,7 @@ public class SpaceService implements Space {
 	@Override
 	public List<Element> filterElements(BucketQuery query) {
 		return bucketRepository.filterElements(rebuildToProperSpaceName(query)).stream()
-				.map(it -> Element.of(it.getId(), query.getName(), it.getFields()))
+				.map(it -> Element.of(it.getId(), query.getBucketName(), it.getFields()))
 				.collect(Collectors.toList());
 	}
 
@@ -68,7 +68,7 @@ public class SpaceService implements Space {
 	}
 
 	private BucketQuery rebuildToProperSpaceName(BucketQuery query) {
-		return BucketQuery.of(getBucketName(query.getName()), query.getLimit(), query.getOffset());
+		return BucketQuery.of(getBucketName(query.getBucketName()), query.getLimit(), query.getOffset());
 	}
 
 	private String getBucketName(String bucketName) {

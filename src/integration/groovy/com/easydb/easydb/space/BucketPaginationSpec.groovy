@@ -95,23 +95,23 @@ class BucketPaginationSpec extends BaseSpec {
 		response.rawStatusCode == 400
 	}
 
-	private PaginatedElementsApiDto filterElements(String spaceName, int offset, int limit) {
+	PaginatedElementsApiDto filterElements(String spaceName, int offset, int limit) {
 		return filterElements(
 				localUrl(String.format("/api/v1/%s/%s?limit=%d&offset=%d", spaceName, BUCKET_NAME, limit, offset)))
 	}
 
-	private PaginatedElementsApiDto filterElements(String fullUrl) {
+	PaginatedElementsApiDto filterElements(String fullUrl) {
 		return restTemplate.getForEntity(
 				fullUrl,
 				PaginatedElementsApiDto.class
 		).body
 	}
 
-	private ResponseEntity<ElementQueryApiDto> addSampleElement(String spaceName, String body) {
+	ResponseEntity<ElementQueryApiDto> addSampleElement(String spaceName, String body) {
 		addSampleElement(spaceName, BUCKET_NAME, body)
 	}
 
-	private static String buildElementBody(String firstName) {
+	static String buildElementBody(String firstName) {
 		JsonOutput.toJson([
 				fields: [
 						[

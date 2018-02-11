@@ -3,19 +3,19 @@ package com.easydb.easydb.domain.bucket;
 
 public class BucketQuery {
 
-	private final String name;
+	private final String bucketName;
 	private final int limit;
 	private final int offset;
 
-	private BucketQuery(String name, int limit, int offset) {
-		this.name = name;
+	private BucketQuery(String bucketName, int limit, int offset) {
+		this.bucketName = bucketName;
 		this.limit = limit;
 		this.offset = offset;
 		validateConstraints();
 	}
 
-	public String getName() {
-		return name;
+	public String getBucketName() {
+		return bucketName;
 	}
 
 	public int getLimit() {

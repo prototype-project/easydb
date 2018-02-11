@@ -31,53 +31,41 @@ class BucketPaginationSpec extends Specification {
         space.removeBucket(TEST_BUCKET_NAME)
     }
 
-    def "should limit number of elements"() {
-        when:
+    @Unroll
+    def "should paginate elements"() {
+        given:
         createElements()
-        BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, 1, 1)
+        BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, limit, offset)
 
-        then:
+        when:
         List<Element> elements = space.filterElements(query)
-        elements.size() == 1
-        elements[0].getFieldValue("firstName") == "Anna"
-    }
-
-    @Unroll
-    def "should return proper number of elements based on limit"() {
-        when:
-        createElements()
-
-        BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, limit, 0)
 
         then:
-        space.filterElements(query).size() == limit
+        elements.size() == expectedNumberOfElements
 
         where:
-        limit << [1, 2, 3]
+        limit | offset | expectedNumberOfElements
+
+        1     |   1    |   1
+        1     |   0    |   1
+        2     |   0    |   2
+        3     |   0    |   3
+        3     |   1    |   2
+        3     |   2    |   1
+        3     |   3    |   0
+        3     |   5    |   0
     }
 
-    @Unroll
-    def "should return proper number of elements based on offset"() {
-        when:
-        createElements()
+    def "should return empty list when there is no elements"() {
+        given:
+        BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, 1, 0)
 
-        BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, 3, offset)
+        when:
+        List<Element> elements = space.filterElements(query)
 
         then:
-        space.filterElements(query).size() == 3 - offset
+        elements.size() == 0
 
-        where:
-        offset << [0, 1, 2, 3]
-    }
-
-    def "should return empty list when offset is to bigger than number of elements"() {
-        when:
-        createElements()
-
-        BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, 3, 5)
-
-        then:
-        space.filterElements(query).size() == 0
     }
 
     @Unroll

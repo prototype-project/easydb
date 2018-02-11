@@ -208,7 +208,7 @@ class SpaceSpec extends Specification {
 
     }
 
-    private static BucketQuery getDefaultBucketQuery() {
+    static BucketQuery getDefaultBucketQuery() {
         return BucketQuery.of(TEST_BUCKET_NAME, 20, 0);
     }
 }

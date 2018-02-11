@@ -77,8 +77,8 @@ public class MongoBucketRepository implements BucketRepository {
 	@Override
 	public List<Element> filterElements(BucketQuery query) {
 		Query mongoQuery = fromBucketQuery(query);
-		return mongoTemplate.find(mongoQuery, PersistentBucketElement.class, query.getName()).stream()
-				.map(it -> it.toDomainElement(query.getName()))
+		return mongoTemplate.find(mongoQuery, PersistentBucketElement.class, query.getBucketName()).stream()
+				.map(it -> it.toDomainElement(query.getBucketName()))
 				.collect(Collectors.toList());
 	}
 
