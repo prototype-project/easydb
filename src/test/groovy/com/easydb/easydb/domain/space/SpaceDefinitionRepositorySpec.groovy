@@ -1,8 +1,5 @@
-package com.easydb.easydb.domain
+package com.easydb.easydb.domain.space
 
-import com.easydb.easydb.domain.space.SpaceDefinition
-import com.easydb.easydb.domain.space.SpaceDefinitionRepository
-import com.easydb.easydb.domain.space.SpaceNameNotUniqueException
 import spock.lang.Specification
 
 class SpaceDefinitionRepositorySpec extends Specification {

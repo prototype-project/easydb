@@ -102,7 +102,7 @@ class CrudBucketSpec extends BaseSpec {
                 PaginatedElementsApiDto.class)
 
         then:
-        BucketQuery query = getDefaultBucketQuery()
+        BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, 20, 0)
         response.body.results == space.filterElements(query).stream()
                 .map({it -> ElementQueryApiDto.from(it)})
                 .collect(Collectors.toList())
@@ -189,16 +189,12 @@ class CrudBucketSpec extends BaseSpec {
         ex.rawStatusCode == 404
     }
 
-    ResponseEntity<ElementQueryApiDto> addSampleElement() {
-        restTemplate.exchange(
-                localUrl('/api/v1/' + TEST_SPACE_NAME + '/'+ TEST_BUCKET_NAME),
-                HttpMethod.POST,
-                httpJsonEntity(sampleElement()),
-                ElementQueryApiDto.class)
+    private ResponseEntity<ElementQueryApiDto> addSampleElement() {
+        addSampleElement(TEST_SPACE_NAME, TEST_BUCKET_NAME, sampleElement())
     }
 
     // make is simpler in next sprint
-    def sampleElement() {
+    private def sampleElement() {
         JsonOutput.toJson([
                 fields: [
                         [
@@ -213,7 +209,7 @@ class CrudBucketSpec extends BaseSpec {
         ])
     }
 
-    def sampleElementUpdate() {
+    private def sampleElementUpdate() {
         JsonOutput.toJson([
                 fields: [
                         [
@@ -226,9 +222,5 @@ class CrudBucketSpec extends BaseSpec {
                         ]
                 ]
         ])
-    }
-
-    private BucketQuery getDefaultBucketQuery() {
-        return BucketQuery.of(TEST_BUCKET_NAME, 20, 0);
     }
 }

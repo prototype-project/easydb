@@ -1,11 +1,9 @@
-package com.easydb.easydb.domain
+package com.easydb.easydb.domain.space
 
 import com.easydb.easydb.domain.bucket.BucketOrElementDoesNotExistException
 import com.easydb.easydb.domain.bucket.BucketQuery
 import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.bucket.ElementField
-import com.easydb.easydb.domain.space.Space
-import com.easydb.easydb.domain.space.SpaceDefinition
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -198,6 +196,16 @@ class SpaceSpec extends Specification {
 
         then:
         elementsFromBucket.size() == 0
+    }
+
+    def "should return number of elements in bucket"() {
+        given:
+        space.addElement(builder().build())
+        space.addElement(builder().build())
+
+        expect:
+        space.getNumberOfElements(TEST_BUCKET_NAME) == 2
+
     }
 
     private static BucketQuery getDefaultBucketQuery() {

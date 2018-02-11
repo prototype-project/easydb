@@ -3,19 +3,18 @@ package com.easydb.easydb.space
 import com.easydb.easydb.BaseSpec
 import com.easydb.easydb.api.ElementQueryApiDto
 import com.easydb.easydb.api.PaginatedElementsApiDto
-import com.easydb.easydb.api.SpaceDefinitionApiDto;
 import groovy.json.JsonOutput
-import org.springframework.http.HttpMethod
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity
+import org.springframework.web.client.HttpClientErrorException;
 
-class SpaceQuerySpec extends BaseSpec {
+class BucketPaginationSpec extends BaseSpec {
 
 	private static String BUCKET_NAME = "people"
 
 	private String spaceName
 
 	def setup() {
-		spaceName = addSampleSpace()
+		spaceName = addSampleSpace().body.spaceName
 		addSampleElement(spaceName, buildElementBody("Daniel"))
 		addSampleElement(spaceName, buildElementBody("Bartek"))
 		addSampleElement(spaceName, buildElementBody("Zdzisiek"))
@@ -78,6 +77,29 @@ class SpaceQuerySpec extends BaseSpec {
 		paginated.getNext() == null
 	}
 
+	def "should throw error when trying to paginate by limit <= 0"() {
+		when:
+		filterElements(spaceName, 0, 0)
+
+		then:
+		def response = thrown(HttpClientErrorException)
+		response.rawStatusCode == 400
+	}
+
+	def "should throw error when trying to paginate by offset < 0"() {
+		when:
+		filterElements(spaceName, -1, 2)
+
+		then:
+		def response = thrown(HttpClientErrorException)
+		response.rawStatusCode == 400
+	}
+
+	private PaginatedElementsApiDto filterElements(String spaceName, int offset, int limit) {
+		return filterElements(
+				localUrl(String.format("/api/v1/%s/%s?limit=%d&offset=%d", spaceName, BUCKET_NAME, limit, offset)))
+	}
+
 	private PaginatedElementsApiDto filterElements(String fullUrl) {
 		return restTemplate.getForEntity(
 				fullUrl,
@@ -85,29 +107,11 @@ class SpaceQuerySpec extends BaseSpec {
 		).body
 	}
 
-	private PaginatedElementsApiDto filterElements(String spaceName, int offset, int limit) {
-		return restTemplate.getForEntity(
-				localUrl(String.format("/api/v1/%s/%s?limit=%d&offset=%d", spaceName, BUCKET_NAME, limit, offset)),
-				PaginatedElementsApiDto.class
-		).body
+	private ResponseEntity<ElementQueryApiDto> addSampleElement(String spaceName, String body) {
+		addSampleElement(spaceName, BUCKET_NAME, body)
 	}
 
-	private String addSampleSpace() {
-		return restTemplate.postForEntity(
-				localUrl("/api/v1/spaces/"),
-				Void,
-				SpaceDefinitionApiDto.class).getBody().spaceName
-	}
-
-	ResponseEntity<ElementQueryApiDto> addSampleElement(String spaceName, String body) {
-		restTemplate.exchange(
-				localUrl('/api/v1/' + spaceName + '/'+ BUCKET_NAME),
-				HttpMethod.POST,
-				httpJsonEntity(body),
-				ElementQueryApiDto.class)
-	}
-
-	def buildElementBody(String firstName) {
+	private static String buildElementBody(String firstName) {
 		JsonOutput.toJson([
 				fields: [
 						[

@@ -63,11 +63,4 @@ class CrudSpaceDefinitionSpec extends BaseSpec {
 		def response = thrown(HttpClientErrorException)
 		response.statusCode == HttpStatus.NOT_FOUND
 	}
-
-	private ResponseEntity<SpaceDefinitionApiDto> addSampleSpace() {
-		restTemplate.postForEntity(
-				localUrl("/api/v1/spaces/"),
-				Void,
-				SpaceDefinitionApiDto.class)
-	}
 }
