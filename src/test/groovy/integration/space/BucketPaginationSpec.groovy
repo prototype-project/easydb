@@ -1,6 +1,6 @@
-package com.easydb.easydb.space
+package integration.space
 
-import com.easydb.easydb.BaseSpec
+import integration.BaseSpec
 import com.easydb.easydb.api.ElementQueryApiDto
 import com.easydb.easydb.api.PaginatedElementsApiDto
 import groovy.json.JsonOutput

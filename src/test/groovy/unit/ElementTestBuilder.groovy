@@ -1,4 +1,4 @@
-package com.easydb.easydb.domain
+package unit
 
 import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.bucket.ElementField

@@ -1,7 +1,7 @@
-package com.easydb.easydb.space
+package integration.space
 
-import com.easydb.easydb.BaseSpec
-import com.easydb.easydb.domain.ElementTestBuilder
+import integration.BaseSpec
+import unit.ElementTestBuilder
 import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.space.Space
 import com.easydb.easydb.domain.space.SpaceDefinition

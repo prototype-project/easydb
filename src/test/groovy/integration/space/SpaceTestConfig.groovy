@@ -1,4 +1,4 @@
-package com.easydb.easydb.space
+package integration.space
 
 import com.github.fakemongo.Fongo
 import com.mongodb.Mongo

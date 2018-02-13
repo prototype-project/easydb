@@ -1,10 +1,12 @@
-package com.easydb.easydb.domain.space
+package unit.space
 
-import com.easydb.easydb.domain.ElementTestBuilder
+import unit.ElementTestBuilder
 import com.easydb.easydb.domain.bucket.BucketQuery
 import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.bucket.ElementField
 import com.easydb.easydb.domain.bucket.InvalidPaginationDataException
+import com.easydb.easydb.domain.space.Space
+import com.easydb.easydb.domain.space.SpaceDefinition
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Unroll;

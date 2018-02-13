@@ -1,13 +1,15 @@
-package com.easydb.easydb.domain.space
+package unit.space
 
 import com.easydb.easydb.domain.bucket.BucketOrElementDoesNotExistException
 import com.easydb.easydb.domain.bucket.BucketQuery
 import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.bucket.ElementField
+import com.easydb.easydb.domain.space.Space
+import com.easydb.easydb.domain.space.SpaceDefinition
 import spock.lang.Shared
 import spock.lang.Specification
 
-import static com.easydb.easydb.domain.ElementTestBuilder.builder
+import static unit.ElementTestBuilder.builder
 
 
 class SpaceSpec extends Specification {
