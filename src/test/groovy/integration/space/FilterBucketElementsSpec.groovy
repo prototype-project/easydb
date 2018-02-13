@@ -15,8 +15,8 @@ class FilterBucketElementsSpec extends BaseSpec {
         addSampleElement(spaceName, BUCKET_NAME, body)
     }
 
-    String buildElementBody(String firstName, String lastName) {
-        JsonOutput.toJson([
+    String buildElementBody(String firstName, String lastName, String age = null) {
+        def result = [
                 fields: [
                         [
                                 name : "firstName",
@@ -27,7 +27,12 @@ class FilterBucketElementsSpec extends BaseSpec {
                                 value: lastName
                         ]
                 ]
-        ])
+        ]
+        if (age != null) {
+            result.fields.add([name: 'age', value: age])
+        }
+
+        JsonOutput.toJson(result)
     }
 
     private String spaceName
@@ -45,6 +50,9 @@ class FilterBucketElementsSpec extends BaseSpec {
         addSampleElement(spaceName, buildElementBody("Bartek", "B"))
         addSampleElement(spaceName, buildElementBody("Zdzisiek", "Z1"))
         addSampleElement(spaceName, buildElementBody("Zdzisiek", "Z2"))
+        addSampleElement(spaceName, buildElementBody("Zdzisiek", "Z2", '20'))
+        addSampleElement(spaceName, buildElementBody("Zdzisiek", "Z2", '20'))
+        addSampleElement(spaceName, buildElementBody("Zdzisiek", "Z2", '21'))
     }
 
     def "should filter bucket elements by single field"() {
@@ -56,27 +64,36 @@ class FilterBucketElementsSpec extends BaseSpec {
 
         where:
         firstName  | expectedSize
-        "Zdzisiek" | 2
+        "Zdzisiek" | 5
         "Bartek"   | 1
         "Daniel"   | 1
         "Smith"    | 0
     }
 
     def "should filter bucket elements by multiple fields"() {
-        when:
-        PaginatedElementsApiDto filteredElements = filterElements(spaceName, 0, 4, [
+        given:
+        def filters = [
                 firstName: firstName,
-                lastName: lastName
-        ])
+                lastName : lastName
+        ]
+        if (age != null) {
+            filters.age = age
+        }
+
+        when:
+        PaginatedElementsApiDto filteredElements = filterElements(spaceName, 0, 4, filters)
 
         then:
         filteredElements.results.size() == expectedSize
 
         where:
-        firstName  | lastName | expectedSize
-        "Zdzisiek" | "Z1"     | 1
-        "Bartek"   | "B"      | 1
-        "Smith"    | "S"      | 0
+        firstName  | lastName | age  | expectedSize
+        "Zdzisiek" | "Z1"     | null | 1
+        "Bartek"   | "B"      | null | 1
+        "Smith"    | "S"      | null | 0
+        "Zdzisiek" | "Z2"     | '21' | 1
+        "Zdzisiek" | "Z2"     | '20' | 2
+        "Zdzisiek" | "Z1"     | '20' | 0
     }
 
     PaginatedElementsApiDto filterElements(String spaceName, int offset, int limit, Map<String, String> filters) {
