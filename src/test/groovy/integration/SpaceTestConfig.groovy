@@ -1,4 +1,4 @@
-package integration.space
+package integration
 
 import com.github.fakemongo.Fongo
 import com.mongodb.Mongo

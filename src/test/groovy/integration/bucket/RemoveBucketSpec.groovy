@@ -1,4 +1,4 @@
-package integration.space
+package integration.bucket
 
 import integration.BaseSpec
 import unit.ElementTestBuilder

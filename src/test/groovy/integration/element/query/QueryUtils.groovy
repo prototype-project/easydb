@@ -1,4 +1,4 @@
-package integration.space
+package integration.element.query
 
 import com.easydb.easydb.api.ElementQueryApiDto
 import com.easydb.easydb.api.PaginatedElementsApiDto

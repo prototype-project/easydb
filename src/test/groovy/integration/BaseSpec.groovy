@@ -3,7 +3,6 @@ package integration
 import com.easydb.easydb.EasydbApplication
 import com.easydb.easydb.api.ElementQueryApiDto
 import com.easydb.easydb.api.SpaceDefinitionApiDto
-import integration.space.SpaceTestConfig
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpEntity
