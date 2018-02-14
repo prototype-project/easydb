@@ -1,14 +1,11 @@
 package integration.space
 
 import integration.BaseSpec
-import com.easydb.easydb.api.ElementQueryApiDto
 import com.easydb.easydb.api.PaginatedElementsApiDto
 import groovy.json.JsonOutput
-import org.springframework.http.ResponseEntity
 
 
-class FilterBucketElementsSpec extends BaseSpec {
-    String BUCKET_NAME = "people"
+class FilterBucketElementsSpec extends BaseSpec implements QueryUtils {
 
     private String spaceName
 
@@ -78,10 +75,6 @@ class FilterBucketElementsSpec extends BaseSpec {
         filteredElements.results.size() == 0
     }
 
-    ResponseEntity<ElementQueryApiDto> addSampleElement(String spaceName, String body) {
-        addSampleElement(spaceName, BUCKET_NAME, body)
-    }
-
     String buildElementBody(String firstName, String lastName, String age = null) {
         def result = [
                 fields: [
@@ -100,21 +93,5 @@ class FilterBucketElementsSpec extends BaseSpec {
         }
 
         JsonOutput.toJson(result)
-    }
-
-    PaginatedElementsApiDto filterElements(String spaceName, int offset, int limit, Map<String, String> filters) {
-        String filtersAsString = ''
-        filters.forEach({ key, val -> filtersAsString = filtersAsString + '&' + key + '=' + val })
-        filterElements(buildUrl(spaceName, BUCKET_NAME, limit, offset, filtersAsString))
-    }
-
-    String buildUrl(String spaceId, String bucketName, int limit, int offset, String filters) {
-        localUrl(String.format("/api/v1/%s/%s?limit=%d&offset=%d&%s", spaceId, bucketName, limit, offset, filters))
-    }
-
-    PaginatedElementsApiDto filterElements(String fullUrl) {
-        restTemplate.getForEntity(
-                fullUrl,
-                PaginatedElementsApiDto.class).body
     }
 }

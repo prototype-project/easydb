@@ -41,7 +41,7 @@ abstract class BaseSpec extends Specification {
         new HttpEntity<String>(jsonBody, headers())
     }
 
-    protected ResponseEntity<ElementQueryApiDto> addSampleElement(String spaceName, String bucketName, String body) {
+    ResponseEntity<ElementQueryApiDto> addSampleElement(String spaceName, String bucketName, String body) {
         return restTemplate.exchange(
                 localUrl('/api/v1/' + spaceName + '/'+ bucketName),
                 HttpMethod.POST,
@@ -49,7 +49,7 @@ abstract class BaseSpec extends Specification {
                 ElementQueryApiDto.class)
     }
 
-    protected ResponseEntity<SpaceDefinitionApiDto> addSampleSpace() {
+    ResponseEntity<SpaceDefinitionApiDto> addSampleSpace() {
         return restTemplate.postForEntity(
                 localUrl("/api/v1/spaces/"),
                 Void,
