@@ -3,7 +3,6 @@ package integration.space
 import integration.BaseSpec
 import com.easydb.easydb.api.ElementQueryApiDto
 import com.easydb.easydb.api.PaginatedElementsApiDto
-import com.easydb.easydb.api.SpaceDefinitionApiDto
 import groovy.json.JsonOutput
 import org.springframework.http.ResponseEntity
 
@@ -11,38 +10,7 @@ import org.springframework.http.ResponseEntity
 class FilterBucketElementsSpec extends BaseSpec {
     String BUCKET_NAME = "people"
 
-    ResponseEntity<ElementQueryApiDto> addSampleElement(String spaceName, String body) {
-        addSampleElement(spaceName, BUCKET_NAME, body)
-    }
-
-    String buildElementBody(String firstName, String lastName, String age = null) {
-        def result = [
-                fields: [
-                        [
-                                name : "firstName",
-                                value: firstName
-                        ],
-                        [
-                                name : "lastName",
-                                value: lastName
-                        ]
-                ]
-        ]
-        if (age != null) {
-            result.fields.add([name: 'age', value: age])
-        }
-
-        JsonOutput.toJson(result)
-    }
-
     private String spaceName
-
-    protected ResponseEntity<SpaceDefinitionApiDto> addSampleSpace() {
-        return restTemplate.postForEntity(
-                localUrl("/api/v1/spaces/"),
-                Void,
-                SpaceDefinitionApiDto.class)
-    }
 
     def setup() {
         spaceName = addSampleSpace().body.spaceName
@@ -57,7 +25,7 @@ class FilterBucketElementsSpec extends BaseSpec {
 
     def "should filter bucket elements by single field"() {
         when:
-        PaginatedElementsApiDto filteredElements = filterElements(spaceName, 0, 4, [firstName: firstName])
+        PaginatedElementsApiDto filteredElements = filterElements(spaceName, 0, 7, [firstName: firstName])
 
         then:
         filteredElements.results.size() == expectedSize
@@ -81,7 +49,7 @@ class FilterBucketElementsSpec extends BaseSpec {
         }
 
         when:
-        PaginatedElementsApiDto filteredElements = filterElements(spaceName, 0, 4, filters)
+        PaginatedElementsApiDto filteredElements = filterElements(spaceName, 0, 7, filters)
 
         then:
         filteredElements.results.size() == expectedSize
@@ -94,6 +62,44 @@ class FilterBucketElementsSpec extends BaseSpec {
         "Zdzisiek" | "Z2"     | '21' | 1
         "Zdzisiek" | "Z2"     | '20' | 2
         "Zdzisiek" | "Z1"     | '20' | 0
+    }
+
+    def "should not ignore unknown filter fields"() {
+        given:
+        def filters = [
+                firstName: 'Zdzisiek',
+                uknownField : 'someValue'
+        ]
+
+        when:
+        PaginatedElementsApiDto filteredElements = filterElements(spaceName, 0, 7, filters)
+
+        then:
+        filteredElements.results.size() == 0
+    }
+
+    ResponseEntity<ElementQueryApiDto> addSampleElement(String spaceName, String body) {
+        addSampleElement(spaceName, BUCKET_NAME, body)
+    }
+
+    String buildElementBody(String firstName, String lastName, String age = null) {
+        def result = [
+                fields: [
+                        [
+                                name : "firstName",
+                                value: firstName
+                        ],
+                        [
+                                name : "lastName",
+                                value: lastName
+                        ]
+                ]
+        ]
+        if (age != null) {
+            result.fields.add([name: 'age', value: age])
+        }
+
+        JsonOutput.toJson(result)
     }
 
     PaginatedElementsApiDto filterElements(String spaceName, int offset, int limit, Map<String, String> filters) {
