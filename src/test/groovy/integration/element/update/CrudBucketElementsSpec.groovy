@@ -1,6 +1,6 @@
-package com.easydb.easydb.space
+package integration.element.update
 
-import com.easydb.easydb.BaseSpec
+import integration.BaseSpec
 import com.easydb.easydb.api.ElementQueryApiDto
 import com.easydb.easydb.api.PaginatedElementsApiDto
 import com.easydb.easydb.domain.bucket.BucketQuery
@@ -17,7 +17,7 @@ import org.springframework.web.client.HttpClientErrorException
 
 import java.util.stream.Collectors
 
-class CrudBucketSpec extends BaseSpec {
+class CrudBucketElementsSpec extends BaseSpec {
 
     @Autowired
     SpaceFactory spaceFactory

@@ -7,12 +7,15 @@ import com.easydb.easydb.domain.space.SpaceDefinition;
 import com.easydb.easydb.domain.space.SpaceDefinitionRepository;
 import com.easydb.easydb.domain.space.SpaceFactory;
 import com.easydb.easydb.infrastructure.space.UUIDProvider;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -81,6 +84,7 @@ class SpaceController {
     PaginatedElementsApiDto filterElements(
             @PathVariable("spaceName") String spaceName,
             @PathVariable("bucketName") String bucketName,
+            @RequestParam Map<String, String> filters,
             @RequestParam(value = "limit", defaultValue = "20") int limit,
             @RequestParam(value = "offset", defaultValue = "0") int offset,
             HttpServletRequest request) {
@@ -88,6 +92,14 @@ class SpaceController {
         Space space = spaceFactory.buildSpace(spaceDefinition);
 
         BucketQuery query = BucketQuery.of(bucketName, limit, offset);
+
+        filters.keySet()
+                .stream()
+                .filter(fieldName -> !fieldName.equals("limit") && !fieldName.equals("offset"))
+                .forEach(fieldName ->
+                    query.whereFieldEq(fieldName, filters.get(fieldName))
+                );
+
         List<ElementQueryApiDto> results = space.filterElements(query).stream()
                 .map(ElementQueryApiDto::from)
                 .collect(Collectors.toList());

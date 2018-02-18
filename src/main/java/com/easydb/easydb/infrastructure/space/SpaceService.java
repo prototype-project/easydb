@@ -68,7 +68,7 @@ public class SpaceService implements Space {
 	}
 
 	private BucketQuery rebuildToProperSpaceName(BucketQuery query) {
-		return BucketQuery.of(getBucketName(query.getBucketName()), query.getLimit(), query.getOffset());
+		return query.rename(getBucketName(query.getBucketName()));
 	}
 
 	private String getBucketName(String bucketName) {

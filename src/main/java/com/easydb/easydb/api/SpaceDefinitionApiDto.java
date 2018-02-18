@@ -4,7 +4,7 @@ import com.easydb.easydb.domain.space.SpaceDefinition;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-class SpaceDefinitionApiDto {
+public class SpaceDefinitionApiDto {
 
 	@JsonProperty("spaceName")
 	private final String spaceName;

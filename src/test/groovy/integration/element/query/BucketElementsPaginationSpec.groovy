@@ -1,15 +1,11 @@
-package com.easydb.easydb.space
+package integration.element.query
 
-import com.easydb.easydb.BaseSpec
-import com.easydb.easydb.api.ElementQueryApiDto
+import integration.BaseSpec
 import com.easydb.easydb.api.PaginatedElementsApiDto
 import groovy.json.JsonOutput
-import org.springframework.http.ResponseEntity
 import org.springframework.web.client.HttpClientErrorException;
 
-class BucketPaginationSpec extends BaseSpec {
-
-	private static String BUCKET_NAME = "people"
+class BucketElementsPaginationSpec extends BaseSpec implements QueryUtils {
 
 	private String spaceName
 
@@ -93,22 +89,6 @@ class BucketPaginationSpec extends BaseSpec {
 		then:
 		def response = thrown(HttpClientErrorException)
 		response.rawStatusCode == 400
-	}
-
-	PaginatedElementsApiDto filterElements(String spaceName, int offset, int limit) {
-		return filterElements(
-				localUrl(String.format("/api/v1/%s/%s?limit=%d&offset=%d", spaceName, BUCKET_NAME, limit, offset)))
-	}
-
-	PaginatedElementsApiDto filterElements(String fullUrl) {
-		return restTemplate.getForEntity(
-				fullUrl,
-				PaginatedElementsApiDto.class
-		).body
-	}
-
-	ResponseEntity<ElementQueryApiDto> addSampleElement(String spaceName, String body) {
-		addSampleElement(spaceName, BUCKET_NAME, body)
 	}
 
 	static String buildElementBody(String firstName) {

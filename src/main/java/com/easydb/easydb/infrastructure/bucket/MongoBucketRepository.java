@@ -95,6 +95,7 @@ public class MongoBucketRepository implements BucketRepository {
 		Query query = new Query();
 		query.limit(bucketQuery.getLimit());
 		query.skip(bucketQuery.getOffset());
+		bucketQuery.buildMongoCriteria().map(criteria -> query.addCriteria(criteria));
 		return query;
 	}
 }

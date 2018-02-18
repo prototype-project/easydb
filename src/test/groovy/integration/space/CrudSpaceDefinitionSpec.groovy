@@ -1,6 +1,6 @@
-package com.easydb.easydb.space;
+package integration.space;
 
-import com.easydb.easydb.BaseSpec
+import integration.BaseSpec
 import com.easydb.easydb.api.SpaceDefinitionApiDto;
 import com.easydb.easydb.domain.space.SpaceDefinitionRepository
 import org.springframework.beans.factory.annotation.Autowired

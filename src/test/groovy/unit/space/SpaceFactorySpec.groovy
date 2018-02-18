@@ -1,5 +1,8 @@
-package com.easydb.easydb.domain.space
+package unit.space
 
+import com.easydb.easydb.domain.space.Space
+import com.easydb.easydb.domain.space.SpaceDefinition
+import com.easydb.easydb.domain.space.SpaceFactory
 import spock.lang.Specification
 
 class SpaceFactorySpec extends Specification {
