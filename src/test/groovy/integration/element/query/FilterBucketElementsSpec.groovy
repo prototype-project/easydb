@@ -32,6 +32,7 @@ class FilterBucketElementsSpec extends BaseSpec implements QueryUtils {
         "Bartek"   | 1
         "Daniel"   | 1
         "Smith"    | 0
+        "@#%!#%@"  | 0
     }
 
     def "should filter bucket elements by multiple fields"() {
