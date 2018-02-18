@@ -68,6 +68,17 @@ task integrationTest(type: Test) {
 	classpath = sourceSets.integration.runtimeClasspath
 }
 
+task run {
+	doFirst {
+		String profile = project.hasProperty('profile') ? project.property('profile'): 'production'
+		bootRun.systemProperty 'spring.profiles.active', profile
+	}
+}
+
+bootRun {
+	dependsOn run
+}
+
 check.dependsOn integrationTest
 integrationTest.mustRunAfter test
 
