@@ -44,6 +44,8 @@ configurations {
 	integrationRuntime.extendsFrom testRuntime
 }
 
+
+
 dependencies {
 	compile 'org.springframework.boot:spring-boot-starter-web'
 	compile group: 'com.google.guava', name: 'guava', version: '19.0'
