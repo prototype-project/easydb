@@ -8,7 +8,7 @@ public interface BucketRepository {
 
 	void remove(String name);
 
-	Element insertElement(Element element);
+	void insertElement(Element element);
 
 	Element getElement(String bucketName, String id) throws BucketOrElementDoesNotExistException;
 

@@ -1,6 +1,6 @@
 package com.easydb.easydb.api;
 
-import com.easydb.easydb.domain.space.SpaceDefinition;
+import com.easydb.easydb.domain.space.Space;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -14,7 +14,7 @@ public class SpaceDefinitionApiDto {
 		this.spaceName = spaceName;
 	}
 
-	SpaceDefinition toDomain() {
-		return SpaceDefinition.of(spaceName);
+	Space toDomain() {
+		return Space.of(spaceName);
 	}
 }

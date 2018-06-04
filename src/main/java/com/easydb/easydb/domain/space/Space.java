@@ -1,26 +1,17 @@
 package com.easydb.easydb.domain.space;
 
-import com.easydb.easydb.domain.bucket.BucketQuery;
-import com.easydb.easydb.domain.bucket.Element;
+public class Space {
+    private final String name;
 
-import java.util.List;
+    private Space(String name) {
+        this.name = name;
+    }
 
-public interface Space {
-    boolean bucketExists(String name);
+    public String getName() {
+        return name;
+    }
 
-    void removeBucket(String name);
-
-	void addElement(Element element);
-
-	Element getElement(String bucketName, String id);
-
-	void removeElement(String bucketName, String elementId);
-
-	boolean elementExists(String bucketName, String elementId);
-
-	void updateElement(Element toUpdate);
-
-	List<Element> filterElements(BucketQuery query);
-
-	long getNumberOfElements(String bucketName);
+    public static Space of(String name) {
+        return new Space(name);
+    }
 }

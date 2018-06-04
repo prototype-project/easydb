@@ -33,9 +33,8 @@ public class MongoBucketRepository implements BucketRepository {
 	}
 
 	@Override
-	public Element insertElement(Element element) {
+	public void insertElement(Element element) {
 		mongoTemplate.insert(PersistentBucketElement.of(element), element.getBucketName());
-		return element;
 	}
 
 	@Override
@@ -95,7 +94,6 @@ public class MongoBucketRepository implements BucketRepository {
 		Query query = new Query();
 		query.limit(bucketQuery.getLimit());
 		query.skip(bucketQuery.getOffset());
-		bucketQuery.buildMongoCriteria().map(criteria -> query.addCriteria(criteria));
 		return query;
 	}
 }

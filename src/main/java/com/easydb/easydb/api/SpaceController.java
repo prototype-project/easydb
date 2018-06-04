@@ -1,12 +1,11 @@
 package com.easydb.easydb.api;
 
-import com.easydb.easydb.domain.bucket.BucketQuery;
 import com.easydb.easydb.domain.bucket.Element;
+import com.easydb.easydb.domain.space.SpaceService;
 import com.easydb.easydb.domain.space.Space;
-import com.easydb.easydb.domain.space.SpaceDefinition;
-import com.easydb.easydb.domain.space.SpaceDefinitionRepository;
-import com.easydb.easydb.domain.space.SpaceFactory;
-import com.easydb.easydb.infrastructure.space.UUIDProvider;
+import com.easydb.easydb.domain.space.SpaceRepository;
+import com.easydb.easydb.domain.space.SpaceServiceFactory;
+import com.easydb.easydb.domain.space.UUIDProvider;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -14,32 +13,28 @@ import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 @RestController
 @RequestMapping(value = "/api/v1")
 class SpaceController {
 
-    private final SpaceFactory spaceFactory;
-    private final SpaceDefinitionRepository spaceDefinitionRepository;
+    private final SpaceServiceFactory spaceServiceFactory;
+    private final SpaceRepository spaceRepository;
     private final UUIDProvider uuidProvider;
 
     private SpaceController(
-            SpaceFactory spaceFactory,
+            SpaceServiceFactory spaceServiceFactory,
             UUIDProvider uuidProvider,
-            SpaceDefinitionRepository spaceDefinitionRepository) {
-        this.spaceFactory = spaceFactory;
+            SpaceRepository spaceRepository) {
+        this.spaceServiceFactory = spaceServiceFactory;
         this.uuidProvider = uuidProvider;
-        this.spaceDefinitionRepository = spaceDefinitionRepository;
+        this.spaceRepository = spaceRepository;
     }
 
     @DeleteMapping(path = "/{spaceName}/{bucketName}")
     @ResponseStatus(value = HttpStatus.OK)
     void deleteBucket(@PathVariable("spaceName") String spaceName, @PathVariable("bucketName") String bucketName) {
-        SpaceDefinition spaceDefinition = spaceDefinitionRepository.get(spaceName);
-        Space space = spaceFactory.buildSpace(spaceDefinition);
+        Space spaceDefinition = spaceRepository.get(spaceName);
+        SpaceService space = spaceServiceFactory.buildSpaceService(spaceDefinition);
         space.removeBucket(bucketName);
     }
 
@@ -50,8 +45,8 @@ class SpaceController {
             @PathVariable("bucketName") String bucketName,
             @RequestBody @Valid ElementOperationApiDto toCreate) {
         Element element = toCreate.toDomain(uuidProvider.generateUUID(), bucketName);
-        SpaceDefinition spaceDefinition = spaceDefinitionRepository.get(spaceName);
-        Space space = spaceFactory.buildSpace(spaceDefinition);
+        Space spaceDefinition = spaceRepository.get(spaceName);
+        SpaceService space = spaceServiceFactory.buildSpaceService(spaceDefinition);
         space.addElement(element);
         return ElementQueryApiDto.from(element);
     }
@@ -62,8 +57,8 @@ class SpaceController {
             @PathVariable("spaceName") String spaceName,
             @PathVariable("bucketName") String bucketName,
             @PathVariable("elementId") String elementId) {
-        SpaceDefinition spaceDefinition = spaceDefinitionRepository.get(spaceName);
-        Space space = spaceFactory.buildSpace(spaceDefinition);
+        Space spaceDefinition = spaceRepository.get(spaceName);
+        SpaceService space = spaceServiceFactory.buildSpaceService(spaceDefinition);
         space.removeElement(bucketName, elementId);
     }
 
@@ -74,39 +69,9 @@ class SpaceController {
             @PathVariable("bucketName") String bucketName,
             @PathVariable("elementId") String elementId,
             @RequestBody @Valid ElementOperationApiDto toUpdate) {
-        SpaceDefinition spaceDefinition = spaceDefinitionRepository.get(spaceName);
-        Space space = spaceFactory.buildSpace(spaceDefinition);
+        Space spaceDefinition = spaceRepository.get(spaceName);
+        SpaceService space = spaceServiceFactory.buildSpaceService(spaceDefinition);
         space.updateElement(toUpdate.toDomain(elementId, bucketName));
-    }
-
-    @GetMapping(path = "/{spaceName}/{bucketName}")
-    @ResponseStatus(value = HttpStatus.OK)
-    PaginatedElementsApiDto filterElements(
-            @PathVariable("spaceName") String spaceName,
-            @PathVariable("bucketName") String bucketName,
-            @RequestParam Map<String, String> filters,
-            @RequestParam(value = "limit", defaultValue = "20") int limit,
-            @RequestParam(value = "offset", defaultValue = "0") int offset,
-            HttpServletRequest request) {
-        SpaceDefinition spaceDefinition = spaceDefinitionRepository.get(spaceName);
-        Space space = spaceFactory.buildSpace(spaceDefinition);
-
-        BucketQuery query = BucketQuery.of(bucketName, limit, offset);
-
-        filters.keySet()
-                .stream()
-                .filter(fieldName -> !fieldName.equals("limit") && !fieldName.equals("offset"))
-                .forEach(fieldName ->
-                    query.whereFieldEq(fieldName, filters.get(fieldName))
-                );
-
-        List<ElementQueryApiDto> results = space.filterElements(query).stream()
-                .map(ElementQueryApiDto::from)
-                .collect(Collectors.toList());
-
-        return PaginatedElementsApiDto.of(
-                getNextPageLink(space.getNumberOfElements(bucketName), limit, offset, request),
-                results);
     }
 
     @GetMapping(path = "/{spaceName}/{bucketName}/{elementId}")
@@ -115,8 +80,8 @@ class SpaceController {
             @PathVariable("spaceName") String spaceName,
             @PathVariable("bucketName") String bucketName,
             @PathVariable("elementId") String elementId) {
-        SpaceDefinition spaceDefinition = spaceDefinitionRepository.get(spaceName);
-        Space space = spaceFactory.buildSpace(spaceDefinition);
+        Space spaceDefinition = spaceRepository.get(spaceName);
+        SpaceService space = spaceServiceFactory.buildSpaceService(spaceDefinition);
         return ElementQueryApiDto.from(space.getElement(bucketName, elementId));
     }
 
