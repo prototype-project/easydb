@@ -26,16 +26,16 @@ repositories {
 sourceSets {
 	test {
 		resources {
-			srcDir file('src/')
+			srcDir 'test'
 		}
 	}
 	integration {
 		java {
 			compileClasspath += main.output + test.output
 			runtimeClasspath += main.output + test.output
-			srcDir file('src/integration')
+			srcDir file('src/integration/groovy')
 		}
-		resources.srcDir file('src/integration/groovy/resources')
+		resources.srcDir file('src/integration/resources')
 	}
 }
 
@@ -67,6 +67,10 @@ task integrationTest(type: Test) {
 	testClassesDir = sourceSets.integration.output.classesDir
 	classpath = sourceSets.integration.runtimeClasspath
 }
+
+check.dependsOn integrationTest
+integrationTest.mustRunAfter test
+
 
 task run {
 	doFirst {

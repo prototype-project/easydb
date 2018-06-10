@@ -3,7 +3,6 @@ package com.easydb.easydb.api;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
-import java.util.Optional;
 import org.hibernate.validator.constraints.NotEmpty;
 
 public class ElementFieldApiDto implements Comparable<ElementFieldApiDto> {
@@ -15,7 +14,7 @@ public class ElementFieldApiDto implements Comparable<ElementFieldApiDto> {
 
     @JsonCreator
     ElementFieldApiDto(
-            @JsonProperty("spaceName") String name,
+            @JsonProperty("name") String name,
             @JsonProperty("value") String value) {
         this.name = name;
         this.value = value;

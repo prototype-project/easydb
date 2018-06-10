@@ -1,5 +1,6 @@
 package com.easydb.easydb.api;
 
+import com.easydb.easydb.domain.bucket.BucketQuery;
 import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.space.SpaceService;
 import com.easydb.easydb.domain.space.Space;
@@ -7,6 +8,9 @@ import com.easydb.easydb.domain.space.SpaceRepository;
 import com.easydb.easydb.domain.space.SpaceServiceFactory;
 import com.easydb.easydb.domain.space.UUIDProvider;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -89,6 +93,29 @@ class SpaceController {
                                           HttpServletRequest request) {
         return numberOfElements - (offset + limit) > 0 ?
                 String.format("%s?limit=%d&offset=%d", getUrlFromRequest(request), limit, offset + limit) : null;
+    }
+
+    @GetMapping(path = "/{spaceName}/{bucketName}")
+    @ResponseStatus(value = HttpStatus.OK)
+    PaginatedElementsApiDto getElements(
+            @PathVariable("spaceName") String spaceName,
+            @PathVariable("bucketName") String bucketName,
+            @RequestParam Map<String, String> filters,
+            @RequestParam(value = "limit", defaultValue = "20") int limit,
+            @RequestParam(value = "offset", defaultValue = "0") int offset,
+            HttpServletRequest request) {
+        Space spaceDefinition = spaceRepository.get(spaceName);
+        SpaceService space = spaceServiceFactory.buildSpaceService(spaceDefinition);
+
+        BucketQuery query = BucketQuery.of(bucketName, limit, offset);
+
+        List<ElementQueryApiDto> results = space.filterElements(query).stream()
+                .map(ElementQueryApiDto::from)
+                .collect(Collectors.toList());
+
+        return PaginatedElementsApiDto.of(
+                getNextPageLink(space.getNumberOfElements(bucketName), limit, offset, request),
+                results);
     }
 
     private static String getUrlFromRequest(HttpServletRequest request) {

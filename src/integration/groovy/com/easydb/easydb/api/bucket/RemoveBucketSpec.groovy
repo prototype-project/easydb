@@ -1,7 +1,8 @@
-package com.easydb.easydb.domain.bucket
+package com.easydb.easydb.api.bucket
 
 import com.easydb.easydb.BaseSpec
 import com.easydb.easydb.ElementTestBuilder
+import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.space.SpaceService
 import com.easydb.easydb.domain.space.Space
 import com.easydb.easydb.domain.space.SpaceRepository
@@ -34,7 +35,7 @@ class RemoveBucketSpec extends BaseSpec {
         spaceDefinitionRepository.remove(TEST_SPACE_NAME)
     }
 
-    def "should remove com.easydb.easydb.element.bucket"() {
+    def "should remove bucket"() {
         given:
         Element toCreate = ElementTestBuilder.builder().build()
         space.addElement(toCreate)

@@ -1,4 +1,4 @@
-package com.easydb.easydb.domain.query
+package com.easydb.easydb.api.query
 
 import com.easydb.easydb.BaseSpec
 import com.easydb.easydb.api.ElementQueryApiDto

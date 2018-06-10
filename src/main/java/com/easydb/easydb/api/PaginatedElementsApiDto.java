@@ -26,6 +26,4 @@ public class PaginatedElementsApiDto {
 	static PaginatedElementsApiDto of(String nextPageLink, List<ElementQueryApiDto> results) {
 		return new PaginatedElementsApiDto(nextPageLink, results);
 	}
-
-
 }

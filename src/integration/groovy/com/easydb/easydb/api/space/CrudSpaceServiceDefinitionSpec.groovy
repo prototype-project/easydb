@@ -1,7 +1,8 @@
-package com.easydb.easydb.domain.space
+package com.easydb.easydb.api.space
 
 import com.easydb.easydb.BaseSpec;
-import com.easydb.easydb.api.SpaceDefinitionApiDto;
+import com.easydb.easydb.api.SpaceDefinitionApiDto
+import com.easydb.easydb.domain.space.SpaceRepository;
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -13,7 +14,7 @@ class CrudSpaceServiceDefinitionSpec extends BaseSpec {
 	@Autowired
 	SpaceRepository definitionRepository
 
-	def "should create new com.easydb.easydb.element.space"() {
+	def "should create new space"() {
 		when:
 		ResponseEntity<SpaceDefinitionApiDto> response = addSampleSpace()
 
@@ -24,7 +25,7 @@ class CrudSpaceServiceDefinitionSpec extends BaseSpec {
 		}
 	}
 
-	def "should remove com.easydb.easydb.element.space"() {
+	def "should remove space"() {
 		given:
 		String spaceName = addSampleSpace().getBody().spaceName
 
@@ -39,7 +40,7 @@ class CrudSpaceServiceDefinitionSpec extends BaseSpec {
 		response.statusCode == HttpStatus.NOT_FOUND
 	}
 
-	def "should get com.easydb.easydb.element.space"() {
+	def "should get space"() {
 		given:
 		String spaceName = addSampleSpace().getBody().spaceName
 
@@ -53,7 +54,7 @@ class CrudSpaceServiceDefinitionSpec extends BaseSpec {
 		response.body.spaceName == spaceName
 	}
 
-	def "should return 404 when get not existing com.easydb.easydb.element.space"() {
+	def "should return 404 when get not existing space"() {
 		when:
 		restTemplate.getForEntity(
 				localUrl("/api/v1/spaces/notexisting"), SpaceDefinitionApiDto)

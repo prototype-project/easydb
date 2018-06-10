@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 
 @Configuration
 public class SpaceFactoryConfig {
+
     @Bean
     UUIDProvider uuidProvider() {
         return new UUIDProvider();

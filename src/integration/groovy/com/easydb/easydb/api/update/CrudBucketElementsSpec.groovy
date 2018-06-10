@@ -1,4 +1,4 @@
-package com.easydb.easydb.domain.update
+package com.easydb.easydb.api.update
 
 import com.easydb.easydb.BaseSpec
 import com.easydb.easydb.api.ElementQueryApiDto
@@ -41,7 +41,7 @@ class CrudBucketElementsSpec extends BaseSpec {
         spaceDefinitionRepository.remove(TEST_SPACE_NAME) // TODO remove all buckets when removing definition
     }
 
-    def "should add com.easydb.easydb.element to com.easydb.easydb.element.bucket"() {
+    def "should add element to bucket"() {
         when:
         ResponseEntity<ElementQueryApiDto> response = addSampleElement()
 
@@ -52,7 +52,7 @@ class CrudBucketElementsSpec extends BaseSpec {
         response.body == ElementQueryApiDto.from(space.getElement(TEST_BUCKET_NAME, response.body.getId()))
     }
 
-    def "should remove com.easydb.easydb.element from com.easydb.easydb.element.bucket"() {
+    def "should remove element from bucket"() {
         given:
         ResponseEntity<ElementQueryApiDto> addElementResponse = addSampleElement()
 
@@ -70,7 +70,7 @@ class CrudBucketElementsSpec extends BaseSpec {
         !space.elementExists(TEST_BUCKET_NAME, addElementResponse.body.getId())
     }
 
-    def "should update com.easydb.easydb.element"() {
+    def "should update element"() {
         given:
         ResponseEntity<ElementQueryApiDto> addElementResponse = addSampleElement()
 
@@ -90,7 +90,7 @@ class CrudBucketElementsSpec extends BaseSpec {
         updatedElement.getFieldValue('lastName') == 'snow'
     }
 
-    def "should get all elements from com.easydb.easydb.element.bucket"() {
+    def "should get all elements from bucket"() {
         given:
         addSampleElement()
 
@@ -108,7 +108,7 @@ class CrudBucketElementsSpec extends BaseSpec {
                 .collect(Collectors.toList())
     }
 
-    def "should get com.easydb.easydb.element from com.easydb.easydb.element.bucket"() {
+    def "should get element from bucket"() {
         given:
         ResponseEntity<ElementQueryApiDto> addElementResponse = addSampleElement()
 
@@ -123,7 +123,7 @@ class CrudBucketElementsSpec extends BaseSpec {
         addElementResponse.body == getElementResponse.body
     }
 
-    def "should return 404 when trying to update com.easydb.easydb.element in nonexistent com.easydb.easydb.element.bucket"() {
+    def "should return 404 when trying to update element in nonexistent bucket"() {
         when:
         restTemplate.exchange(
                 localUrl('/api/v1/' + TEST_SPACE_NAME + '/'+ TEST_BUCKET_NAME + '/' + 'someId'),
@@ -138,7 +138,7 @@ class CrudBucketElementsSpec extends BaseSpec {
         ex.rawStatusCode == 404
     }
 
-    def "should return 404 when trying to update nonexistent com.easydb.easydb.element"() {
+    def "should return 404 when trying to update nonexistent element"() {
         given:
         addSampleElement()
 
@@ -156,7 +156,7 @@ class CrudBucketElementsSpec extends BaseSpec {
         ex.rawStatusCode == 404
     }
 
-    def "should return 404 when trying to get com.easydb.easydb.element from nonexistent com.easydb.easydb.element.bucket"() {
+    def "should return 404 when trying to get element from nonexistent bucket"() {
         when:
         restTemplate.exchange(
                 localUrl('/api/v1/' + TEST_SPACE_NAME + '/'+ TEST_BUCKET_NAME + '/' + 'someId'),
@@ -171,7 +171,7 @@ class CrudBucketElementsSpec extends BaseSpec {
         ex.rawStatusCode == 404
     }
 
-    def "should return 404 when trying to get nonexistent com.easydb.easydb.element"() {
+    def "should return 404 when trying to get nonexistent element"() {
         given:
         addSampleElement()
 
@@ -193,8 +193,7 @@ class CrudBucketElementsSpec extends BaseSpec {
         addSampleElement(TEST_SPACE_NAME, TEST_BUCKET_NAME, sampleElement())
     }
 
-    // make is simpler in next sprint
-    private def sampleElement() {
+    private static def sampleElement() {
         JsonOutput.toJson([
                 fields: [
                         [
@@ -209,7 +208,7 @@ class CrudBucketElementsSpec extends BaseSpec {
         ])
     }
 
-    private def sampleElementUpdate() {
+    private static def sampleElementUpdate() {
         JsonOutput.toJson([
                 fields: [
                         [
