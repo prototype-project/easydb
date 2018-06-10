@@ -1,24 +1,21 @@
 package com.easydb.easydb.config.metrics;
 
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricRegistry;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import org.springframework.stereotype.Component;
+import javax.servlet.annotation.WebFilter;
 
-@Component
+@WebFilter
 public class MetricsFilter implements Filter {
 
-	private final Meter requests;
+	private final ApplicationMetrics applicationMetrics;
 
-	MetricsFilter(MetricRegistry metricRegistry) {
-		this.requests = metricRegistry.meter("requests");
+	MetricsFilter(ApplicationMetrics applicationMetrics) {
+		this.applicationMetrics = applicationMetrics;
 	}
-
 
 	@Override
 	public void init(FilterConfig config) throws ServletException { }
@@ -28,7 +25,7 @@ public class MetricsFilter implements Filter {
 			throws java.io.IOException, ServletException {
 		chain.doFilter(request, response);
 
-		requests.mark();
+		applicationMetrics.getTotalRequestsCounter().increment();
 	}
 
 	@Override
