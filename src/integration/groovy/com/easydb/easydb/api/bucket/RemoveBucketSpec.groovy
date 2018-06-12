@@ -1,6 +1,6 @@
 package com.easydb.easydb.api.bucket
 
-import com.easydb.easydb.BaseSpec
+import com.easydb.easydb.BaseIntegrationSpec
 import com.easydb.easydb.ElementTestBuilder
 import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.space.SpaceService
@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.client.RestTemplate
 
 
-class RemoveBucketSpec extends BaseSpec {
+class RemoveBucketSpec extends BaseIntegrationSpec {
     RestTemplate restTemplate = new RestTemplate()
 
     @Autowired

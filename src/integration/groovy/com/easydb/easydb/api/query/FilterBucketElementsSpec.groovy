@@ -1,10 +1,8 @@
 package com.easydb.easydb.api.query
 
-import com.easydb.easydb.BaseSpec
-import com.easydb.easydb.api.PaginatedElementsApiDto
-import groovy.json.JsonOutput
+import com.easydb.easydb.BaseIntegrationSpec
 
-class FilterBucketElementsSpec extends BaseSpec implements QueryUtils {
+class FilterBucketElementsSpec extends BaseIntegrationSpec implements QueryUtils {
 
 //    private String spaceName
 //

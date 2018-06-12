@@ -1,11 +1,11 @@
 package com.easydb.easydb.api.query
 
-import com.easydb.easydb.BaseSpec
+import com.easydb.easydb.BaseIntegrationSpec
 import com.easydb.easydb.api.PaginatedElementsApiDto
 import groovy.json.JsonOutput
 import org.springframework.web.client.HttpClientErrorException;
 
-class BucketElementsPaginationSpec extends BaseSpec implements QueryUtils {
+class BucketElementsPaginationSpec extends BaseIntegrationSpec implements QueryUtils {
 
 	private String spaceName
 

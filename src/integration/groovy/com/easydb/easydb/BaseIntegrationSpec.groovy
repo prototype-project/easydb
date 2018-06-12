@@ -16,11 +16,11 @@ import spock.lang.Specification
 
 @SpringBootTest(
         classes = [EasydbApplication],
-        properties = "application.environment=groovy",
+        properties = "application.environment=integration",
         webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(classes = SpaceTestConfig)
-@ActiveProfiles("groovy")
-abstract class BaseSpec extends Specification {
+@ActiveProfiles("integration")
+abstract class BaseIntegrationSpec extends Specification {
 
     RestTemplate restTemplate = new RestTemplate()
 

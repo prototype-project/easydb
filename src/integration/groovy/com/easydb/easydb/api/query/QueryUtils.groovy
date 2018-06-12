@@ -1,12 +1,12 @@
 package com.easydb.easydb.api.query
 
-import com.easydb.easydb.BaseSpec
+import com.easydb.easydb.BaseIntegrationSpec
 import com.easydb.easydb.api.ElementQueryApiDto
 import com.easydb.easydb.api.PaginatedElementsApiDto
 import groovy.transform.SelfType
 import org.springframework.http.ResponseEntity
 
-@SelfType(BaseSpec)
+@SelfType(BaseIntegrationSpec)
 trait QueryUtils {
     static String TEST_BUCKET_NAME = "people"
 
