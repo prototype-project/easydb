@@ -1,5 +1,6 @@
-package com.easydb.easydb.config.metrics;
+package com.easydb.easydb.config;
 
+import com.easydb.easydb.config.metrics.ApplicationMetrics;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

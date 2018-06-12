@@ -1,0 +1,5 @@
+monitoring.enabled: false
+
+zookeeper:
+  retrySleepMillis: 100
+  retryTimeoutMillis: 100

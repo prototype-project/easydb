@@ -7,7 +7,7 @@ spring:
     mongodb:
       uri: ${MONGODB_URI}
   application:
-    name: bookstore
+    name: easydb
   metrics:
     prometheus:
       enabled: true

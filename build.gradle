@@ -55,12 +55,16 @@ dependencies {
 	compile group: 'org.springframework.boot', name: 'spring-boot-actuator', version: '1.5.13.RELEASE'
 	compile group: 'io.micrometer', name: 'micrometer-spring-legacy', version: '1.0.4'
 	compile group: 'io.micrometer', name: 'micrometer-registry-prometheus', version: '1.0.4'
+	compile group: 'org.apache.curator', name: 'curator-framework', version: '4.0.0'
+	compile group: 'org.apache.curator', name: 'curator-recipes', version: '4.0.0'
+	compile group: 'net.sf.jopt-simple', name: 'jopt-simple', version: '5.0.4'
 
 	testCompile 'org.codehaus.groovy:groovy-all:2.4.4'
 	testCompile group: 'org.spockframework', name: 'spock-spring', version: '1.1-groovy-2.4'
 	testCompile 'org.springframework.boot:spring-boot-starter-test'
 	testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
     testCompile group: 'com.github.fakemongo', name: 'fongo', version: '2.1.0'
+	testCompile group: 'org.apache.curator', name: 'curator-test', version: '4.0.0'
 }
 
 task integrationTest(type: Test) {
@@ -71,20 +75,17 @@ task integrationTest(type: Test) {
 check.dependsOn integrationTest
 integrationTest.mustRunAfter test
 
-
 task run {
 	doFirst {
-		String profile = project.hasProperty('profile') ? project.property('profile'): 'production'
-		bootRun.systemProperty 'spring.profiles.active', profile
+		String env = project.hasProperty('environment') ? project.property('environment'): 'local'
+		String port = project.hasProperty('port') ? project.property('port'): '8080'
+		bootRun.args = ["--environment=" + env, "--port=" + port]
 	}
 }
 
 bootRun {
 	dependsOn run
 }
-
-check.dependsOn integrationTest
-integrationTest.mustRunAfter test
 
 tasks.withType(Test) {
 	reports.html.destination = file("${reporting.baseDir}/${name}")

@@ -2,6 +2,7 @@ package com.easydb.easydb
 
 import com.easydb.easydb.api.ElementQueryApiDto
 import com.easydb.easydb.api.SpaceDefinitionApiDto
+import org.apache.curator.test.TestingServer
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpEntity
@@ -22,7 +23,11 @@ import spock.lang.Specification
 @ActiveProfiles("integration")
 abstract class BaseIntegrationSpec extends Specification {
 
+    static ZOOKEEPER_PORT = 2181
+
     RestTemplate restTemplate = new RestTemplate()
+
+    TestingServer zookeeperServer
 
     @Value('${local.server.port}')
     int port
@@ -54,5 +59,20 @@ abstract class BaseIntegrationSpec extends Specification {
                 localUrl("/api/v1/spaces/"),
                 Void,
                 SpaceDefinitionApiDto.class)
+    }
+
+    void startZookeeperServer() {
+        if (zookeeperServer == null) {
+            zookeeperServer = new TestingServer(ZOOKEEPER_PORT, true)
+        }
+        else {
+            zookeeperServer.start()
+        }
+    }
+
+    void stopZookeeperServer() {
+        if (zookeeperServer != null) {
+            zookeeperServer.stop()
+        }
     }
 }

@@ -13,7 +13,7 @@ public class ApplicationMetrics {
 				.register(Metrics.globalRegistry);
 	}
 
-	Counter getTotalRequestsCounter() {
+	public Counter getTotalRequestsCounter() {
 		return totalRequestsCounter;
 	}
 }
