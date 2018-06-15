@@ -1,5 +1,6 @@
 package com.easydb.easydb.api;
 
+import com.easydb.easydb.config.ApplicationMetrics;
 import com.easydb.easydb.domain.bucket.BucketQuery;
 import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.space.SpaceService;
@@ -24,14 +25,16 @@ class SpaceController {
     private final SpaceServiceFactory spaceServiceFactory;
     private final SpaceRepository spaceRepository;
     private final UUIDProvider uuidProvider;
+    private final ApplicationMetrics metrics;
 
     private SpaceController(
             SpaceServiceFactory spaceServiceFactory,
             UUIDProvider uuidProvider,
-            SpaceRepository spaceRepository) {
+            SpaceRepository spaceRepository, ApplicationMetrics metrics) {
         this.spaceServiceFactory = spaceServiceFactory;
         this.uuidProvider = uuidProvider;
         this.spaceRepository = spaceRepository;
+        this.metrics = metrics;
     }
 
     @DeleteMapping(path = "/{spaceName}/{bucketName}")
@@ -40,6 +43,7 @@ class SpaceController {
         Space spaceDefinition = spaceRepository.get(spaceName);
         SpaceService space = spaceServiceFactory.buildSpaceService(spaceDefinition);
         space.removeBucket(bucketName);
+        metrics.deleteBucketRequestsCounter(spaceName).increment();
     }
 
     @PostMapping(path = "/{spaceName}/{bucketName}")
@@ -52,6 +56,8 @@ class SpaceController {
         Space spaceDefinition = spaceRepository.get(spaceName);
         SpaceService space = spaceServiceFactory.buildSpaceService(spaceDefinition);
         space.addElement(element);
+
+        metrics.addElementRequestsCounter(spaceName, bucketName).increment();
         return ElementQueryApiDto.from(element);
     }
 
@@ -64,6 +70,7 @@ class SpaceController {
         Space spaceDefinition = spaceRepository.get(spaceName);
         SpaceService space = spaceServiceFactory.buildSpaceService(spaceDefinition);
         space.removeElement(bucketName, elementId);
+        metrics.deleteElementRequestsCounter(spaceName, bucketName).increment();
     }
 
     @PutMapping(path = "/{spaceName}/{bucketName}/{elementId}")
@@ -76,6 +83,7 @@ class SpaceController {
         Space spaceDefinition = spaceRepository.get(spaceName);
         SpaceService space = spaceServiceFactory.buildSpaceService(spaceDefinition);
         space.updateElement(toUpdate.toDomain(elementId, bucketName));
+        metrics.updateElementRequestsCounter(spaceName, bucketName).increment();
     }
 
     @GetMapping(path = "/{spaceName}/{bucketName}/{elementId}")
@@ -86,13 +94,9 @@ class SpaceController {
             @PathVariable("elementId") String elementId) {
         Space spaceDefinition = spaceRepository.get(spaceName);
         SpaceService space = spaceServiceFactory.buildSpaceService(spaceDefinition);
-        return ElementQueryApiDto.from(space.getElement(bucketName, elementId));
-    }
 
-    private static String getNextPageLink(long numberOfElements, int limit, int offset,
-                                          HttpServletRequest request) {
-        return numberOfElements - (offset + limit) > 0 ?
-                String.format("%s?limit=%d&offset=%d", getUrlFromRequest(request), limit, offset + limit) : null;
+        metrics.getElementRequestsCounter(spaceName, bucketName).increment();
+        return ElementQueryApiDto.from(space.getElement(bucketName, elementId));
     }
 
     @GetMapping(path = "/{spaceName}/{bucketName}")
@@ -113,9 +117,16 @@ class SpaceController {
                 .map(ElementQueryApiDto::from)
                 .collect(Collectors.toList());
 
+        metrics.getElementsRequestsCounter(spaceName, bucketName).increment();
         return PaginatedElementsApiDto.of(
                 getNextPageLink(space.getNumberOfElements(bucketName), limit, offset, request),
                 results);
+    }
+
+    private static String getNextPageLink(long numberOfElements, int limit, int offset,
+                                          HttpServletRequest request) {
+        return numberOfElements - (offset + limit) > 0 ?
+                String.format("%s?limit=%d&offset=%d", getUrlFromRequest(request), limit, offset + limit) : null;
     }
 
     private static String getUrlFromRequest(HttpServletRequest request) {

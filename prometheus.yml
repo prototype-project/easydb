@@ -1,4 +1,5 @@
-scrape_interval:       5s
+global:
+  scrape_interval:     5s
   evaluation_interval: 5s
 
 scrape_configs:

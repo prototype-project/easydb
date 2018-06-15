@@ -1,5 +1,6 @@
 package com.easydb.easydb.api;
 
+import com.easydb.easydb.config.ApplicationMetrics;
 import com.easydb.easydb.domain.space.Space;
 import com.easydb.easydb.domain.space.SpaceRepository;
 import com.easydb.easydb.domain.space.UUIDProvider;
@@ -18,11 +19,14 @@ class SpaceDefinitionController {
 
 	private final SpaceRepository spaceRepository;
 	private final UUIDProvider uuidProvider;
+	private final ApplicationMetrics metrics;
 
 	SpaceDefinitionController(SpaceRepository spaceRepository,
-	                          UUIDProvider uuidProvider) {
+	                          UUIDProvider uuidProvider,
+	                          ApplicationMetrics metrics) {
 		this.spaceRepository = spaceRepository;
 		this.uuidProvider = uuidProvider;
+		this.metrics = metrics;
 	}
 
 	@PostMapping
@@ -30,6 +34,7 @@ class SpaceDefinitionController {
 	SpaceDefinitionApiDto createSpace() {
 		Space spaceDefinition = Space.of(uuidProvider.generateUUID());
 		spaceRepository.save(spaceDefinition);
+		metrics.createSpaceRequestsCounter().increment();
 		return new SpaceDefinitionApiDto(spaceDefinition.getName());
 	}
 
@@ -37,11 +42,13 @@ class SpaceDefinitionController {
 	@ResponseStatus(value = HttpStatus.OK)
 	void deleteSpace(@PathVariable("spaceName") String spaceName) {
 		spaceRepository.remove(spaceName);
+		metrics.deleteSpaceRequestsCounter().increment();
 	}
 
 	@GetMapping(path = "/{spaceName}")
 	SpaceDefinitionApiDto getSpace(@PathVariable("spaceName") String spaceName) {
 		Space fromDb = spaceRepository.get(spaceName);
+		metrics.getSpaceRequestsCounter().increment();
 		return new SpaceDefinitionApiDto(fromDb.getName());
 	}
 }
