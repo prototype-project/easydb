@@ -9,5 +9,5 @@ public interface SpaceRepository {
 
     void remove(String name) throws SpaceDoesNotExistException;
 
-
+    void update(Space toUpdate);
 }

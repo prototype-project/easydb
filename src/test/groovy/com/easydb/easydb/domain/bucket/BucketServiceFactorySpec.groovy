@@ -7,19 +7,22 @@ import com.easydb.easydb.domain.space.SpaceDoesNotExistException
 
 class BucketServiceFactorySpec extends BaseSpecification {
 
-    def cleanup() {
-        try {
-            spaceRepository.remove("testSpace")
-        } catch (Exception ignored) {}
+    static TEST_SPACE = "testSpace"
+
+    def setupSpec() {
+        spaceService.save(Space.of(TEST_SPACE))
     }
 
-    def "should build space"() {
+    def cleanupSpec() {
+        spaceService.remove(TEST_SPACE)
+    }
+
+    def "should build bucket service"() {
         when:
-        spaceRepository.save(Space.of("testSpace"))
-        BucketService space = bucketServiceFactory.buildBucketService("testSpace")
+        BucketService bucketService = bucketServiceFactory.buildBucketService(TEST_SPACE)
 
         then:
-        space != null
+        bucketService != null
     }
 
     def "should throw error when building bucket service for not existing space"() {

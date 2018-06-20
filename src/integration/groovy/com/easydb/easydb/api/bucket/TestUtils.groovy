@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity
 @SelfType(BaseIntegrationSpec)
 trait TestUtils {
 
-    static String TEST_BUCKET_NAME = "peoples"
+    static String TEST_BUCKET_NAME = "bucketPeoples"
 
     PaginatedElementsApiDto filterElements(String fullUrl) {
         restTemplate.getForEntity(

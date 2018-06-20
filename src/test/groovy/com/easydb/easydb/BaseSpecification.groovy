@@ -3,6 +3,7 @@ package com.easydb.easydb
 import com.easydb.easydb.domain.bucket.BucketRepository
 import com.easydb.easydb.domain.space.SpaceRepository
 import com.easydb.easydb.domain.space.BucketServiceFactory
+import com.easydb.easydb.domain.space.SpaceService
 import com.easydb.easydb.infrastructure.bucket.MongoBucketRepository
 import com.easydb.easydb.infrastructure.space.MongoSpaceRepository
 import com.github.fakemongo.Fongo
@@ -28,4 +29,7 @@ class BaseSpecification extends Specification {
 
     @Shared
     BucketServiceFactory bucketServiceFactory = new BucketServiceFactory(bucketRepository, spaceRepository)
+
+    @Shared
+    SpaceService spaceService = new SpaceService(bucketServiceFactory, spaceRepository)
 }

@@ -8,26 +8,25 @@ import spock.lang.Unroll
 
 class BucketPaginationSpec extends BaseSpecification {
 
-    public static final String TEST_BUCKET_NAME = "people"
-    public static final String TEST_SPACE = "testSpace"
+    static final String TEST_BUCKET_NAME = "bucketPagination"
+    static final String TEST_SPACE = "testSpace"
 
     @Shared
     BucketService bucketService
 
     def setupSpec() {
-        Space space = Space.of(TEST_SPACE)
-        spaceRepository.save(space)
-        bucketService = bucketServiceFactory.buildBucketService(TEST_SPACE)
+        spaceService.save(Space.of(TEST_SPACE))
+        bucketService = spaceService.bucketServiceForSpace(TEST_SPACE)
     }
 
     def cleanupSpec() {
-        spaceRepository.remove(TEST_SPACE)
+        spaceService.remove(TEST_SPACE)
     }
 
     def cleanup() {
         try {
             bucketService.removeBucket(TEST_BUCKET_NAME)
-        } catch (Exception ignored) {}
+        } catch (BucketDoesNotExistException ignored) {}
     }
 
     @Unroll
@@ -96,8 +95,8 @@ class BucketPaginationSpec extends BaseSpecification {
     }
 
     def createElements() {
-        bucketService.addElement(ElementTestBuilder.builder().fields([ElementField.of('firstName', 'John')]).build())
-        bucketService.addElement(ElementTestBuilder.builder().fields([ElementField.of('firstName', 'Anna')]).build())
-        bucketService.addElement(ElementTestBuilder.builder().fields([ElementField.of('firstName', 'Maria')]).build())
+        bucketService.addElement(ElementTestBuilder.builder().bucketName(TEST_BUCKET_NAME).fields([ElementField.of('firstName', 'John')]).build())
+        bucketService.addElement(ElementTestBuilder.builder().bucketName(TEST_BUCKET_NAME).fields([ElementField.of('firstName', 'Anna')]).build())
+        bucketService.addElement(ElementTestBuilder.builder().bucketName(TEST_BUCKET_NAME).fields([ElementField.of('firstName', 'Maria')]).build())
     }
 }

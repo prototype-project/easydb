@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 @Configuration
-public class SpaceFactoryConfig {
+public class BucketConfig {
 
     @Bean
     UUIDProvider uuidProvider() {
@@ -18,7 +18,7 @@ public class SpaceFactoryConfig {
     }
 
     @Bean
-    BucketServiceFactory spaceFactory(BucketRepository bucketRepository, SpaceRepository spaceRepository) {
+    BucketServiceFactory bucketServiceFactory(BucketRepository bucketRepository, SpaceRepository spaceRepository) {
         return new BucketServiceFactory(bucketRepository, spaceRepository);
     }
 

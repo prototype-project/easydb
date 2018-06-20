@@ -4,28 +4,25 @@ import com.easydb.easydb.BaseIntegrationSpec
 import com.easydb.easydb.ElementTestBuilder
 import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.bucket.BucketService
-import com.easydb.easydb.domain.space.SpaceRepository
-import com.easydb.easydb.domain.space.BucketServiceFactory
+import com.easydb.easydb.domain.space.SpaceService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 
 
 class RemoveBucketSpec extends BaseIntegrationSpec {
+
     RestTemplate restTemplate = new RestTemplate()
 
     @Autowired
-    BucketServiceFactory spaceFactory
-
-    @Autowired
-    SpaceRepository spaceDefinitionRepository
+    SpaceService spaceService
 
     String spaceName
     BucketService bucketService
 
     def setup() {
         spaceName = addSampleSpace().body.spaceName
-        bucketService = spaceFactory.buildBucketService(spaceName)
+        bucketService = spaceService.bucketServiceForSpace(spaceName)
     }
 
     def "should remove bucket"() {

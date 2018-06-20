@@ -1,18 +1,23 @@
 package com.easydb.easydb.domain.bucket;
 
 import com.easydb.easydb.domain.space.Space;
+import com.easydb.easydb.domain.space.SpaceRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
 
 public class BucketService {
-	private final Space space;
+
+	private final String spaceName;
+	private final SpaceRepository spaceRepository;
 	private final BucketRepository bucketRepository;
 
 	public BucketService(
-			Space spaceName,
+			String spaceName,
+			SpaceRepository spaceRepository,
 			BucketRepository bucketRepository) {
-		this.space = spaceName;
+		this.spaceName = spaceName;
+		this.spaceRepository = spaceRepository;
 		this.bucketRepository = bucketRepository;
 	}
 
@@ -21,10 +26,17 @@ public class BucketService {
 	}
 
 	public void removeBucket(String bucketName) {
+		// TODO remove race conditions by using optimistic locking
+		Space space = spaceRepository.get(spaceName);
+		space.getBuckets().remove(bucketName);
+		spaceRepository.update(space);
 		bucketRepository.removeBucket(getBucketName(bucketName));
 	}
 
 	public void addElement(Element element) {
+		Space space = spaceRepository.get(spaceName);
+		space.getBuckets().add(element.getBucketName());
+		spaceRepository.update(space);
 		bucketRepository.insertElement(
 				Element.of(element.getId(), getBucketName(element.getBucketName()), element.getFields()));
 	}
@@ -62,6 +74,6 @@ public class BucketService {
 	}
 
 	private String getBucketName(String bucketName) {
-		return space.getName() + ":" + bucketName;
+		return spaceName + ":" + bucketName;
 	}
 }

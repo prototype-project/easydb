@@ -2,27 +2,27 @@ package com.easydb.easydb.domain.bucket
 
 import com.easydb.easydb.BaseSpecification
 import com.easydb.easydb.domain.space.Space
-import spock.lang.Shared
 
 import static com.easydb.easydb.ElementTestBuilder.builder
 
 
 class BucketServiceSpec extends BaseSpecification {
 
-    public static final String TEST_BUCKET_NAME = "peoples"
+    public static final String TEST_BUCKET_NAME = "bucketService"
     public static final String TEST_SPACE = "testSpace"
 
-    @Shared
     BucketService bucketService
 
     def setupSpec() {
-        Space space = Space.of(TEST_SPACE)
-        spaceRepository.save(space)
-        this.bucketService = bucketServiceFactory.buildBucketService(TEST_SPACE)
+        spaceService.save(Space.of(TEST_SPACE))
     }
 
     def cleanupSpec() {
-        spaceRepository.remove(TEST_SPACE)
+        spaceService.remove(TEST_SPACE)
+    }
+
+    def setup() {
+        bucketService = spaceService.bucketServiceForSpace(TEST_SPACE)
     }
 
     def cleanup() {
@@ -56,6 +56,18 @@ class BucketServiceSpec extends BaseSpecification {
             bucketName == toCreate.bucketName
         }
     }
+
+    def "should update space's buckets when adding first element to bucket"() {
+        given:
+        Element toCreate = builder().bucketName(TEST_BUCKET_NAME).build()
+
+        when:
+        bucketService.addElement(toCreate)
+
+        then:
+        spaceService.get(TEST_SPACE).buckets == [TEST_BUCKET_NAME] as Set
+    }
+
 
     def "should remove element from bucket"() {
         given:

@@ -5,9 +5,8 @@ import com.easydb.easydb.api.ElementQueryApiDto
 import com.easydb.easydb.api.PaginatedElementsApiDto
 import com.easydb.easydb.domain.bucket.BucketQuery
 import com.easydb.easydb.domain.bucket.Element
-import com.easydb.easydb.domain.space.SpaceRepository
-import com.easydb.easydb.domain.space.BucketServiceFactory
 import com.easydb.easydb.domain.bucket.BucketService
+import com.easydb.easydb.domain.space.SpaceService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
@@ -18,18 +17,14 @@ import java.util.stream.Collectors
 class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestUtils {
 
     @Autowired
-    BucketServiceFactory bucketServiceFactory
-
-    @Autowired
-    SpaceRepository spaceRepository
-
-    BucketService bucketService
+    SpaceService spaceService
 
     String spaceName
+    BucketService bucketService
 
     def setup() {
         spaceName = addSampleSpace().body.spaceName
-        this.bucketService = bucketServiceFactory.buildBucketService(spaceName)
+        this.bucketService = spaceService.bucketServiceForSpace(spaceName)
     }
 
     def "should add element to bucket"() {

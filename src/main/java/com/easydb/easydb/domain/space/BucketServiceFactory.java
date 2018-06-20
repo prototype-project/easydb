@@ -13,8 +13,9 @@ public class BucketServiceFactory {
     }
 
     public BucketService buildBucketService(String spaceName) {
-        return new BucketService(
-                spaceRepository.get(spaceName),
-                bucketRepository);
+        if (!spaceRepository.exists(spaceName)) {
+            throw new SpaceDoesNotExistException(spaceName);
+        }
+        return new BucketService(spaceName, spaceRepository, bucketRepository);
     }
 }
