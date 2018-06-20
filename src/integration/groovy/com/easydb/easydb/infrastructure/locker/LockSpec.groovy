@@ -19,14 +19,6 @@ class LockSpec extends BaseIntegrationSpec {
 
     ElementsLocker locker
 
-    def setupSpec() {
-        startZookeeperServer()
-    }
-
-    def cleanupSpec() {
-        stopZookeeperServer()
-    }
-
     def setup() {
         locker = lockerFactory.build("SpaceX")
     }

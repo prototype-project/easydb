@@ -45,10 +45,18 @@ public class MongoSpaceRepository implements SpaceRepository {
 
     @Override
     public void remove(String spaceName) {
+        ensureSpaceExists(spaceName);
+
         mongoTemplate.remove(getPersistentElement(spaceName), SPACE_COLLECTION_NAME);
     }
 
     private PersistentSpace getPersistentElement(String spaceName) {
         return mongoTemplate.findById(spaceName, PersistentSpace.class, SPACE_COLLECTION_NAME);
+    }
+
+    private void ensureSpaceExists(String spaceName) {
+        if (!exists(spaceName)) {
+            throw new SpaceDoesNotExistException(spaceName);
+        }
     }
 }

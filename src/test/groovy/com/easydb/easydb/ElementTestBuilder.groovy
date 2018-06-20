@@ -18,7 +18,7 @@ class ElementTestBuilder {
     }
 
     ElementTestBuilder bucketName(String name) {
-        this.bucketName = bucketName
+        this.bucketName = name
         return this
     }
 

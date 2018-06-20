@@ -1,10 +1,8 @@
-package com.easydb.easydb.domain.space
+package com.easydb.easydb.domain.bucket
 
+import com.easydb.easydb.BaseSpecification
 import com.easydb.easydb.ElementTestBuilder
-import com.easydb.easydb.domain.bucket.BucketQuery
-import com.easydb.easydb.domain.bucket.Element
-import com.easydb.easydb.domain.bucket.ElementField
-import com.easydb.easydb.domain.bucket.InvalidPaginationDataException
+import com.easydb.easydb.domain.space.Space
 import spock.lang.Shared
 import spock.lang.Unroll
 
@@ -14,12 +12,12 @@ class BucketPaginationSpec extends BaseSpecification {
     public static final String TEST_SPACE = "testSpace"
 
     @Shared
-    SpaceService spaceService
+    BucketService bucketService
 
     def setupSpec() {
         Space space = Space.of(TEST_SPACE)
         spaceRepository.save(space)
-        spaceService = spaceFactory.buildSpaceService(space)
+        bucketService = bucketServiceFactory.buildBucketService(TEST_SPACE)
     }
 
     def cleanupSpec() {
@@ -27,7 +25,9 @@ class BucketPaginationSpec extends BaseSpecification {
     }
 
     def cleanup() {
-        spaceService.removeBucket(TEST_BUCKET_NAME)
+        try {
+            bucketService.removeBucket(TEST_BUCKET_NAME)
+        } catch (Exception ignored) {}
     }
 
     @Unroll
@@ -37,7 +37,7 @@ class BucketPaginationSpec extends BaseSpecification {
         BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, limit, offset)
 
         when:
-        List<Element> elements = spaceService.filterElements(query)
+        List<Element> elements = bucketService.filterElements(query)
 
         then:
         elements.size() == expectedNumberOfElements
@@ -60,7 +60,7 @@ class BucketPaginationSpec extends BaseSpecification {
         BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, 1, 0)
 
         when:
-        List<Element> elements = spaceService.filterElements(query)
+        List<Element> elements = bucketService.filterElements(query)
 
         then:
         elements.size() == 0
@@ -74,7 +74,7 @@ class BucketPaginationSpec extends BaseSpecification {
         BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, limit, 2)
 
         and:
-        spaceService.filterElements(query)
+        bucketService.filterElements(query)
 
         then:
         thrown(InvalidPaginationDataException)
@@ -89,15 +89,15 @@ class BucketPaginationSpec extends BaseSpecification {
         BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, 1, -2)
 
         and:
-        spaceService.filterElements(query)
+        bucketService.filterElements(query)
 
         then:
         thrown(InvalidPaginationDataException)
     }
 
     def createElements() {
-        spaceService.addElement(ElementTestBuilder.builder().fields([ElementField.of('firstName', 'John')]).build())
-        spaceService.addElement(ElementTestBuilder.builder().fields([ElementField.of('firstName', 'Anna')]).build())
-        spaceService.addElement(ElementTestBuilder.builder().fields([ElementField.of('firstName', 'Maria')]).build())
+        bucketService.addElement(ElementTestBuilder.builder().fields([ElementField.of('firstName', 'John')]).build())
+        bucketService.addElement(ElementTestBuilder.builder().fields([ElementField.of('firstName', 'Anna')]).build())
+        bucketService.addElement(ElementTestBuilder.builder().fields([ElementField.of('firstName', 'Maria')]).build())
     }
 }

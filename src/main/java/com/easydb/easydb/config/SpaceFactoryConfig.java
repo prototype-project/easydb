@@ -1,6 +1,7 @@
 package com.easydb.easydb.config;
 
-import com.easydb.easydb.domain.space.SpaceServiceFactory;
+import com.easydb.easydb.domain.space.BucketServiceFactory;
+import com.easydb.easydb.domain.space.SpaceRepository;
 import com.easydb.easydb.domain.space.UUIDProvider;
 import com.easydb.easydb.domain.bucket.BucketRepository;
 import com.easydb.easydb.infrastructure.bucket.MongoBucketRepository;
@@ -17,8 +18,8 @@ public class SpaceFactoryConfig {
     }
 
     @Bean
-    SpaceServiceFactory spaceFactory(BucketRepository bucketRepository) {
-        return new SpaceServiceFactory(bucketRepository);
+    BucketServiceFactory spaceFactory(BucketRepository bucketRepository, SpaceRepository spaceRepository) {
+        return new BucketServiceFactory(bucketRepository, spaceRepository);
     }
 
     @Bean

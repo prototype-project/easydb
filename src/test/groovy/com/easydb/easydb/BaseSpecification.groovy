@@ -1,6 +1,8 @@
-package com.easydb.easydb.domain.space
+package com.easydb.easydb
 
 import com.easydb.easydb.domain.bucket.BucketRepository
+import com.easydb.easydb.domain.space.SpaceRepository
+import com.easydb.easydb.domain.space.BucketServiceFactory
 import com.easydb.easydb.infrastructure.bucket.MongoBucketRepository
 import com.easydb.easydb.infrastructure.space.MongoSpaceRepository
 import com.github.fakemongo.Fongo
@@ -8,7 +10,7 @@ import org.springframework.data.mongodb.core.MongoTemplate
 import spock.lang.Shared
 import spock.lang.Specification
 
-class BaseSpecification extends Specification{
+class BaseSpecification extends Specification {
     @Shared
     String DB_NAME = "testDb"
 
@@ -22,8 +24,8 @@ class BaseSpecification extends Specification{
     BucketRepository bucketRepository = new MongoBucketRepository(new MongoTemplate(fongo.getMongo(), DB_NAME))
 
     @Shared
-    SpaceServiceFactory spaceFactory = new SpaceServiceFactory(bucketRepository)
+    SpaceRepository spaceRepository = new MongoSpaceRepository(new MongoTemplate(fongo.getMongo(), DB_NAME))
 
     @Shared
-    SpaceRepository spaceRepository = new MongoSpaceRepository(new MongoTemplate(fongo.getMongo(), DB_NAME))
+    BucketServiceFactory bucketServiceFactory = new BucketServiceFactory(bucketRepository, spaceRepository)
 }

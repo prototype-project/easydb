@@ -1,135 +1,54 @@
 package com.easydb.easydb.api;
 
 import com.easydb.easydb.config.ApplicationMetrics;
-import com.easydb.easydb.domain.bucket.BucketQuery;
-import com.easydb.easydb.domain.bucket.Element;
-import com.easydb.easydb.domain.space.SpaceService;
 import com.easydb.easydb.domain.space.Space;
 import com.easydb.easydb.domain.space.SpaceRepository;
-import com.easydb.easydb.domain.space.SpaceServiceFactory;
 import com.easydb.easydb.domain.space.UUIDProvider;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/api/v1")
+@RequestMapping(value = "/api/v1/spaces")
 class SpaceController {
 
-    private final SpaceServiceFactory spaceServiceFactory;
-    private final SpaceRepository spaceRepository;
-    private final UUIDProvider uuidProvider;
-    private final ApplicationMetrics metrics;
+	private final SpaceRepository spaceRepository;
+	private final UUIDProvider uuidProvider;
+	private final ApplicationMetrics metrics;
 
-    private SpaceController(
-            SpaceServiceFactory spaceServiceFactory,
-            UUIDProvider uuidProvider,
-            SpaceRepository spaceRepository, ApplicationMetrics metrics) {
-        this.spaceServiceFactory = spaceServiceFactory;
-        this.uuidProvider = uuidProvider;
-        this.spaceRepository = spaceRepository;
-        this.metrics = metrics;
-    }
+	SpaceController(SpaceRepository spaceRepository,
+	                UUIDProvider uuidProvider,
+	                ApplicationMetrics metrics) {
+		this.spaceRepository = spaceRepository;
+		this.uuidProvider = uuidProvider;
+		this.metrics = metrics;
+	}
 
-    @DeleteMapping(path = "/{spaceName}/{bucketName}")
-    @ResponseStatus(value = HttpStatus.OK)
-    void deleteBucket(@PathVariable("spaceName") String spaceName, @PathVariable("bucketName") String bucketName) {
-        Space spaceDefinition = spaceRepository.get(spaceName);
-        SpaceService space = spaceServiceFactory.buildSpaceService(spaceDefinition);
-        space.removeBucket(bucketName);
-        metrics.deleteBucketRequestsCounter(spaceName).increment();
-    }
+	@PostMapping
+	@ResponseStatus(value = HttpStatus.CREATED)
+	SpaceDefinitionApiDto createSpace() {
+		Space spaceDefinition = Space.of(uuidProvider.generateUUID());
+		spaceRepository.save(spaceDefinition);
+		metrics.createSpaceRequestsCounter().increment();
+		return new SpaceDefinitionApiDto(spaceDefinition.getName());
+	}
 
-    @PostMapping(path = "/{spaceName}/{bucketName}")
-    @ResponseStatus(value = HttpStatus.CREATED)
-    ElementQueryApiDto addElement(
-            @PathVariable("spaceName") String spaceName,
-            @PathVariable("bucketName") String bucketName,
-            @RequestBody @Valid ElementOperationApiDto toCreate) {
-        Element element = toCreate.toDomain(uuidProvider.generateUUID(), bucketName);
-        Space spaceDefinition = spaceRepository.get(spaceName);
-        SpaceService space = spaceServiceFactory.buildSpaceService(spaceDefinition);
-        space.addElement(element);
+	@DeleteMapping(path = "/{spaceName}")
+	@ResponseStatus(value = HttpStatus.OK)
+	void deleteSpace(@PathVariable("spaceName") String spaceName) {
+		spaceRepository.remove(spaceName);
+		metrics.deleteSpaceRequestsCounter().increment();
+	}
 
-        metrics.addElementRequestsCounter(spaceName, bucketName).increment();
-        return ElementQueryApiDto.from(element);
-    }
-
-    @DeleteMapping(path = "/{spaceName}/{bucketName}/{elementId}")
-    @ResponseStatus(value = HttpStatus.OK)
-    void deleteElement(
-            @PathVariable("spaceName") String spaceName,
-            @PathVariable("bucketName") String bucketName,
-            @PathVariable("elementId") String elementId) {
-        Space spaceDefinition = spaceRepository.get(spaceName);
-        SpaceService space = spaceServiceFactory.buildSpaceService(spaceDefinition);
-        space.removeElement(bucketName, elementId);
-        metrics.deleteElementRequestsCounter(spaceName, bucketName).increment();
-    }
-
-    @PutMapping(path = "/{spaceName}/{bucketName}/{elementId}")
-    @ResponseStatus(value = HttpStatus.OK)
-    void updateElement(
-            @PathVariable("spaceName") String spaceName,
-            @PathVariable("bucketName") String bucketName,
-            @PathVariable("elementId") String elementId,
-            @RequestBody @Valid ElementOperationApiDto toUpdate) {
-        Space spaceDefinition = spaceRepository.get(spaceName);
-        SpaceService space = spaceServiceFactory.buildSpaceService(spaceDefinition);
-        space.updateElement(toUpdate.toDomain(elementId, bucketName));
-        metrics.updateElementRequestsCounter(spaceName, bucketName).increment();
-    }
-
-    @GetMapping(path = "/{spaceName}/{bucketName}/{elementId}")
-    @ResponseStatus(value = HttpStatus.OK)
-    ElementQueryApiDto getElement(
-            @PathVariable("spaceName") String spaceName,
-            @PathVariable("bucketName") String bucketName,
-            @PathVariable("elementId") String elementId) {
-        Space spaceDefinition = spaceRepository.get(spaceName);
-        SpaceService space = spaceServiceFactory.buildSpaceService(spaceDefinition);
-
-        metrics.getElementRequestsCounter(spaceName, bucketName).increment();
-        return ElementQueryApiDto.from(space.getElement(bucketName, elementId));
-    }
-
-    @GetMapping(path = "/{spaceName}/{bucketName}")
-    @ResponseStatus(value = HttpStatus.OK)
-    PaginatedElementsApiDto getElements(
-            @PathVariable("spaceName") String spaceName,
-            @PathVariable("bucketName") String bucketName,
-            @RequestParam Map<String, String> filters,
-            @RequestParam(value = "limit", defaultValue = "20") int limit,
-            @RequestParam(value = "offset", defaultValue = "0") int offset,
-            HttpServletRequest request) {
-        Space spaceDefinition = spaceRepository.get(spaceName);
-        SpaceService space = spaceServiceFactory.buildSpaceService(spaceDefinition);
-
-        BucketQuery query = BucketQuery.of(bucketName, limit, offset);
-
-        List<ElementQueryApiDto> results = space.filterElements(query).stream()
-                .map(ElementQueryApiDto::from)
-                .collect(Collectors.toList());
-
-        metrics.getElementsRequestsCounter(spaceName, bucketName).increment();
-        return PaginatedElementsApiDto.of(
-                getNextPageLink(space.getNumberOfElements(bucketName), limit, offset, request),
-                results);
-    }
-
-    private static String getNextPageLink(long numberOfElements, int limit, int offset,
-                                          HttpServletRequest request) {
-        return numberOfElements - (offset + limit) > 0 ?
-                String.format("%s?limit=%d&offset=%d", getUrlFromRequest(request), limit, offset + limit) : null;
-    }
-
-    private static String getUrlFromRequest(HttpServletRequest request) {
-        return request.getRequestURL().toString();
-    }
+	@GetMapping(path = "/{spaceName}")
+	SpaceDefinitionApiDto getSpace(@PathVariable("spaceName") String spaceName) {
+		Space fromDb = spaceRepository.get(spaceName);
+		metrics.getSpaceRequestsCounter().increment();
+		return new SpaceDefinitionApiDto(fromDb.getName());
+	}
 }

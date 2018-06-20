@@ -22,7 +22,6 @@ public class Element {
 				Collectors.toMap(ElementField::getName, it -> it)));
 	}
 
-
 	public static Element of(String id, String name, List<ElementField> fields) {
 		return new Element(id, name, fields);
 	}

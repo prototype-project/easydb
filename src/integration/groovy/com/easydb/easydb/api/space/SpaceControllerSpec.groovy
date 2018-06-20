@@ -2,17 +2,12 @@ package com.easydb.easydb.api.space
 
 import com.easydb.easydb.BaseIntegrationSpec;
 import com.easydb.easydb.api.SpaceDefinitionApiDto
-import com.easydb.easydb.domain.space.SpaceRepository;
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.HttpClientErrorException
 
 
-class CrudSpaceServiceDefinitionSpec extends BaseIntegrationSpec {
-
-	@Autowired
-	SpaceRepository definitionRepository
+class SpaceControllerSpec extends BaseIntegrationSpec {
 
 	def "should create new space"() {
 		when:

@@ -1,19 +1,18 @@
-package com.easydb.easydb.api.query
+package com.easydb.easydb.api.bucket
 
 import com.easydb.easydb.BaseIntegrationSpec
 import com.easydb.easydb.api.PaginatedElementsApiDto
-import groovy.json.JsonOutput
 import org.springframework.web.client.HttpClientErrorException;
 
-class BucketElementsPaginationSpec extends BaseIntegrationSpec implements QueryUtils {
+class BucketElementsPaginationSpec extends BaseIntegrationSpec implements TestUtils {
 
 	private String spaceName
 
 	def setup() {
 		spaceName = addSampleSpace().body.spaceName
-		addSampleElement(spaceName, buildElementBody("Daniel"))
-		addSampleElement(spaceName, buildElementBody("Bartek"))
-		addSampleElement(spaceName, buildElementBody("Zdzisiek"))
+		addSampleElement(spaceName, buildElementBody("Daniel", "Faderski"))
+		addSampleElement(spaceName, buildElementBody("Bartek", "Beczkowski"))
+		addSampleElement(spaceName, buildElementBody("Zdzisiek", "Czajka"))
 	}
 
 	def "should properly paginate results by offset when all elements was fetched"() {
@@ -89,16 +88,5 @@ class BucketElementsPaginationSpec extends BaseIntegrationSpec implements QueryU
 		then:
 		def response = thrown(HttpClientErrorException)
 		response.rawStatusCode == 400
-	}
-
-	static String buildElementBody(String firstName) {
-		JsonOutput.toJson([
-				fields: [
-						[
-								name : "firstName",
-								value: firstName
-						]
-				]
-		])
 	}
 }

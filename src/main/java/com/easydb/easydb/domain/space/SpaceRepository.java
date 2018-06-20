@@ -8,4 +8,6 @@ public interface SpaceRepository {
     Space get(String name) throws SpaceDoesNotExistException;
 
     void remove(String name) throws SpaceDoesNotExistException;
+
+
 }

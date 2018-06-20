@@ -1,8 +1,8 @@
-package com.easydb.easydb.api.query
+package com.easydb.easydb.api.bucket
 
 import com.easydb.easydb.BaseIntegrationSpec
 
-class FilterBucketElementsSpec extends BaseIntegrationSpec implements QueryUtils {
+class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestUtils {
 
 //    private String spaceName
 //

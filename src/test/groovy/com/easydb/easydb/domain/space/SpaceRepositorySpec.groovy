@@ -1,12 +1,16 @@
 package com.easydb.easydb.domain.space
 
+import com.easydb.easydb.BaseSpecification
 
-class SpaceServiceDefinitionRepositorySpec extends BaseSpecification {
+
+class SpaceRepositorySpec extends BaseSpecification {
 
     public static final String TEST_SPACE = "testSpace"
 
     def cleanup() {
-        spaceRepository.remove(TEST_SPACE)
+        try {
+            spaceRepository.remove(TEST_SPACE)
+        } catch (SpaceDoesNotExistException ignored) {}
     }
 
     def "should create space"() {

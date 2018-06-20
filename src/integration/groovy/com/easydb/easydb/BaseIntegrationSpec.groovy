@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.web.client.RestTemplate
@@ -19,6 +20,7 @@ import spock.lang.Specification
         classes = [EasydbApplication],
         properties = "application.environment=integration",
         webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
+@DirtiesContext
 @ContextConfiguration(classes = SpaceTestConfig)
 @ActiveProfiles("integration")
 abstract class BaseIntegrationSpec extends Specification {
@@ -31,6 +33,14 @@ abstract class BaseIntegrationSpec extends Specification {
 
     @Value('${local.server.port}')
     int port
+
+    void setupSpec() {
+        startZookeeperServer()
+    }
+
+    void cleanupSpec() {
+        stopZookeeperServer()
+    }
 
     String localUrl(String endpoint) {
         return "http://localhost:$port$endpoint"
