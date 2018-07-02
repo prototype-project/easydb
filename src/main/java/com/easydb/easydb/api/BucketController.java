@@ -4,13 +4,10 @@ import com.easydb.easydb.config.ApplicationMetrics;
 import com.easydb.easydb.domain.bucket.BucketQuery;
 import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.bucket.BucketService;
-import com.easydb.easydb.domain.space.BucketServiceFactory;
-import com.easydb.easydb.domain.space.Space;
 import com.easydb.easydb.domain.space.SpaceService;
 import com.easydb.easydb.domain.space.UUIDProvider;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -26,7 +23,7 @@ class BucketController {
     private final UUIDProvider uuidProvider;
     private final ApplicationMetrics metrics;
 
-    private BucketController(
+    BucketController(
             SpaceService spaceService,
             UUIDProvider uuidProvider,
             ApplicationMetrics metrics) {
@@ -47,7 +44,7 @@ class BucketController {
     ElementQueryApiDto addElement(
             @PathVariable("spaceName") String spaceName,
             @PathVariable("bucketName") String bucketName,
-            @RequestBody @Valid ElementOperationApiDto toCreate) {
+            @RequestBody @Valid ElementCrudApiDto toCreate) {
         Element element = toCreate.toDomain(uuidProvider.generateUUID(), bucketName);
         spaceService.bucketServiceForSpace(spaceName).addElement(element);
 
@@ -71,7 +68,7 @@ class BucketController {
             @PathVariable("spaceName") String spaceName,
             @PathVariable("bucketName") String bucketName,
             @PathVariable("elementId") String elementId,
-            @RequestBody @Valid ElementOperationApiDto toUpdate) {
+            @RequestBody @Valid ElementCrudApiDto toUpdate) {
         spaceService.bucketServiceForSpace(spaceName).updateElement(toUpdate.toDomain(elementId, bucketName));
         metrics.updateElementRequestsCounter(spaceName, bucketName).increment();
     }
@@ -93,7 +90,6 @@ class BucketController {
     PaginatedElementsApiDto filterElements(
             @PathVariable("spaceName") String spaceName,
             @PathVariable("bucketName") String bucketName,
-            @RequestParam Map<String, String> filters,
             @RequestParam(value = "limit", defaultValue = "20") int limit,
             @RequestParam(value = "offset", defaultValue = "0") int offset,
             HttpServletRequest request) {

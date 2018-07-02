@@ -1,15 +1,11 @@
 package com.easydb.easydb
 
-import com.easydb.easydb.api.ElementQueryApiDto
-import com.easydb.easydb.api.SpaceDefinitionApiDto
 import org.apache.curator.test.TestingServer
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.ContextConfiguration
@@ -54,21 +50,6 @@ abstract class BaseIntegrationSpec extends Specification {
 
     HttpEntity httpJsonEntity(String jsonBody) {
         new HttpEntity<String>(jsonBody, headers())
-    }
-
-    ResponseEntity<ElementQueryApiDto> addSampleElement(String spaceName, String bucketName, String body) {
-        return restTemplate.exchange(
-                localUrl('/api/v1/' + spaceName + '/'+ bucketName),
-                HttpMethod.POST,
-                httpJsonEntity(body),
-                ElementQueryApiDto.class)
-    }
-
-    ResponseEntity<SpaceDefinitionApiDto> addSampleSpace() {
-        return restTemplate.postForEntity(
-                localUrl("/api/v1/spaces/"),
-                Void,
-                SpaceDefinitionApiDto.class)
     }
 
     void startZookeeperServer() {

@@ -1,6 +1,7 @@
 package com.easydb.easydb.api.bucket
 
 import com.easydb.easydb.BaseIntegrationSpec
+import com.easydb.easydb.TestUtils
 
 class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestUtils {
 
@@ -8,13 +9,13 @@ class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestUtils 
 //
 //    def setup() {
 //        spaceName = addSampleSpace().body.spaceName
-//        addSampleElement(spaceName, buildElementBody("Daniel", "D"))
-//        addSampleElement(spaceName, buildElementBody("Bartek", "B"))
-//        addSampleElement(spaceName, buildElementBody("Zdzisiek", "Z1"))
-//        addSampleElement(spaceName, buildElementBody("Zdzisiek", "Z2"))
-//        addSampleElement(spaceName, buildElementBody("Zdzisiek", "Z2", '20'))
-//        addSampleElement(spaceName, buildElementBody("Zdzisiek", "Z2", '20'))
-//        addSampleElement(spaceName, buildElementBody("Zdzisiek", "Z2", '21'))
+//        addElement(spaceName, buildElementBody("Daniel", "D"))
+//        addElement(spaceName, buildElementBody("Bartek", "B"))
+//        addElement(spaceName, buildElementBody("Zdzisiek", "Z1"))
+//        addElement(spaceName, buildElementBody("Zdzisiek", "Z2"))
+//        addElement(spaceName, buildElementBody("Zdzisiek", "Z2", '20'))
+//        addElement(spaceName, buildElementBody("Zdzisiek", "Z2", '20'))
+//        addElement(spaceName, buildElementBody("Zdzisiek", "Z2", '21'))
 //    }
 //
 //    def "should filter com.easydb.easydb.element.bucket elements by single field"() {

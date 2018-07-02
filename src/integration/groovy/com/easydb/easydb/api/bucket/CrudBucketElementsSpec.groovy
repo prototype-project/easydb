@@ -1,6 +1,7 @@
 package com.easydb.easydb.api.bucket
 
 import com.easydb.easydb.BaseIntegrationSpec
+import com.easydb.easydb.TestUtils
 import com.easydb.easydb.api.ElementQueryApiDto
 import com.easydb.easydb.api.PaginatedElementsApiDto
 import com.easydb.easydb.domain.bucket.BucketQuery
@@ -64,7 +65,7 @@ class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestUtils {
         ResponseEntity response = restTemplate.exchange(
                 localUrl('/api/v1/' + spaceName + '/'+ TEST_BUCKET_NAME + '/' + addElementResponse.body.getId()),
                 HttpMethod.PUT,
-                httpJsonEntity(sampleElementUpdate()),
+                httpJsonEntity(sampleUpdateElementBody()),
                 Void.class)
 
         then:
@@ -114,7 +115,7 @@ class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestUtils {
         restTemplate.exchange(
                 localUrl('/api/v1/' + spaceName + '/'+ TEST_BUCKET_NAME + '/' + 'someId'),
                 HttpMethod.PUT,
-                httpJsonEntity(sampleElementUpdate()),
+                httpJsonEntity(sampleUpdateElementBody()),
                 Void.class)
 
         then:
@@ -132,7 +133,7 @@ class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestUtils {
         restTemplate.exchange(
                 localUrl('/api/v1/' + spaceName + '/'+ TEST_BUCKET_NAME + '/' + 'nonexistentId'),
                 HttpMethod.PUT,
-                httpJsonEntity(sampleElementUpdate()),
+                httpJsonEntity(sampleUpdateElementBody()),
                 Void.class)
 
         then:

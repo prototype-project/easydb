@@ -4,6 +4,7 @@ import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.bucket.ElementField;
 import java.util.List;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
@@ -12,6 +13,9 @@ class PersistentBucketElement {
 	@Id
 	private final String id;
 	private final List<ElementField> fields;
+
+	@Version
+	private long version;
 
 	private PersistentBucketElement(String id, List<ElementField> fields) {
 		this.id = id;

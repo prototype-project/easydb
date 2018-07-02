@@ -9,7 +9,6 @@ class ElementTestBuilder {
     private List<ElementField> fields = [
             ElementField.of('firstName', 'John'),
             ElementField.of('lastName', 'Smith'),
-            ElementField.of('email', 'john.smith@op.pl')
     ]
 
     ElementTestBuilder id(String id) {
@@ -24,6 +23,16 @@ class ElementTestBuilder {
 
     ElementTestBuilder fields(List<ElementField> fields) {
         this.fields = fields
+        return this
+    }
+
+    ElementTestBuilder clearFields() {
+        this.fields = []
+        return this
+    }
+
+    ElementTestBuilder addField(ElementField field) {
+        this.fields.add(field)
         return this
     }
 

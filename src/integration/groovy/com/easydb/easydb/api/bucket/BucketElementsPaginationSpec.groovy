@@ -1,7 +1,10 @@
 package com.easydb.easydb.api.bucket
 
 import com.easydb.easydb.BaseIntegrationSpec
+import com.easydb.easydb.ElementTestBuilder
+import com.easydb.easydb.TestUtils
 import com.easydb.easydb.api.PaginatedElementsApiDto
+import com.easydb.easydb.domain.bucket.ElementField
 import org.springframework.web.client.HttpClientErrorException;
 
 class BucketElementsPaginationSpec extends BaseIntegrationSpec implements TestUtils {
@@ -10,9 +13,29 @@ class BucketElementsPaginationSpec extends BaseIntegrationSpec implements TestUt
 
 	def setup() {
 		spaceName = addSampleSpace().body.spaceName
-		addSampleElement(spaceName, buildElementBody("Daniel", "Faderski"))
-		addSampleElement(spaceName, buildElementBody("Bartek", "Beczkowski"))
-		addSampleElement(spaceName, buildElementBody("Zdzisiek", "Czajka"))
+		addElement(spaceName, buildElementBody(
+				ElementTestBuilder
+						.builder()
+						.clearFields()
+						.addField(ElementField.of("firstName", "Daniel"))
+						.addField(ElementField.of("lastName", "Faderski"))
+						.build()))
+
+		addElement(spaceName, buildElementBody(
+				ElementTestBuilder
+						.builder()
+						.clearFields()
+						.addField(ElementField.of("firstName", "Daniel"))
+						.addField(ElementField.of("lastName", "Faderski"))
+						.build()))
+
+		addElement(spaceName, buildElementBody(
+				ElementTestBuilder
+						.builder()
+						.clearFields()
+						.addField(ElementField.of("firstName", "Daniel"))
+						.addField(ElementField.of("lastName", "Faderski"))
+						.build()))
 	}
 
 	def "should properly paginate results by offset when all elements was fetched"() {

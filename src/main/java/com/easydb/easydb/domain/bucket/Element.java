@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Element {
@@ -40,5 +41,22 @@ public class Element {
 
 	public String getFieldValue(String fieldName) {
 		return fieldsAsMap.get(fieldName).getValue();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		Element that = (Element) o;
+
+		return bucketName.equals(that.bucketName) &&
+				fields.equals(that.fields) &&
+				id.equals(that.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(bucketName, fields, id);
 	}
 }

@@ -2,6 +2,7 @@ package com.easydb.easydb.api.bucket
 
 import com.easydb.easydb.BaseIntegrationSpec
 import com.easydb.easydb.ElementTestBuilder
+import com.easydb.easydb.TestUtils
 import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.bucket.BucketService
 import com.easydb.easydb.domain.space.SpaceService
@@ -10,7 +11,7 @@ import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 
 
-class RemoveBucketSpec extends BaseIntegrationSpec {
+class RemoveBucketSpec extends BaseIntegrationSpec implements TestUtils {
 
     RestTemplate restTemplate = new RestTemplate()
 
