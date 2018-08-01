@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.InitBinder;
 @ControllerAdvice
 public class CommonControllerAdviser {
 
-	@InitBinder
-	private void activateDirectFieldAccess(DataBinder dataBinder) {
-		dataBinder.initDirectFieldAccess();
-	}
+    @InitBinder
+    private void activateDirectFieldAccess(DataBinder dataBinder) {
+        dataBinder.initDirectFieldAccess();
+    }
 }

@@ -11,23 +11,25 @@ import javax.servlet.annotation.WebFilter;
 @WebFilter
 public class MetricsFilter implements Filter {
 
-	private final ApplicationMetrics applicationMetrics;
+    private final ApplicationMetrics applicationMetrics;
 
-	MetricsFilter(ApplicationMetrics applicationMetrics) {
-		this.applicationMetrics = applicationMetrics;
-	}
+    MetricsFilter(ApplicationMetrics applicationMetrics) {
+        this.applicationMetrics = applicationMetrics;
+    }
 
-	@Override
-	public void init(FilterConfig config) throws ServletException { }
+    @Override
+    public void init(FilterConfig config) throws ServletException {
+    }
 
-	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-			throws java.io.IOException, ServletException {
-		chain.doFilter(request, response);
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws java.io.IOException, ServletException {
+        chain.doFilter(request, response);
 
-		applicationMetrics.getTotalRequestsCounter().increment();
-	}
+        applicationMetrics.getTotalRequestsCounter().increment();
+    }
 
-	@Override
-	public void destroy() { }
+    @Override
+    public void destroy() {
+    }
 }

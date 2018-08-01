@@ -16,42 +16,42 @@ import org.hibernate.validator.constraints.NotEmpty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ElementTransactionOperationApiDto {
 
-	private String id;
+    private String id;
 
-	@NotEmpty
-	private String bucketName;
+    @NotEmpty
+    private String bucketName;
 
-	@NotNull
-	@Valid
-	private List<ElementFieldApiDto> fields;
+    @NotNull
+    @Valid
+    private List<ElementFieldApiDto> fields;
 
-	@JsonCreator
-	private ElementTransactionOperationApiDto(
-			@JsonProperty("id") String id,
-			@JsonProperty("bucketName") String bucketName,
-			@JsonProperty("fields") List<ElementFieldApiDto> fields) {
-		this.id = id;
-		this.bucketName = bucketName;
-		Collections.sort(fields);
-		this.fields = ImmutableList.copyOf(fields);
-	}
+    @JsonCreator
+    private ElementTransactionOperationApiDto(
+            @JsonProperty("id") String id,
+            @JsonProperty("bucketName") String bucketName,
+            @JsonProperty("fields") List<ElementFieldApiDto> fields) {
+        this.id = id;
+        this.bucketName = bucketName;
+        Collections.sort(fields);
+        this.fields = ImmutableList.copyOf(fields);
+    }
 
-	public String getId() {
-		return id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public List<ElementFieldApiDto> getFields() {
-		return fields;
-	}
+    public List<ElementFieldApiDto> getFields() {
+        return fields;
+    }
 
-	Element toDomainElement() {
-		return toDomainElement(this.id);
-	}
+    Element toDomainElement() {
+        return toDomainElement(this.id);
+    }
 
-	Element toDomainElement(String id) {
-		List<ElementField> domainFields = fields.stream()
-				.map(ElementFieldApiDto::toDomain)
-				.collect(Collectors.toList());
-		return Element.of(id, bucketName, domainFields);
-	}
+    Element toDomainElement(String id) {
+        List<ElementField> domainFields = fields.stream()
+                .map(ElementFieldApiDto::toDomain)
+                .collect(Collectors.toList());
+        return Element.of(id, bucketName, domainFields);
+    }
 }

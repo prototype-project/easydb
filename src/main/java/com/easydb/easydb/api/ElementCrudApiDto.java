@@ -17,7 +17,7 @@ public class ElementCrudApiDto {
 
     @JsonCreator
     public ElementCrudApiDto(
-    		@JsonProperty("fields") List<ElementFieldApiDto> fields) {
+            @JsonProperty("fields") List<ElementFieldApiDto> fields) {
         this.fields = fields;
     }
 

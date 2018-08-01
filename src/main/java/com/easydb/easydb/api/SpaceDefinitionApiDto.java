@@ -7,16 +7,16 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 public class SpaceDefinitionApiDto {
 
-	@NotEmpty
-	@JsonProperty("spaceName")
-	private final String spaceName;
+    @NotEmpty
+    @JsonProperty("spaceName")
+    private final String spaceName;
 
-	@JsonCreator
-	public SpaceDefinitionApiDto(@JsonProperty("spaceName") String spaceName) {
-		this.spaceName = spaceName;
-	}
+    @JsonCreator
+    public SpaceDefinitionApiDto(@JsonProperty("spaceName") String spaceName) {
+        this.spaceName = spaceName;
+    }
 
-	Space toDomain() {
-		return Space.of(spaceName);
-	}
+    Space toDomain() {
+        return Space.of(spaceName);
+    }
 }

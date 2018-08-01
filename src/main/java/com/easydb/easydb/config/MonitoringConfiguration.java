@@ -6,13 +6,13 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class MonitoringConfiguration {
 
-	@Bean
-	ApplicationMetrics applicationMetrics() {
-		return new ApplicationMetrics();
-	}
+    @Bean
+    ApplicationMetrics applicationMetrics() {
+        return new ApplicationMetrics();
+    }
 
-	@Bean
-	MetricsFilter metricsFilter() {
-		return new MetricsFilter(applicationMetrics());
-	}
+    @Bean
+    MetricsFilter metricsFilter() {
+        return new MetricsFilter(applicationMetrics());
+    }
 }

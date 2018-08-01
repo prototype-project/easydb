@@ -2,9 +2,9 @@ package com.easydb.easydb.api;
 
 import com.easydb.easydb.config.ApplicationMetrics;
 import com.easydb.easydb.domain.bucket.BucketQuery;
-import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.bucket.BucketService;
-import com.easydb.easydb.domain.space.SpaceService;
+import com.easydb.easydb.domain.bucket.BucketServiceFactory;
+import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.space.UUIDProvider;
 
 import java.util.List;
@@ -19,23 +19,23 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = "/api/v1")
 class BucketController {
 
-    private final SpaceService spaceService;
     private final UUIDProvider uuidProvider;
     private final ApplicationMetrics metrics;
+    private final BucketServiceFactory bucketServiceFactory;
 
     BucketController(
-            SpaceService spaceService,
             UUIDProvider uuidProvider,
-            ApplicationMetrics metrics) {
-        this.spaceService = spaceService;
+            ApplicationMetrics metrics,
+            BucketServiceFactory bucketServiceFactory) {
         this.uuidProvider = uuidProvider;
         this.metrics = metrics;
+        this.bucketServiceFactory = bucketServiceFactory;
     }
 
     @DeleteMapping(path = "/{spaceName}/{bucketName}")
     @ResponseStatus(value = HttpStatus.OK)
     void deleteBucket(@PathVariable("spaceName") String spaceName, @PathVariable("bucketName") String bucketName) {
-        spaceService.bucketServiceForSpace(spaceName).removeBucket(bucketName);
+        bucketServiceFactory.buildBucketService(spaceName).removeBucket(bucketName);
         metrics.deleteBucketRequestsCounter(spaceName).increment();
     }
 
@@ -46,7 +46,7 @@ class BucketController {
             @PathVariable("bucketName") String bucketName,
             @RequestBody @Valid ElementCrudApiDto toCreate) {
         Element element = toCreate.toDomain(uuidProvider.generateUUID(), bucketName);
-        spaceService.bucketServiceForSpace(spaceName).addElement(element);
+        bucketServiceFactory.buildBucketService(spaceName).addElement(element);
 
         metrics.addElementRequestsCounter(spaceName, bucketName).increment();
         return ElementQueryApiDto.from(element);
@@ -58,7 +58,7 @@ class BucketController {
             @PathVariable("spaceName") String spaceName,
             @PathVariable("bucketName") String bucketName,
             @PathVariable("elementId") String elementId) {
-        spaceService.bucketServiceForSpace(spaceName).removeElement(bucketName, elementId);
+        bucketServiceFactory.buildBucketService(spaceName).removeElement(bucketName, elementId);
         metrics.deleteElementRequestsCounter(spaceName, bucketName).increment();
     }
 
@@ -69,7 +69,7 @@ class BucketController {
             @PathVariable("bucketName") String bucketName,
             @PathVariable("elementId") String elementId,
             @RequestBody @Valid ElementCrudApiDto toUpdate) {
-        spaceService.bucketServiceForSpace(spaceName).updateElement(toUpdate.toDomain(elementId, bucketName));
+        bucketServiceFactory.buildBucketService(spaceName).updateElement(toUpdate.toDomain(elementId, bucketName));
         metrics.updateElementRequestsCounter(spaceName, bucketName).increment();
     }
 
@@ -79,7 +79,7 @@ class BucketController {
             @PathVariable("spaceName") String spaceName,
             @PathVariable("bucketName") String bucketName,
             @PathVariable("elementId") String elementId) {
-        BucketService bucketService = spaceService.bucketServiceForSpace(spaceName);
+        BucketService bucketService = bucketServiceFactory.buildBucketService(spaceName);
 
         metrics.getElementRequestsCounter(spaceName, bucketName).increment();
         return ElementQueryApiDto.from(bucketService.getElement(bucketName, elementId));
@@ -93,7 +93,7 @@ class BucketController {
             @RequestParam(value = "limit", defaultValue = "20") int limit,
             @RequestParam(value = "offset", defaultValue = "0") int offset,
             HttpServletRequest request) {
-        BucketService bucketService = spaceService.bucketServiceForSpace(spaceName);
+        BucketService bucketService = bucketServiceFactory.buildBucketService(spaceName);
 
         BucketQuery query = BucketQuery.of(bucketName, limit, offset);
 

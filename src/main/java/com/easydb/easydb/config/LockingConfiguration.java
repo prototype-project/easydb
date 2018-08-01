@@ -15,24 +15,24 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(ZookeeperProperties.class)
 public class LockingConfiguration {
 
-	@Autowired
-	ZookeeperProperties properties;
+    @Autowired
+    ZookeeperProperties properties;
 
-	@Bean(initMethod = "start", destroyMethod = "close")
-	CuratorFramework curatorClient() {
-		RetryPolicy retryPolicy = new RetryUntilElapsed(properties.getRetryTimeoutMillis(), properties.getRetrySleepMillis());
+    @Bean(initMethod = "start", destroyMethod = "close")
+    CuratorFramework curatorClient() {
+        RetryPolicy retryPolicy = new RetryUntilElapsed(properties.getRetryTimeoutMillis(), properties.getRetrySleepMillis());
 
-		CuratorFrameworkFactory.Builder clientBuilder = CuratorFrameworkFactory.builder();
-		clientBuilder.connectionTimeoutMs(properties.getConnectionTimeoutMillis());
-		clientBuilder.sessionTimeoutMs(properties.getSessionTimeoutMillis());
-		clientBuilder.connectString(properties.getConnectionString());
-		clientBuilder.retryPolicy(retryPolicy);
-		//TODO set connection retry policy
-		return clientBuilder.build();
-	}
+        CuratorFrameworkFactory.Builder clientBuilder = CuratorFrameworkFactory.builder();
+        clientBuilder.connectionTimeoutMs(properties.getConnectionTimeoutMillis());
+        clientBuilder.sessionTimeoutMs(properties.getSessionTimeoutMillis());
+        clientBuilder.connectString(properties.getConnectionString());
+        clientBuilder.retryPolicy(retryPolicy);
+        //TODO set connection retry policy
+        return clientBuilder.build();
+    }
 
-	@Bean
-	ElementsLockerFactory elementsLockerFactory(CuratorFramework client) {
-		return new ZookeeperElementsLockerFactory(client);
-	}
+    @Bean
+    ElementsLockerFactory elementsLockerFactory(CuratorFramework client) {
+        return new ZookeeperElementsLockerFactory(client);
+    }
 }

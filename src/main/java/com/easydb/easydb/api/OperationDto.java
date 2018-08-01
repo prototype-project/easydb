@@ -13,43 +13,43 @@ import javax.validation.constraints.NotNull;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OperationDto {
 
-	@NotNull
-	private final Operation.OperationType type;
+    @NotNull
+    private final Operation.OperationType type;
 
-	@NotNull
-	@Valid
-	private final ElementTransactionOperationApiDto element;
+    @NotNull
+    @Valid
+    private final ElementTransactionOperationApiDto element;
 
-	@JsonCreator
-	public OperationDto(
-			@JsonProperty("type") Operation.OperationType type,
-			@JsonProperty("element") ElementTransactionOperationApiDto element) {
-		this.type = type;
-		this.element = element;
-		validate();
-	}
+    @JsonCreator
+    public OperationDto(
+            @JsonProperty("type") Operation.OperationType type,
+            @JsonProperty("element") ElementTransactionOperationApiDto element) {
+        this.type = type;
+        this.element = element;
+        validate();
+    }
 
-	public ElementTransactionOperationApiDto getElement() {
-		return element;
-	}
+    public ElementTransactionOperationApiDto getElement() {
+        return element;
+    }
 
-	Operation toDomain(UUIDProvider uuidProvider) {
-		if (type.equals(Operation.OperationType.CREATE)) {
-			return Operation.of(type, element.toDomainElement(uuidProvider.generateUUID()));
-		}
-		return Operation.of(type, element.toDomainElement());
-	}
+    Operation toDomain(UUIDProvider uuidProvider) {
+        if (type.equals(Operation.OperationType.CREATE)) {
+            return Operation.of(type, element.toDomainElement(uuidProvider.generateUUID()));
+        }
+        return Operation.of(type, element.toDomainElement());
+    }
 
-	private void validate() {
-		if (!type.equals(Operation.OperationType.CREATE) && elementHasEmptyId()) {
-			throw new ElementIdMustNotBeEmptyException();
-		}
-		if (type.equals(Operation.OperationType.CREATE) && !elementHasEmptyId()) {
-			throw new ElementIdMustBeEmptyException();
-		}
-	}
+    private void validate() {
+        if (!type.equals(Operation.OperationType.CREATE) && elementHasEmptyId()) {
+            throw new ElementIdMustNotBeEmptyException();
+        }
+        if (type.equals(Operation.OperationType.CREATE) && !elementHasEmptyId()) {
+            throw new ElementIdMustBeEmptyException();
+        }
+    }
 
-	private boolean elementHasEmptyId() {
-		return Strings.isNullOrEmpty(element.getId());
-	}
+    private boolean elementHasEmptyId() {
+        return Strings.isNullOrEmpty(element.getId());
+    }
 }

@@ -5,8 +5,8 @@ import com.easydb.easydb.ElementTestBuilder
 import com.easydb.easydb.OperationTestBuilder
 import com.easydb.easydb.TestUtils
 import com.easydb.easydb.domain.bucket.BucketService
+import com.easydb.easydb.domain.bucket.BucketServiceFactory
 import com.easydb.easydb.domain.bucket.ElementField
-import com.easydb.easydb.domain.space.SpaceService
 import com.easydb.easydb.domain.transactions.Operation
 import com.easydb.easydb.domain.transactions.Transaction
 import com.easydb.easydb.domain.transactions.TransactionRepository
@@ -21,7 +21,7 @@ import org.springframework.web.client.HttpClientErrorException
 class TransactionControllerSpec extends BaseIntegrationSpec implements TestUtils {
 
     @Autowired
-    SpaceService spaceService
+    BucketServiceFactory bucketServiceFactory
 
     @Autowired
     TransactionRepository repository
@@ -29,10 +29,9 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestUtils
     String spaceName
     BucketService bucketService
 
-
     def setup() {
         spaceName = addSampleSpace().body.spaceName
-        this.bucketService = spaceService.bucketServiceForSpace(spaceName)
+        this.bucketService = bucketServiceFactory.buildBucketService(spaceName)
     }
 
     def "should create transaction with ACTIVE status"() {
@@ -61,7 +60,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestUtils
                 .build()
 
         when:
-        ResponseEntity<Void> response = addOperation(transactionId, operation)
+        ResponseEntity<Void> response = addOperation(spaceName, transactionId, operation)
 
         then:
         response.statusCodeValue == 201
@@ -87,7 +86,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestUtils
 
         when:
         restTemplate.exchange(
-                localUrl("/api/v1/transactions/add-operation/notExistingTransaction"),
+                localUrl("/api/v1/transactions/${spaceName}/add-operation/notExistingTransaction"),
                 HttpMethod.POST,
                 httpJsonEntity(buildOperationBody(operation)),
                 Void.class)
@@ -108,7 +107,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestUtils
                 .build()
 
         when:
-        addOperation(transactionId, operation)
+        addOperation(spaceName, transactionId, operation)
 
         then:
         def response = thrown(HttpClientErrorException)
@@ -129,7 +128,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestUtils
                 .build()
 
         when:
-        addOperation(transactionId, operation)
+        addOperation(spaceName, transactionId, operation)
 
         then:
         def response = thrown(HttpClientErrorException)
@@ -150,7 +149,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestUtils
 
         when:
         restTemplate.exchange(
-                localUrl("/api/v1/transactions/add-operation/${transactionId}"),
+                localUrl("/api/v1/transactions/${spaceName}/add-operation/${transactionId}"),
                 HttpMethod.POST,
                 httpJsonEntity(body),
                 Void.class)
@@ -181,7 +180,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestUtils
                 .build()
 
         when:
-        addOperation(transactionId, operation)
+        addOperation(spaceName, transactionId, operation)
 
         then:
         def response = thrown(HttpClientErrorException)
@@ -200,7 +199,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestUtils
             .build()
 
         when:
-        addOperation(transactionId, operation)
+        addOperation(spaceName, transactionId, operation)
 
         then:
         def response = thrown(HttpClientErrorException)
@@ -228,7 +227,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestUtils
                 .build()
 
         when:
-        ResponseEntity<Void> response = addOperation(transactionId, operation)
+        ResponseEntity<Void> response = addOperation(spaceName, transactionId, operation)
 
         then:
         response.statusCode == HttpStatus.CREATED

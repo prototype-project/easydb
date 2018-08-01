@@ -1,41 +1,22 @@
 package com.easydb.easydb.domain.space;
 
-import com.easydb.easydb.domain.bucket.BucketService;
+import com.easydb.easydb.domain.bucket.BucketRepository;
 
 public class SpaceService {
 
-	private final BucketServiceFactory bucketServiceFactory;
-	private final SpaceRepository spaceRepository;
+    private final SpaceRepository spaceRepository;
+    private final BucketRepository bucketRepository;
 
-	public SpaceService(BucketServiceFactory bucketServiceFactory, SpaceRepository spaceRepository) {
-		this.bucketServiceFactory = bucketServiceFactory;
-		this.spaceRepository = spaceRepository;
-	}
+    public SpaceService(SpaceRepository spaceRepository, BucketRepository bucketRepository) {
+        this.spaceRepository = spaceRepository;
+        this.bucketRepository = bucketRepository;
+    }
 
-	public void save(Space toSave) {
-		spaceRepository.save(toSave);
-	}
-
-	public boolean exists(String name) {
-		return spaceRepository.exists(name);
-	}
-
-	public Space get(String name) {
-		return spaceRepository.get(name);
-	}
-
-	public void remove(String name) {
-		Space space = spaceRepository.get(name);
-		BucketService bucketService = bucketServiceFactory.buildBucketService(name);
-		space.getBuckets().forEach(bucketService::removeBucket);
-		spaceRepository.remove(name);
-	}
-
-	public void update(Space toUpdate) {
-		spaceRepository.update(toUpdate);
-	}
-
-	public BucketService bucketServiceForSpace(String spaceName) {
-		return bucketServiceFactory.buildBucketService(spaceName);
-	}
+    public void remove(String name) {
+        Space space = spaceRepository.get(name);
+        space.getBuckets().stream()
+                .map(bucket -> name + ":" + bucket)
+                .forEach(bucketRepository::removeBucket);
+        spaceRepository.remove(name);
+    }
 }

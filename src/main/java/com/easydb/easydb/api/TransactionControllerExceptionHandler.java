@@ -1,6 +1,6 @@
 package com.easydb.easydb.api;
 
-import com.easydb.easydb.infrastructure.transactions.TransactionDoesNotExistException;
+import com.easydb.easydb.domain.transactions.TransactionDoesNotExistException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

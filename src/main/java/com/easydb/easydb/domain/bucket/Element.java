@@ -10,53 +10,53 @@ import java.util.stream.Collectors;
 
 public class Element {
 
-	private final String id;
-	private final String bucketName;
-	private final List<ElementField> fields;
-	private final Map<String, ElementField> fieldsAsMap;
+    private final String id;
+    private final String bucketName;
+    private final List<ElementField> fields;
+    private final Map<String, ElementField> fieldsAsMap;
 
-	private Element(String id, String bucketName, List<ElementField> fields) {
-		this.id = id;
-		this.bucketName = bucketName;
-		this.fields = ImmutableList.copyOf(fields);
-		this.fieldsAsMap = ImmutableMap.copyOf(fields.stream().collect(
-				Collectors.toMap(ElementField::getName, it -> it)));
-	}
+    private Element(String id, String bucketName, List<ElementField> fields) {
+        this.id = id;
+        this.bucketName = bucketName;
+        this.fields = ImmutableList.copyOf(fields);
+        this.fieldsAsMap = ImmutableMap.copyOf(fields.stream().collect(
+                Collectors.toMap(ElementField::getName, it -> it)));
+    }
 
-	public static Element of(String id, String name, List<ElementField> fields) {
-		return new Element(id, name, fields);
-	}
+    public static Element of(String id, String bucketName, List<ElementField> fields) {
+        return new Element(id, bucketName, fields);
+    }
 
-	public String getBucketName() {
-		return bucketName;
-	}
+    public String getBucketName() {
+        return bucketName;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public List<ElementField> getFields() {
-		return fields;
-	}
+    public List<ElementField> getFields() {
+        return fields;
+    }
 
-	public String getFieldValue(String fieldName) {
-		return fieldsAsMap.get(fieldName).getValue();
-	}
+    public String getFieldValue(String fieldName) {
+        return fieldsAsMap.get(fieldName).getValue();
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-		Element that = (Element) o;
+        Element that = (Element) o;
 
-		return bucketName.equals(that.bucketName) &&
-				fields.equals(that.fields) &&
-				id.equals(that.id);
-	}
+        return bucketName.equals(that.bucketName) &&
+                fields.equals(that.fields) &&
+                id.equals(that.id);
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(bucketName, fields, id);
-	}
+    @Override
+    public int hashCode() {
+        return Objects.hash(bucketName, fields, id);
+    }
 }

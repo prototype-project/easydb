@@ -1,33 +1,11 @@
-package com.easydb.easydb.domain.bucket
+package com.easydb.easydb.infrastructure.bucket
 
-import com.easydb.easydb.BaseSpecification
 import com.easydb.easydb.ElementTestBuilder
-import com.easydb.easydb.domain.space.Space
-import spock.lang.Shared
+import com.easydb.easydb.IntegrationWithCleanedDatabaseSpec
+import com.easydb.easydb.domain.bucket.*
 import spock.lang.Unroll
 
-class BucketPaginationSpec extends BaseSpecification {
-
-    static final String TEST_BUCKET_NAME = "bucketPagination"
-    static final String TEST_SPACE = "testSpace"
-
-    @Shared
-    BucketService bucketService
-
-    def setupSpec() {
-        spaceService.save(Space.of(TEST_SPACE))
-        bucketService = spaceService.bucketServiceForSpace(TEST_SPACE)
-    }
-
-    def cleanupSpec() {
-        spaceService.remove(TEST_SPACE)
-    }
-
-    def cleanup() {
-        try {
-            bucketService.removeBucket(TEST_BUCKET_NAME)
-        } catch (BucketDoesNotExistException ignored) {}
-    }
+class BucketServicePaginationSpec extends IntegrationWithCleanedDatabaseSpec {
 
     @Unroll
     def "should paginate elements"() {
@@ -44,14 +22,14 @@ class BucketPaginationSpec extends BaseSpecification {
         where:
         limit | offset | expectedNumberOfElements
 
-        1     |   1    |   1
-        1     |   0    |   1
-        2     |   0    |   2
-        3     |   0    |   3
-        3     |   1    |   2
-        3     |   2    |   1
-        3     |   3    |   0
-        3     |   5    |   0
+        1     | 1      | 1
+        1     | 0      | 1
+        2     | 0      | 2
+        3     | 0      | 3
+        3     | 1      | 2
+        3     | 2      | 1
+        3     | 3      | 0
+        3     | 5      | 0
     }
 
     def "should return empty list when there is no elements"() {
@@ -63,7 +41,6 @@ class BucketPaginationSpec extends BaseSpecification {
 
         then:
         elements.size() == 0
-
     }
 
     @Unroll

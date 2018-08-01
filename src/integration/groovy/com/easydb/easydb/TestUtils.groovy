@@ -85,9 +85,9 @@ trait TestUtils {
         )
     }
 
-    ResponseEntity<Void> addOperation(String transactionId, Operation operation) {
+    ResponseEntity<Void> addOperation(String spaceName, String transactionId, Operation operation) {
         return restTemplate.exchange(
-                localUrl("/api/v1/transactions/add-operation/${transactionId}"),
+                localUrl("/api/v1/transactions/${spaceName}/add-operation/${transactionId}"),
                 HttpMethod.POST,
                 httpJsonEntity(buildOperationBody(operation)),
                 Void.class

@@ -1,28 +1,24 @@
-package com.easydb.easydb.domain.bucket
+package com.easydb.easydb.infrastructure.bucket
 
-import com.easydb.easydb.BaseSpecification
-import com.easydb.easydb.domain.space.Space
+import com.easydb.easydb.IntegrationWithCleanedDatabaseSpec
+import com.easydb.easydb.domain.bucket.*
+import com.easydb.easydb.domain.space.SpaceRepository
+import org.springframework.beans.factory.annotation.Autowired
 
 import static com.easydb.easydb.ElementTestBuilder.builder
 
-
-class BucketServiceSpec extends BaseSpecification {
-
-    public static final String TEST_BUCKET_NAME = "bucketService"
-    public static final String TEST_SPACE = "testSpace"
+class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec {
 
     BucketService bucketService
 
-    def setupSpec() {
-        spaceService.save(Space.of(TEST_SPACE))
-    }
+    @Autowired BucketServiceFactory bucketServiceFactory
 
-    def cleanupSpec() {
-        spaceService.remove(TEST_SPACE)
-    }
+    @Autowired SpaceRepository spaceRepository
+
+    @Autowired BucketRepository bucketRepository
 
     def setup() {
-        bucketService = spaceService.bucketServiceForSpace(TEST_SPACE)
+        bucketService = new SimpleBucketService(TEST_SPACE, spaceRepository, bucketRepository)
     }
 
     def cleanup() {
@@ -65,7 +61,7 @@ class BucketServiceSpec extends BaseSpecification {
         bucketService.addElement(toCreate)
 
         then:
-        spaceService.get(TEST_SPACE).buckets == [TEST_BUCKET_NAME] as Set
+        spaceRepository.get(TEST_SPACE).buckets == [TEST_BUCKET_NAME] as Set
     }
 
 
@@ -218,7 +214,6 @@ class BucketServiceSpec extends BaseSpecification {
 
         expect:
         bucketService.getNumberOfElements(TEST_BUCKET_NAME) == 2
-
     }
 
     static BucketQuery getDefaultBucketQuery() {

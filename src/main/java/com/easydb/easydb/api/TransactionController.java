@@ -1,7 +1,12 @@
 package com.easydb.easydb.api;
 
+import com.easydb.easydb.domain.bucket.BucketRepository;
+import com.easydb.easydb.domain.bucket.BucketService;
+import com.easydb.easydb.domain.bucket.SimpleBucketService;
+import com.easydb.easydb.domain.space.SpaceRepository;
+import com.easydb.easydb.domain.space.SpaceService;
 import com.easydb.easydb.domain.space.UUIDProvider;
-import com.easydb.easydb.domain.transactions.TransactionManager;
+import com.easydb.easydb.domain.transactions.TransactionManagerFactory;
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,24 +20,34 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/api/v1/transactions")
 class TransactionController {
 
-	private final TransactionManager manager;
-	private final UUIDProvider uuidProvider;
+    private final TransactionManagerFactory transactionManagerFactory;
+    private final UUIDProvider uuidProvider;
+    private final SpaceRepository spaceRepository;
+    private final BucketRepository bucketRepository;
 
-	TransactionController(TransactionManager manager, UUIDProvider uuidProvider) {
-		this.manager = manager;
-		this.uuidProvider = uuidProvider;
-	}
+    TransactionController(TransactionManagerFactory transactionManagerFactory, UUIDProvider uuidProvider,
+                          SpaceRepository spaceRepository, BucketRepository bucketRepository) {
+        this.transactionManagerFactory = transactionManagerFactory;
+        this.uuidProvider = uuidProvider;
+        this.spaceRepository = spaceRepository;
+        this.bucketRepository = bucketRepository;
+    }
 
-	@PostMapping("/{spaceName}")
-	@ResponseStatus(value = HttpStatus.CREATED)
-	String beginTransaction(@PathVariable("spaceName") String spaceName) {
-		return manager.beginTransaction(spaceName);
-	}
+    @PostMapping("/{spaceName}")
+    @ResponseStatus(value = HttpStatus.CREATED)
+    String beginTransaction(@PathVariable("spaceName") String spaceName) {
+        BucketService simpleBucketService = new SimpleBucketService(spaceName, spaceRepository, bucketRepository);
+        return transactionManagerFactory.buildTransactionManager(simpleBucketService)
+                .beginTransaction(spaceName);
+    }
 
-	@PostMapping("/add-operation/{transactionId}")
-	@ResponseStatus(value = HttpStatus.CREATED)
-	void addOperation(@PathVariable String transactionId,
-	                  @RequestBody @Valid OperationDto dto) {
-		manager.addOperation(transactionId, dto.toDomain(uuidProvider));
-	}
+    @PostMapping("{spaceName}/add-operation/{transactionId}")
+    @ResponseStatus(value = HttpStatus.CREATED)
+    void addOperation(@PathVariable String transactionId,
+                      @PathVariable String spaceName,
+                      @RequestBody @Valid OperationDto dto) {
+        BucketService simpleBucketService = new SimpleBucketService(spaceName, spaceRepository, bucketRepository);
+        transactionManagerFactory.buildTransactionManager(simpleBucketService)
+                .addOperation(transactionId, dto.toDomain(uuidProvider));
+    }
 }

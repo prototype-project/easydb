@@ -17,101 +17,100 @@ import org.springframework.data.mongodb.core.query.Update;
 
 public class MongoBucketRepository implements BucketRepository {
 
-	private final MongoTemplate mongoTemplate;
+    private final MongoTemplate mongoTemplate;
 
-	public MongoBucketRepository(MongoTemplate mongoTemplate) {
-		this.mongoTemplate = mongoTemplate;
-	}
+    public MongoBucketRepository(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
+    }
 
-	@Override
-	public boolean bucketExists(String name) {
-		return mongoTemplate.collectionExists(name);
-	}
+    @Override
+    public boolean bucketExists(String name) {
+        return mongoTemplate.collectionExists(name);
+    }
 
-	@Override
-	public void removeBucket(String bucketName) {
-		ensureBucketExists(bucketName);
-		mongoTemplate.dropCollection(bucketName);
-	}
+    @Override
+    public void removeBucket(String bucketName) {
+        ensureBucketExists(bucketName);
+        mongoTemplate.dropCollection(bucketName);
+    }
 
-	@Override
-	public void insertElement(Element element) {
-		mongoTemplate.insert(PersistentBucketElement.of(element), element.getBucketName());
-	}
+    @Override
+    public void insertElement(Element element) {
+        mongoTemplate.insert(PersistentBucketElement.of(element), element.getBucketName());
+    }
 
-	@Override
-	public Element getElement(String bucketName, String id) {
-		ensureBucketExists(bucketName);
+    @Override
+    public Element getElement(String bucketName, String id) {
+        ensureBucketExists(bucketName);
 
-		PersistentBucketElement elementFromDb = getPersistentElement(bucketName, id);
-		return Optional.ofNullable(elementFromDb)
-				.map(it -> it.toDomainElement(bucketName))
-				.orElseThrow(() -> new ElementDoesNotExistException(bucketName, id));
-	}
+        PersistentBucketElement elementFromDb = getPersistentElement(bucketName, id);
+        return Optional.ofNullable(elementFromDb)
+                .map(it -> it.toDomainElement(bucketName))
+                .orElseThrow(() -> new ElementDoesNotExistException(bucketName, id));
+    }
 
-	@Override
-	public void removeElement(String bucketName, String id) {
-		ensureBucketExists(bucketName);
+    @Override
+    public void removeElement(String bucketName, String id) {
+        ensureBucketExists(bucketName);
 
-		mongoTemplate.remove(getPersistentElement(bucketName, id), bucketName);
-	}
+        mongoTemplate.remove(getPersistentElement(bucketName, id), bucketName);
+    }
 
-	@Override
-	public boolean elementExists(String bucketName, String elementId) {
-		ensureBucketExists(bucketName);
+    @Override
+    public boolean elementExists(String bucketName, String elementId) {
+        ensureBucketExists(bucketName);
 
-		try {
-			getElement(bucketName, elementId);
-			return true;
-		}
-		catch (ElementDoesNotExistException e) {
-			return false;
-		}
-	}
+        try {
+            getElement(bucketName, elementId);
+            return true;
+        } catch (ElementDoesNotExistException e) {
+            return false;
+        }
+    }
 
-	@Override
-	public void updateElement(Element toUpdate) {
-		ensureBucketExists(toUpdate.getBucketName());
+    @Override
+    public void updateElement(Element toUpdate) {
+        ensureBucketExists(toUpdate.getBucketName());
 
-		Query query = new Query();
-		query.addCriteria(Criteria.where("_id").is(toUpdate.getId()));
-		Update update = new Update();
-		update.set("fields", toUpdate.getFields());
-		WriteResult updateResult = mongoTemplate.updateFirst(query, update, toUpdate.getBucketName());
-		if (updateResult.getN() == 0) {
-			throw new ElementDoesNotExistException(toUpdate.getBucketName(), toUpdate.getId());
-		}
-	}
+        Query query = new Query();
+        query.addCriteria(Criteria.where("_id").is(toUpdate.getId()));
+        Update update = new Update();
+        update.set("fields", toUpdate.getFields());
+        WriteResult updateResult = mongoTemplate.updateFirst(query, update, toUpdate.getBucketName());
+        if (updateResult.getN() == 0) {
+            throw new ElementDoesNotExistException(toUpdate.getBucketName(), toUpdate.getId());
+        }
+    }
 
-	@Override
-	public List<Element> filterElements(BucketQuery query) {
-		Query mongoQuery = fromBucketQuery(query);
-		return mongoTemplate.find(mongoQuery, PersistentBucketElement.class, query.getBucketName()).stream()
-				.map(it -> it.toDomainElement(query.getBucketName()))
-				.collect(Collectors.toList());
-	}
+    @Override
+    public List<Element> filterElements(BucketQuery query) {
+        Query mongoQuery = fromBucketQuery(query);
+        return mongoTemplate.find(mongoQuery, PersistentBucketElement.class, query.getBucketName()).stream()
+                .map(it -> it.toDomainElement(query.getBucketName()))
+                .collect(Collectors.toList());
+    }
 
-	@Override
-	public long getNumberOfElements(String bucketName) {
-		ensureBucketExists(bucketName);
+    @Override
+    public long getNumberOfElements(String bucketName) {
+        ensureBucketExists(bucketName);
 
-		return mongoTemplate.count(new Query(), PersistentBucketElement.class, bucketName);
-	}
+        return mongoTemplate.count(new Query(), PersistentBucketElement.class, bucketName);
+    }
 
-	private void ensureBucketExists(String bucketName) {
-		if (!bucketExists(bucketName)) {
-			throw new BucketDoesNotExistException(bucketName);
-		}
-	}
+    private void ensureBucketExists(String bucketName) {
+        if (!bucketExists(bucketName)) {
+            throw new BucketDoesNotExistException(bucketName);
+        }
+    }
 
-	private PersistentBucketElement getPersistentElement(String bucketName, String id) {
-		return mongoTemplate.findById(id, PersistentBucketElement.class, bucketName);
-	}
+    private PersistentBucketElement getPersistentElement(String bucketName, String id) {
+        return mongoTemplate.findById(id, PersistentBucketElement.class, bucketName);
+    }
 
-	private Query fromBucketQuery(BucketQuery bucketQuery) {
-		Query query = new Query();
-		query.limit(bucketQuery.getLimit());
-		query.skip(bucketQuery.getOffset());
-		return query;
-	}
+    private Query fromBucketQuery(BucketQuery bucketQuery) {
+        Query query = new Query();
+        query.limit(bucketQuery.getLimit());
+        query.skip(bucketQuery.getOffset());
+        return query;
+    }
 }

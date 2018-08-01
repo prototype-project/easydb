@@ -3,9 +3,9 @@ package com.easydb.easydb.api.bucket
 import com.easydb.easydb.BaseIntegrationSpec
 import com.easydb.easydb.ElementTestBuilder
 import com.easydb.easydb.TestUtils
-import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.bucket.BucketService
-import com.easydb.easydb.domain.space.SpaceService
+import com.easydb.easydb.domain.bucket.BucketServiceFactory
+import com.easydb.easydb.domain.bucket.Element
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
@@ -16,14 +16,14 @@ class RemoveBucketSpec extends BaseIntegrationSpec implements TestUtils {
     RestTemplate restTemplate = new RestTemplate()
 
     @Autowired
-    SpaceService spaceService
+    BucketServiceFactory bucketServiceFactory
 
     String spaceName
     BucketService bucketService
 
     def setup() {
         spaceName = addSampleSpace().body.spaceName
-        bucketService = spaceService.bucketServiceForSpace(spaceName)
+        bucketService = bucketServiceFactory.buildBucketService(spaceName)
     }
 
     def "should remove bucket"() {

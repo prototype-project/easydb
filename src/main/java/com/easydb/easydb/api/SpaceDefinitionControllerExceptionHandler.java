@@ -11,11 +11,13 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class SpaceDefinitionControllerExceptionHandler extends ResponseEntityExceptionHandler {
 
-	@ExceptionHandler(value = {SpaceNameNotUniqueException.class})
-	@ResponseStatus(value = HttpStatus.BAD_REQUEST)
-	void handleSpaceNameNotUniqueException() { }
+    @ExceptionHandler(value = {SpaceNameNotUniqueException.class})
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    void handleSpaceNameNotUniqueException() {
+    }
 
-	@ExceptionHandler(value = {SpaceDoesNotExistException.class})
-	@ResponseStatus(value = HttpStatus.NOT_FOUND)
-	void handleSpaceDoesNotExistException() { }
+    @ExceptionHandler(value = {SpaceDoesNotExistException.class})
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    void handleSpaceDoesNotExistException() {
+    }
 }

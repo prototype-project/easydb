@@ -9,25 +9,25 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 class PersistentTransaction {
 
-	private final String spaceName;
+    private final String spaceName;
 
-	@Id
-	private final String id;
+    @Id
+    private final String id;
 
-	private final List<Operation> operations;
+    private final List<Operation> operations;
 
-	private final Transaction.State state;
+    private final Transaction.State state;
 
-	PersistentTransaction(String spaceName, String id,
-	                             List<Operation> operations, Transaction.State state) {
-		this.spaceName = spaceName;
-		this.id = id;
-		this.operations = operations;
-		this.state = state;
-	}
+    PersistentTransaction(String spaceName, String id,
+                          List<Operation> operations, Transaction.State state) {
+        this.spaceName = spaceName;
+        this.id = id;
+        this.operations = operations;
+        this.state = state;
+    }
 
-	Transaction toDomain() {
-		return new Transaction(spaceName, id, operations, state);
-	}
+    Transaction toDomain() {
+        return new Transaction(spaceName, id, operations, state);
+    }
 
 }

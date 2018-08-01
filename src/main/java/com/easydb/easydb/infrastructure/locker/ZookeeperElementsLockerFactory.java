@@ -6,14 +6,14 @@ import org.apache.curator.framework.CuratorFramework;
 
 public class ZookeeperElementsLockerFactory implements ElementsLockerFactory {
 
-	private final CuratorFramework client;
+    private final CuratorFramework client;
 
-	public ZookeeperElementsLockerFactory(CuratorFramework client) {
-		this.client = client;
-	}
+    public ZookeeperElementsLockerFactory(CuratorFramework client) {
+        this.client = client;
+    }
 
-	@Override
-	public ElementsLocker build(String spaceName) {
-		return ZookeeperLocker.of(spaceName, client);
-	}
+    @Override
+    public ElementsLocker build(String spaceName) {
+        return ZookeeperLocker.of(spaceName, client);
+    }
 }

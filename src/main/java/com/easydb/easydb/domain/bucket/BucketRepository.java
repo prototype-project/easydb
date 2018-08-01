@@ -4,21 +4,21 @@ import java.util.List;
 
 public interface BucketRepository {
 
-	boolean bucketExists(String name);
+    boolean bucketExists(String name);
 
-	void removeBucket(String name);
+    void removeBucket(String name) throws BucketDoesNotExistException;
 
-	void insertElement(Element element);
+    void insertElement(Element element);
 
-	Element getElement(String bucketName, String id) throws ElementDoesNotExistException;
+    Element getElement(String bucketName, String id) throws BucketDoesNotExistException, ElementDoesNotExistException;
 
-	void removeElement(String bucketName, String id);
+    void removeElement(String bucketName, String id) throws BucketDoesNotExistException, ElementDoesNotExistException;
 
-	boolean elementExists(String bucketName, String elementId);
+    boolean elementExists(String bucketName, String elementId) throws BucketDoesNotExistException;
 
-	void updateElement(Element toUpdate) throws ElementDoesNotExistException;
+    void updateElement(Element toUpdate) throws BucketDoesNotExistException, ElementDoesNotExistException;
 
-	List<Element> filterElements(BucketQuery query);
+    List<Element> filterElements(BucketQuery query);
 
-	long getNumberOfElements(String bucketName);
+    long getNumberOfElements(String bucketName) throws BucketDoesNotExistException;
 }
