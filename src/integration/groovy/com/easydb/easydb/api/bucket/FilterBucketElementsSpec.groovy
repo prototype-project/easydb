@@ -1,9 +1,9 @@
 package com.easydb.easydb.api.bucket
 
 import com.easydb.easydb.BaseIntegrationSpec
-import com.easydb.easydb.TestUtils
+import com.easydb.easydb.TestHttpOperations
 
-class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestUtils {
+class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOperations {
 
 //    private String spaceName
 //
@@ -20,7 +20,7 @@ class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestUtils 
 //
 //    def "should filter com.easydb.easydb.element.bucket elements by single field"() {
 //        when:
-//        PaginatedElementsApiDto filteredElements = filterElements(spaceName, 0, 7, [firstName: firstName])
+//        PaginatedElementsApiDto filteredElements = getElementsByFullUrl(spaceName, 0, 7, [firstName: firstName])
 //
 //        then:
 //        filteredElements.results.size() == expectedSize
@@ -45,7 +45,7 @@ class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestUtils 
 //        }
 //
 //        when:
-//        PaginatedElementsApiDto filteredElements = filterElements(spaceName, 0, 7, filters)
+//        PaginatedElementsApiDto filteredElements = getElementsByFullUrl(spaceName, 0, 7, filters)
 //
 //        then:
 //        filteredElements.results.size() == expectedSize
@@ -68,7 +68,7 @@ class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestUtils 
 //        ]
 //
 //        when:
-//        PaginatedElementsApiDto filteredElements = filterElements(spaceName, 0, 7, filters)
+//        PaginatedElementsApiDto filteredElements = getElementsByFullUrl(spaceName, 0, 7, filters)
 //
 //        then:
 //        filteredElements.results.size() == 0

@@ -1,7 +1,7 @@
 package com.easydb.easydb.config;
 
-import com.easydb.easydb.domain.locker.ElementsLockerFactory;
-import com.easydb.easydb.infrastructure.locker.ZookeeperElementsLockerFactory;
+import com.easydb.easydb.domain.locker.factories.ElementsLockerFactory;
+import com.easydb.easydb.infrastructure.locker.factories.ZookeeperElementsLockerFactory;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;

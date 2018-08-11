@@ -2,6 +2,7 @@ package com.easydb.easydb.infrastructure.bucket
 
 import com.easydb.easydb.IntegrationWithCleanedDatabaseSpec
 import com.easydb.easydb.domain.bucket.*
+import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
 import com.easydb.easydb.domain.space.SpaceRepository
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -18,7 +19,7 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec {
     @Autowired BucketRepository bucketRepository
 
     def setup() {
-        bucketService = new SimpleBucketService(TEST_SPACE, spaceRepository, bucketRepository)
+        bucketService = bucketServiceFactory.buildBucketService(TEST_SPACE)
     }
 
     def cleanup() {
@@ -142,6 +143,7 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec {
         with(elementFromBucket) {
             id == toCreate.id
             bucketName == toCreate.bucketName
+            fields.toSet() == toCreate.fields.toSet()
         }
     }
 
@@ -180,6 +182,7 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec {
         with(elementsFromBucket[0]) {
             id == toCreate.id
             bucketName == toCreate.bucketName
+            fields == toCreate.fields
         }
     }
 

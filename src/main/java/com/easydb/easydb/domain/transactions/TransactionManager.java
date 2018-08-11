@@ -1,7 +1,9 @@
 package com.easydb.easydb.domain.transactions;
 
-import com.easydb.easydb.domain.bucket.BucketService;
-import com.easydb.easydb.domain.locker.ElementsLockerFactory;
+import com.easydb.easydb.domain.bucket.SimpleElementOperations;
+import com.easydb.easydb.domain.bucket.VersionedElement;
+import com.easydb.easydb.domain.bucket.factories.SimpleElementOperationsFactory;
+import com.easydb.easydb.domain.locker.factories.ElementsLockerFactory;
 import com.easydb.easydb.domain.space.SpaceRepository;
 import com.easydb.easydb.domain.space.UUIDProvider;
 import org.slf4j.Logger;
@@ -12,24 +14,20 @@ public class TransactionManager {
 
     private final UUIDProvider uuidProvider;
     private final TransactionRepository transactionRepository;
-    private final BucketService simpleBucketService;
     private final SpaceRepository spaceRepository;
-    private final int numberOfRetries;
-
-    private final TransactionEngine transactionEngine;
+    private final ElementsLockerFactory lockerFactory;
+    private final SimpleElementOperationsFactory simpleElementOperationsFactory;
 
     public TransactionManager(UUIDProvider uuidProvider,
                               TransactionRepository transactionRepository,
                               SpaceRepository spaceRepository,
-                              BucketService simpleBucketService,
-                              ElementsLockerFactory lockerFactory, int numberOfRetries) {
+                              ElementsLockerFactory lockerFactory,
+                              SimpleElementOperationsFactory simpleElementOperationsFactory) {
         this.uuidProvider = uuidProvider;
         this.transactionRepository = transactionRepository;
         this.spaceRepository = spaceRepository;
-        this.simpleBucketService = simpleBucketService;
-        this.numberOfRetries = numberOfRetries;
-
-        this.transactionEngine = new TransactionEngine(lockerFactory, simpleBucketService);
+        this.lockerFactory = lockerFactory;
+        this.simpleElementOperationsFactory = simpleElementOperationsFactory;
     }
 
     public String beginTransaction(String spaceName) {
@@ -41,32 +39,34 @@ public class TransactionManager {
         return uuid;
     }
 
-    public void addOperation(String transactionId, Operation operation) {
+    public OperationResult addOperation(String transactionId, Operation operation) {
         Transaction transaction = transactionRepository.get(transactionId);
-        ensureElementAndBucketExist(operation);
+        ensureElementAndBucketExist(transaction.getSpaceName(), operation);
 
         transaction.addOperation(operation);
+
+        OperationResult result = getResultForOperation(transaction.getSpaceName(), operation);
+        addReadElementIfNeeded(transaction, result);
+
         transactionRepository.update(transaction);
+        return result;
     }
 
     public void commitTransaction(String transactionId) {
         Transaction transaction = transactionRepository.get(transactionId);
-        performTransactionWithRetries(transaction);
+        performTransaction(transaction);
     }
 
-    private void performTransactionWithRetries(Transaction transaction) {
-        for (int i = 0; i < numberOfRetries; i++) {
-            try {
-                transactionEngine.performTransaction(transaction);
-            } catch (Exception e) {
-                if (i < numberOfRetries) {
-                    logger.error("Retrying transaction {} ...", transaction.getId(), e);
-                } else {
-                    logger.error("Aborting transaction {} ...", transaction.getId(), e);
-                    throw new TransactionAbortedException(
-                            "Transaction " + transaction.getId() + " was aborted after " + numberOfRetries + " retries");
-                }
-            }
+    private void performTransaction(Transaction transaction) {
+        SimpleElementOperations simpleElementOperations =
+                simpleElementOperationsFactory.buildSimpleElementOperations(transaction.getSpaceName());
+        TransactionEngine transactionEngine = new TransactionEngine(lockerFactory, simpleElementOperations);
+        try {
+            transactionEngine.performTransaction(transaction);
+        } catch (Exception e) {
+            logger.error("Aborting transaction {} ...", transaction.getId(), e);
+            throw new TransactionAbortedException(
+                    "Transaction " + transaction.getId() + " was aborted");
         }
     }
 
@@ -74,9 +74,23 @@ public class TransactionManager {
         spaceRepository.get(spaceName);
     }
 
-    private void ensureElementAndBucketExist(Operation operation) {
+    private void ensureElementAndBucketExist(String spaceName, Operation operation) {
         if (!operation.getType().equals(Operation.OperationType.CREATE)) {
-            simpleBucketService.getElement(operation.getElement().getBucketName(), operation.getElement().getId());
+            simpleElementOperationsFactory.buildSimpleElementOperations(spaceName)
+                    .getElement(operation.getBucketName(), operation.getElementId());
         }
+    }
+
+    private OperationResult getResultForOperation(String spaceName, Operation o) {
+        if (o.getType().equals(Operation.OperationType.READ)) {
+            VersionedElement element = simpleElementOperationsFactory.buildSimpleElementOperations(spaceName)
+                    .getElement(o.getBucketName(), o.getElementId());
+            return OperationResult.of(element);
+        }
+        return OperationResult.emptyResult();
+    }
+
+    private void addReadElementIfNeeded(Transaction transaction, OperationResult result) {
+        result.getElement().ifPresent(transaction::addReadElement);
     }
 }

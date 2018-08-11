@@ -2,7 +2,7 @@ package com.easydb.easydb.infrastructure.bucket
 
 import com.easydb.easydb.IntegrationWithCleanedDatabaseSpec
 import com.easydb.easydb.domain.bucket.BucketService
-import com.easydb.easydb.domain.bucket.BucketServiceFactory
+import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
 import com.easydb.easydb.domain.space.SpaceDoesNotExistException
 import com.easydb.easydb.domain.space.SpaceRepository
 import org.springframework.beans.factory.annotation.Autowired

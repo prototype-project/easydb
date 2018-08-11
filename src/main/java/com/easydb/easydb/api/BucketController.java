@@ -3,7 +3,7 @@ package com.easydb.easydb.api;
 import com.easydb.easydb.config.ApplicationMetrics;
 import com.easydb.easydb.domain.bucket.BucketQuery;
 import com.easydb.easydb.domain.bucket.BucketService;
-import com.easydb.easydb.domain.bucket.BucketServiceFactory;
+import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory;
 import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.space.UUIDProvider;
 
@@ -49,7 +49,7 @@ class BucketController {
         bucketServiceFactory.buildBucketService(spaceName).addElement(element);
 
         metrics.addElementRequestsCounter(spaceName, bucketName).increment();
-        return ElementQueryApiDto.from(element);
+        return ElementQueryApiDto.of(element);
     }
 
     @DeleteMapping(path = "/{spaceName}/{bucketName}/{elementId}")
@@ -82,7 +82,7 @@ class BucketController {
         BucketService bucketService = bucketServiceFactory.buildBucketService(spaceName);
 
         metrics.getElementRequestsCounter(spaceName, bucketName).increment();
-        return ElementQueryApiDto.from(bucketService.getElement(bucketName, elementId));
+        return ElementQueryApiDto.of(bucketService.getElement(bucketName, elementId));
     }
 
     @GetMapping(path = "/{spaceName}/{bucketName}")
@@ -98,7 +98,7 @@ class BucketController {
         BucketQuery query = BucketQuery.of(bucketName, limit, offset);
 
         List<ElementQueryApiDto> results = bucketService.filterElements(query).stream()
-                .map(ElementQueryApiDto::from)
+                .map(ElementQueryApiDto::of)
                 .collect(Collectors.toList());
 
         metrics.getElementsRequestsCounter(spaceName, bucketName).increment();

@@ -3,14 +3,10 @@ package com.easydb.easydb.api;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 public class PaginatedElementsApiDto {
     private final String next;
 
-    @NotNull
-    @Valid
     private final List<ElementQueryApiDto> results;
 
     @JsonCreator

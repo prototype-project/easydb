@@ -44,6 +44,7 @@ public class ZookeeperLocker implements ElementsLocker {
 
     private final String spaceName;
     private final CuratorFramework client;
+    // TODO think about clearing this map in case of errors during transaction
     private final ThreadLocal<ConcurrentHashMap<ElementKey, InterProcessSemaphoreMutex>> locksMap =
             new ThreadLocal<>();
 

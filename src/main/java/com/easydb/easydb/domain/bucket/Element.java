@@ -3,6 +3,7 @@ package com.easydb.easydb.domain.bucket;
 import com.google.common.collect.ImmutableList;
 
 import com.google.common.collect.ImmutableMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -15,7 +16,7 @@ public class Element {
     private final List<ElementField> fields;
     private final Map<String, ElementField> fieldsAsMap;
 
-    private Element(String id, String bucketName, List<ElementField> fields) {
+    protected Element(String id, String bucketName, List<ElementField> fields) {
         this.id = id;
         this.bucketName = bucketName;
         this.fields = ImmutableList.copyOf(fields);
@@ -36,7 +37,7 @@ public class Element {
     }
 
     public List<ElementField> getFields() {
-        return fields;
+        return Collections.unmodifiableList(fields);
     }
 
     public String getFieldValue(String fieldName) {

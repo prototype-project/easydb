@@ -2,7 +2,7 @@ package com.easydb.easydb.infrastructure.locker
 
 import com.easydb.easydb.BaseIntegrationSpec
 import com.easydb.easydb.domain.locker.ElementsLocker
-import com.easydb.easydb.domain.locker.ElementsLockerFactory
+import com.easydb.easydb.domain.locker.factories.ElementsLockerFactory
 import com.easydb.easydb.domain.locker.LockNotHoldException
 import com.easydb.easydb.domain.locker.LockTimeoutException
 import org.springframework.beans.factory.annotation.Autowired

@@ -44,6 +44,6 @@ public class MongoTransactionRepository implements TransactionRepository {
     }
 
     private PersistentTransaction fromDomain(Transaction t) {
-        return new PersistentTransaction(t.getSpaceName(), t.getId(), t.getOperations(), t.getState());
+        return new PersistentTransaction(t.getSpaceName(), t.getId(), t.getOperations(), t.getReadElements(), t.getState());
     }
 }

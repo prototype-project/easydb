@@ -14,14 +14,4 @@ class TransactionControllerExceptionHandler extends ResponseEntityExceptionHandl
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     void handleTransactionDoesNotExistException() {
     }
-
-    @ExceptionHandler(value = {ElementIdMustNotBeEmptyException.class})
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    void handleElementIdMustNotBeEmptyException() {
-    }
-
-    @ExceptionHandler(value = {ElementIdMustBeEmptyException.class})
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    void handleElementIdMustBeEmptyException() {
-    }
 }

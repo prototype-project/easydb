@@ -3,7 +3,7 @@ package com.easydb.easydb
 import com.easydb.easydb.domain.bucket.BucketDoesNotExistException
 import com.easydb.easydb.domain.bucket.BucketRepository
 import com.easydb.easydb.domain.bucket.BucketService
-import com.easydb.easydb.domain.bucket.BucketServiceFactory
+import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
 import com.easydb.easydb.domain.space.Space
 import com.easydb.easydb.domain.space.SpaceDoesNotExistException
 import com.easydb.easydb.domain.space.SpaceRepository
@@ -11,8 +11,8 @@ import com.easydb.easydb.domain.space.SpaceService
 import org.springframework.beans.factory.annotation.Autowired
 
 class IntegrationWithCleanedDatabaseSpec extends BaseIntegrationSpec {
-    static final String TEST_BUCKET_NAME = "testBucket"
-    static final String TEST_SPACE = "testSpace"
+    public static final String TEST_BUCKET_NAME = "testBucket"
+    public static final String TEST_SPACE = "testSpace"
 
     BucketService bucketService
 

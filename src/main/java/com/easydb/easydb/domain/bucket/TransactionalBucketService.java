@@ -1,59 +1,67 @@
 package com.easydb.easydb.domain.bucket;
 
+import com.easydb.easydb.domain.bucket.factories.SimpleElementOperationsFactory;
+import com.easydb.easydb.domain.space.Space;
+import com.easydb.easydb.domain.space.SpaceRepository;
 import com.easydb.easydb.domain.transactions.Operation;
 import com.easydb.easydb.domain.transactions.Operation.OperationType;
 import com.easydb.easydb.domain.transactions.TransactionManager;
-import com.easydb.easydb.domain.transactions.TransactionManagerFactory;
-import java.util.ArrayList;
 import java.util.List;
-
 
 public class TransactionalBucketService implements BucketService {
 
     private final String spaceName;
-    private final BucketService simpleBucketService;
+    private final SpaceRepository spaceRepository;
+    private final BucketRepository bucketRepository;
     private final TransactionManager transactionManager;
+    private final SimpleElementOperations simpleElementOperations;
 
     public TransactionalBucketService(String spaceName,
-                                      BucketService simpleBucketService,
-                                      TransactionManagerFactory transactionManagerFactory) {
+                                      SpaceRepository spaceRepository,
+                                      BucketRepository bucketRepository,
+                                      SimpleElementOperationsFactory simpleElementOperationsFactory,
+                                      TransactionManager transactionManager) {
         this.spaceName = spaceName;
-        this.simpleBucketService = simpleBucketService;
-        this.transactionManager = transactionManagerFactory.buildTransactionManager(simpleBucketService);
+        this.spaceRepository = spaceRepository;
+        this.bucketRepository = bucketRepository;
+        this.simpleElementOperations = simpleElementOperationsFactory.buildSimpleElementOperations(spaceName);
+        this.transactionManager = transactionManager;
     }
 
     @Override
     public boolean bucketExists(String bucketName) {
-        return simpleBucketService.bucketExists(bucketName);
+        return bucketRepository.bucketExists(getBucketName(bucketName));
     }
 
     @Override
     public void removeBucket(String bucketName) {
-        simpleBucketService.removeBucket(bucketName);
+        Space space = spaceRepository.get(spaceName);
+        space.getBuckets().remove(bucketName);
+        spaceRepository.update(space);
+        bucketRepository.removeBucket(getBucketName(bucketName));;
     }
 
     @Override
     public void addElement(Element element) {
-        simpleBucketService.addElement(element);
+        simpleElementOperations.addElement(element);
     }
 
     @Override
     public Element getElement(String bucketName, String id) {
-        return simpleBucketService.getElement(bucketName, id);
+        return simpleElementOperations.getElement(bucketName, id).toSimpleElement();
     }
 
     @Override
     public void removeElement(String bucketName, String elementId) {
         String transactionId = transactionManager.beginTransaction(spaceName);
-        // TODO think about element id here
-        Operation operation = Operation.of(OperationType.DELETE, Element.of(elementId, bucketName, new ArrayList<>()));
+        Operation operation = Operation.of(OperationType.DELETE, bucketName, elementId);
         transactionManager.addOperation(transactionId, operation);
         transactionManager.commitTransaction(transactionId);
     }
 
     @Override
     public boolean elementExists(String bucketName, String elementId) {
-        return simpleBucketService.elementExists(bucketName, elementId);
+        return simpleElementOperations.elementExists(bucketName, elementId);
     }
 
     @Override
@@ -66,11 +74,15 @@ public class TransactionalBucketService implements BucketService {
 
     @Override
     public List<Element> filterElements(BucketQuery query) {
-        return simpleBucketService.filterElements(query);
+        return simpleElementOperations.filterElements(query);
     }
 
     @Override
     public long getNumberOfElements(String bucketName) {
-        return simpleBucketService.getNumberOfElements(bucketName);
+        return simpleElementOperations.getNumberOfElements(bucketName);
+    }
+
+    private String getBucketName(String bucketName) {
+        return simpleElementOperations.getBucketNameAccordinglyToSpace(bucketName);
     }
 }

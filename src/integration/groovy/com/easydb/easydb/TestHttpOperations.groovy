@@ -1,6 +1,7 @@
 package com.easydb.easydb
 
 import com.easydb.easydb.api.ElementQueryApiDto
+import com.easydb.easydb.api.OperationResultDto
 import com.easydb.easydb.api.PaginatedElementsApiDto
 import com.easydb.easydb.api.SpaceDefinitionApiDto
 import com.easydb.easydb.domain.bucket.Element
@@ -12,20 +13,25 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
 
 @SelfType(BaseIntegrationSpec)
-trait TestUtils {
+trait TestHttpOperations {
 
     static String TEST_BUCKET_NAME = "bucketPeoples"
 
-    PaginatedElementsApiDto filterElements(String fullUrl) {
+    PaginatedElementsApiDto getElements(String spaceName, int offset=0, int limit=10, Map<String, String> filters = [:]) {
+        String filtersAsString = ''
+        filters.forEach({ key, val -> filtersAsString = filtersAsString + '&' + key + '=' + val })
+        getElementsByFullUrl(buildUrl(spaceName, TEST_BUCKET_NAME, limit, offset, filtersAsString))
+    }
+
+    PaginatedElementsApiDto getElementsByFullUrl(String fullUrl) {
         restTemplate.getForEntity(
                 fullUrl,
                 PaginatedElementsApiDto.class).body
     }
 
-    PaginatedElementsApiDto filterElements(String spaceName, int offset, int limit, Map<String, String> filters = [:]) {
-        String filtersAsString = ''
-        filters.forEach({ key, val -> filtersAsString = filtersAsString + '&' + key + '=' + val })
-        filterElements(buildUrl(spaceName, TEST_BUCKET_NAME, limit, offset, filtersAsString))
+    ElementQueryApiDto getElement(String spaceName, String bucketName, String id) {
+        restTemplate.getForEntity(
+                localUrl("/api/v1/$spaceName/$bucketName/$id"), ElementQueryApiDto).body
     }
 
     String buildUrl(String spaceId, String bucketName, int limit, int offset, String filters = '') {
@@ -81,16 +87,23 @@ trait TestUtils {
     ResponseEntity<String> beginTransaction(String spaceName) {
         return restTemplate.postForEntity(
                 localUrl("/api/v1/transactions/${spaceName}"),
-                Void, String.class
+                Void, String
         )
     }
 
-    ResponseEntity<Void> addOperation(String spaceName, String transactionId, Operation operation) {
+    ResponseEntity<OperationResultDto> addOperation(String transactionId, Operation operation) {
         return restTemplate.exchange(
-                localUrl("/api/v1/transactions/${spaceName}/add-operation/${transactionId}"),
+                localUrl("/api/v1/transactions/${transactionId}/add-operation"),
                 HttpMethod.POST,
                 httpJsonEntity(buildOperationBody(operation)),
-                Void.class
+                OperationResultDto.class
+        )
+    }
+
+    ResponseEntity<Void> commitTransaction(String transactionId) {
+        return restTemplate.postForEntity(
+                localUrl("/api/v1/transactions/${transactionId}/commit"),
+                Void, Void
         )
     }
 
@@ -103,11 +116,9 @@ trait TestUtils {
     String buildOperationBody(Operation operation) {
         JsonOutput.toJson([
                 type: operation.type,
-                element: [
-                        fields: operation.element.fields.collect {["name": it.name, "value": it.value]},
-                        bucketName: operation.element.bucketName,
-                        id: operation.element.id
-                ]
+                fields: operation.fields.collect {["name": it.name, "value": it.value]},
+                bucketName: operation.bucketName,
+                elementId: operation.elementId
         ])
     }
 }

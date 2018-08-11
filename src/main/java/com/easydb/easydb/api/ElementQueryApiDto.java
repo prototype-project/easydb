@@ -10,20 +10,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import org.hibernate.validator.constraints.NotEmpty;
 
 public class ElementQueryApiDto {
 
-    @NotEmpty
     private String id;
 
-    @NotEmpty
     private String bucketName;
 
-    @NotNull
-    @Valid
     private List<ElementFieldApiDto> fields;
 
     @JsonCreator
@@ -49,7 +42,7 @@ public class ElementQueryApiDto {
         return id;
     }
 
-    public static ElementQueryApiDto from(Element domainElement) {
+    public static ElementQueryApiDto of(Element domainElement) {
         List<ElementField> fields = domainElement.getFields();
         List<ElementFieldApiDto> apiFields = fields.stream()
                 .map(it -> new ElementFieldApiDto(it.getName(), it.getValue()))

@@ -3,7 +3,7 @@ package com.easydb.easydb.infrastructure.space
 import com.easydb.easydb.BaseIntegrationSpec
 import com.easydb.easydb.ElementTestBuilder
 import com.easydb.easydb.domain.bucket.BucketService
-import com.easydb.easydb.domain.bucket.BucketServiceFactory
+import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
 import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.space.Space
 import com.easydb.easydb.domain.space.SpaceDoesNotExistException

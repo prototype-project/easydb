@@ -2,6 +2,7 @@ package com.easydb.easydb.infrastructure.bucket;
 
 import com.easydb.easydb.domain.bucket.BucketDoesNotExistException;
 import com.easydb.easydb.domain.bucket.BucketQuery;
+import com.easydb.easydb.domain.bucket.VersionedElement;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -40,12 +41,12 @@ public class MongoBucketRepository implements BucketRepository {
     }
 
     @Override
-    public Element getElement(String bucketName, String id) {
+    public VersionedElement getElement(String bucketName, String id) {
         ensureBucketExists(bucketName);
 
         PersistentBucketElement elementFromDb = getPersistentElement(bucketName, id);
         return Optional.ofNullable(elementFromDb)
-                .map(it -> it.toDomainElement(bucketName))
+                .map(it -> it.toDomainVersionedElement(bucketName))
                 .orElseThrow(() -> new ElementDoesNotExistException(bucketName, id));
     }
 
@@ -72,21 +73,20 @@ public class MongoBucketRepository implements BucketRepository {
     public void updateElement(Element toUpdate) {
         ensureBucketExists(toUpdate.getBucketName());
 
-        Query query = new Query();
-        query.addCriteria(Criteria.where("_id").is(toUpdate.getId()));
-        Update update = new Update();
-        update.set("fields", toUpdate.getFields());
-        WriteResult updateResult = mongoTemplate.updateFirst(query, update, toUpdate.getBucketName());
-        if (updateResult.getN() == 0) {
+        PersistentBucketElement persistedElement = getPersistentElement(toUpdate.getBucketName(), toUpdate.getId());
+        if (persistedElement == null) {
             throw new ElementDoesNotExistException(toUpdate.getBucketName(), toUpdate.getId());
         }
+        PersistentBucketElement persistentUpdated = PersistentBucketElement.of(
+                toUpdate.getId(), toUpdate.getFields(), persistedElement.getVersion());
+        mongoTemplate.save(persistentUpdated);
     }
 
     @Override
     public List<Element> filterElements(BucketQuery query) {
         Query mongoQuery = fromBucketQuery(query);
         return mongoTemplate.find(mongoQuery, PersistentBucketElement.class, query.getBucketName()).stream()
-                .map(it -> it.toDomainElement(query.getBucketName()))
+                .map(it -> it.toDomainVersionedElement(query.getBucketName()))
                 .collect(Collectors.toList());
     }
 

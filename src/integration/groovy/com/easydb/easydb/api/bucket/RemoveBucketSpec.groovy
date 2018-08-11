@@ -2,16 +2,16 @@ package com.easydb.easydb.api.bucket
 
 import com.easydb.easydb.BaseIntegrationSpec
 import com.easydb.easydb.ElementTestBuilder
-import com.easydb.easydb.TestUtils
+import com.easydb.easydb.TestHttpOperations
 import com.easydb.easydb.domain.bucket.BucketService
-import com.easydb.easydb.domain.bucket.BucketServiceFactory
+import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
 import com.easydb.easydb.domain.bucket.Element
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 
 
-class RemoveBucketSpec extends BaseIntegrationSpec implements TestUtils {
+class RemoveBucketSpec extends BaseIntegrationSpec implements TestHttpOperations {
 
     RestTemplate restTemplate = new RestTemplate()
 

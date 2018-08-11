@@ -10,7 +10,7 @@ public interface BucketRepository {
 
     void insertElement(Element element);
 
-    Element getElement(String bucketName, String id) throws BucketDoesNotExistException, ElementDoesNotExistException;
+    VersionedElement getElement(String bucketName, String id) throws BucketDoesNotExistException, ElementDoesNotExistException;
 
     void removeElement(String bucketName, String id) throws BucketDoesNotExistException, ElementDoesNotExistException;
 

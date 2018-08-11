@@ -1,12 +1,12 @@
 package com.easydb.easydb.api.bucket
 
 import com.easydb.easydb.BaseIntegrationSpec
-import com.easydb.easydb.TestUtils
+import com.easydb.easydb.TestHttpOperations
 import com.easydb.easydb.api.ElementQueryApiDto
 import com.easydb.easydb.api.PaginatedElementsApiDto
 import com.easydb.easydb.domain.bucket.BucketQuery
 import com.easydb.easydb.domain.bucket.BucketService
-import com.easydb.easydb.domain.bucket.BucketServiceFactory
+import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
 import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.space.SpaceService
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,7 +16,7 @@ import org.springframework.web.client.HttpClientErrorException
 
 import java.util.stream.Collectors
 
-class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestUtils {
+class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOperations {
 
     @Autowired
     SpaceService spaceService
@@ -40,7 +40,7 @@ class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestUtils {
         response.statusCodeValue == 201
 
         and:
-        response.body == ElementQueryApiDto.from(bucketService.getElement(TEST_BUCKET_NAME, response.body.getId()))
+        response.body == ElementQueryApiDto.of(bucketService.getElement(TEST_BUCKET_NAME, response.body.getId()))
     }
 
     def "should remove element from bucket"() {
@@ -95,7 +95,7 @@ class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestUtils {
         then:
         BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, 20, 0)
         response.body.results == bucketService.filterElements(query).stream()
-                .map({it -> ElementQueryApiDto.from(it)})
+                .map({it -> ElementQueryApiDto.of(it)})
                 .collect(Collectors.toList())
     }
 

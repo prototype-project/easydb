@@ -1,55 +1,79 @@
 package com.easydb.easydb.api;
 
+import com.easydb.easydb.domain.bucket.Element;
+import com.easydb.easydb.domain.bucket.ElementField;
 import com.easydb.easydb.domain.space.UUIDProvider;
 import com.easydb.easydb.domain.transactions.Operation;
+import com.easydb.easydb.domain.transactions.Operation.OperationType;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Strings;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.util.CollectionUtils;
+
+import static com.easydb.easydb.domain.transactions.Operation.OperationType.*;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class OperationDto {
 
     @NotNull
-    private final Operation.OperationType type;
+    private final OperationType type;
 
-    @NotNull
+    @NotEmpty
+    private final String bucketName;
+
+    private String elementId;
+
     @Valid
-    private final ElementTransactionOperationApiDto element;
+    private List<ElementFieldApiDto> fields;
 
     @JsonCreator
     public OperationDto(
-            @JsonProperty("type") Operation.OperationType type,
-            @JsonProperty("element") ElementTransactionOperationApiDto element) {
+            @JsonProperty("type") OperationType type,
+            @JsonProperty("bucketName") String bucketName,
+            @JsonProperty("elementId") String elementId,
+            @JsonProperty("fields") List<ElementFieldApiDto> fields) {
         this.type = type;
-        this.element = element;
+        this.bucketName = bucketName;
+        this.elementId = elementId;
+        this.fields = fields;
+        Collections.sort(fields);
         validate();
     }
 
-    public ElementTransactionOperationApiDto getElement() {
-        return element;
-    }
-
     Operation toDomain(UUIDProvider uuidProvider) {
-        if (type.equals(Operation.OperationType.CREATE)) {
-            return Operation.of(type, element.toDomainElement(uuidProvider.generateUUID()));
+        if (type.equals(CREATE)) {
+            return Operation.of(type, bucketName, uuidProvider.generateUUID(), toDomainFields());
         }
-        return Operation.of(type, element.toDomainElement());
+        return Operation.of(type, bucketName, elementId, toDomainFields());
     }
 
     private void validate() {
-        if (!type.equals(Operation.OperationType.CREATE) && elementHasEmptyId()) {
+        if (!type.equals(CREATE) && hasEmptyId()) {
             throw new ElementIdMustNotBeEmptyException();
         }
-        if (type.equals(Operation.OperationType.CREATE) && !elementHasEmptyId()) {
+        if (type.equals(CREATE) && !hasEmptyId()) {
             throw new ElementIdMustBeEmptyException();
+        }
+        if ((type.equals(UPDATE) || type.equals(CREATE)) && CollectionUtils.isEmpty(fields)) {
+            throw new ElementFieldsMustNotBeNull();
         }
     }
 
-    private boolean elementHasEmptyId() {
-        return Strings.isNullOrEmpty(element.getId());
+    private boolean hasEmptyId() {
+        return Strings.isNullOrEmpty(elementId);
+    }
+
+    private List<ElementField> toDomainFields() {
+        return fields.stream()
+                .map(ElementFieldApiDto::toDomain)
+                .collect(Collectors.toList());
     }
 }
