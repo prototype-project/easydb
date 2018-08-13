@@ -2,11 +2,14 @@ package com.easydb.easydb.domain.transactions;
 
 import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.bucket.SimpleElementOperations;
+import com.easydb.easydb.domain.bucket.VersionedElement;
 import com.easydb.easydb.domain.locker.ElementsLocker;
 import com.easydb.easydb.domain.locker.factories.ElementsLockerFactory;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// TODO rollback
 class TransactionEngine {
     private static final Logger logger = LoggerFactory.getLogger(TransactionEngine.class);
 
@@ -18,17 +21,17 @@ class TransactionEngine {
         this.simpleElementOperations = simpleElementOperations;
     }
 
-    void performTransaction(Transaction transaction) {
+    void commit(Transaction transaction) {
         ElementsLocker locker = lockerFactory.build(transaction.getSpaceName());
 
         try {
-             // TODO needed reentrant lock
+            // TODO needed reentrant lock
             transaction.getOperations().forEach(o -> {
                 if (operationRequiresLock(o)) {
                     locker.lockElement(o.getBucketName(), o.getElementId());
                 }
             });
-            transaction.getOperations().forEach(this::performOperation);
+            transaction.getOperations().forEach(o -> performOperation(o, transaction));
         } catch (Exception e) {
             logger.error("Error during committing transaction {}. Making rollback...", transaction.getId());
             throw e;
@@ -45,18 +48,27 @@ class TransactionEngine {
         return o.getType() == Operation.OperationType.UPDATE || o.getType() == Operation.OperationType.DELETE;
     }
 
-    private void performOperation(Operation o) {
+    private void performOperation(Operation o, Transaction t) {
         Element element = Element.of(o.getElementId(), o.getBucketName(), o.getFields());
         switch (o.getType()) {
             case CREATE:
                 simpleElementOperations.addElement(element);
                 break;
             case UPDATE:
-                simpleElementOperations.updateElement(element);
+                performUpdateOperation(o, t);
                 break;
             case DELETE:
                 simpleElementOperations.removeElement(o.getBucketName(), o.getElementId());
                 break;
         }
+    }
+
+    private void performUpdateOperation(Operation o, Transaction t) {
+        Optional<Long> version = Optional.ofNullable(t.getReadElements().get(o.getElementId()));
+        VersionedElement versionedElement = version
+                .map(v -> VersionedElement.of(o.getElementId(), o.getBucketName(), o.getFields(), v))
+                .orElseGet(() -> VersionedElement.of(o.getElementId(), o.getBucketName(), o.getFields()));
+
+        simpleElementOperations.updateElement(versionedElement);
     }
 }

@@ -1,11 +1,9 @@
 package com.easydb.easydb.infrastructure.transactions;
 
-import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.transactions.Operation;
-import com.easydb.easydb.domain.transactions.OperationResult;
 import com.easydb.easydb.domain.transactions.Transaction;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -19,13 +17,13 @@ class PersistentTransaction {
 
     private final List<Operation> operations;
 
-    private final Set<Transaction.ElementVersion> readElements;
+    private final Map<String, Long> readElements;
 
     private final Transaction.State state;
 
     PersistentTransaction(String spaceName, String id,
                           List<Operation> operations,
-                          Set<Transaction.ElementVersion> readElements,
+                          Map<String, Long> readElements,
                           Transaction.State state) {
         this.spaceName = spaceName;
         this.id = id;

@@ -2,10 +2,9 @@ package com.easydb.easydb.domain.transactions;
 
 import com.easydb.easydb.domain.bucket.VersionedElement;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.Map;
 
 public class Transaction {
 
@@ -16,16 +15,16 @@ public class Transaction {
     private final String id;
     private String spaceName;
     private final List<Operation> operations;
-    private final Set<ElementVersion> readElements;
+    private final Map<String, Long> readElements;
     private State state;
 
     Transaction(String spaceName, String id) {
-        this(spaceName, id, new ArrayList<>(), new HashSet<>(), State.ACTIVE);
+        this(spaceName, id, new ArrayList<>(), new HashMap<>(), State.ACTIVE);
     }
 
     public Transaction(String spaceName, String id,
                         List<Operation> operations,
-                        Set<ElementVersion> readElements,
+                        Map<String, Long> readElements,
                         State state) {
         this.spaceName = spaceName;
         this.operations = operations;
@@ -50,7 +49,7 @@ public class Transaction {
         return spaceName;
     }
 
-    public Set<ElementVersion> getReadElements() {
+    public Map<String, Long> getReadElements() {
         return readElements;
     }
 
@@ -59,32 +58,6 @@ public class Transaction {
     }
 
     void addReadElement(VersionedElement element) {
-        readElements.add(new ElementVersion(element.getId(), element.getVersion()));
-    }
-
-    public static class ElementVersion {
-        private final String elementId;
-        private final long version;
-
-        ElementVersion(String elementId, long version) {
-            this.elementId = elementId;
-            this.version = version;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            ElementVersion that = (ElementVersion) o;
-
-            return elementId.equals(that.elementId) &&
-                    version == that.version;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(elementId, version);
-        }
+        readElements.put(element.getId(), element.getVersionOrThrowErrorIfEmpty());
     }
 }

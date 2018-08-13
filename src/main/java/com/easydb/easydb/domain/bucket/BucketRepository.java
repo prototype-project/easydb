@@ -10,15 +10,19 @@ public interface BucketRepository {
 
     void insertElement(Element element);
 
-    VersionedElement getElement(String bucketName, String id) throws BucketDoesNotExistException, ElementDoesNotExistException;
+    VersionedElement getElement(String bucketName, String id)
+            throws BucketDoesNotExistException, ElementDoesNotExistException;
+
+    VersionedElement getElement(String bucketName, String id, long requiredVersion)
+            throws BucketDoesNotExistException, ElementDoesNotExistException;
 
     void removeElement(String bucketName, String id) throws BucketDoesNotExistException, ElementDoesNotExistException;
 
     boolean elementExists(String bucketName, String elementId) throws BucketDoesNotExistException;
 
-    void updateElement(Element toUpdate) throws BucketDoesNotExistException, ElementDoesNotExistException;
+    void updateElement(VersionedElement toUpdate) throws BucketDoesNotExistException, ElementDoesNotExistException;
 
-    List<Element> filterElements(BucketQuery query);
+    List<VersionedElement> filterElements(BucketQuery query);
 
     long getNumberOfElements(String bucketName) throws BucketDoesNotExistException;
 }

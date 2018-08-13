@@ -51,6 +51,16 @@ public class MongoBucketRepository implements BucketRepository {
     }
 
     @Override
+    public VersionedElement getElement(String bucketName, String id, long requiredVersion) {
+        VersionedElement versionedElement = getElement(bucketName, id);
+        if (versionedElement.getVersionOrThrowErrorIfEmpty() != requiredVersion) {
+            throw new ConcurrentTransactionDetectedException(
+                    String.format("Version of element %s changed since last read. Required version: %d", versionedElement, requiredVersion));
+        }
+        return versionedElement;
+    }
+
+    @Override
     public void removeElement(String bucketName, String id) {
         ensureBucketExists(bucketName);
 
@@ -70,20 +80,25 @@ public class MongoBucketRepository implements BucketRepository {
     }
 
     @Override
-    public void updateElement(Element toUpdate) {
+    public void updateElement(VersionedElement toUpdate) {
         ensureBucketExists(toUpdate.getBucketName());
 
         PersistentBucketElement persistedElement = getPersistentElement(toUpdate.getBucketName(), toUpdate.getId());
         if (persistedElement == null) {
             throw new ElementDoesNotExistException(toUpdate.getBucketName(), toUpdate.getId());
         }
-        PersistentBucketElement persistentUpdated = PersistentBucketElement.of(
-                toUpdate.getId(), toUpdate.getFields(), persistedElement.getVersion());
-        mongoTemplate.save(persistentUpdated);
+
+        Query query = buildUpdateQuery(toUpdate);
+        Update update = new Update();
+        update.set("version", persistedElement.getVersion() + 1);
+        update.set("fields", toUpdate.getFields());
+
+        WriteResult updateResult = mongoTemplate.updateFirst(query, update, toUpdate.getBucketName());
+        validateUpdateResultAgainstConcurrency(updateResult, toUpdate);
     }
 
     @Override
-    public List<Element> filterElements(BucketQuery query) {
+    public List<VersionedElement> filterElements(BucketQuery query) {
         Query mongoQuery = fromBucketQuery(query);
         return mongoTemplate.find(mongoQuery, PersistentBucketElement.class, query.getBucketName()).stream()
                 .map(it -> it.toDomainVersionedElement(query.getBucketName()))
@@ -112,5 +127,23 @@ public class MongoBucketRepository implements BucketRepository {
         query.limit(bucketQuery.getLimit());
         query.skip(bucketQuery.getOffset());
         return query;
+    }
+
+    private Query buildUpdateQuery(VersionedElement toUpdate) {
+        Query query = new Query();
+        if (toUpdate.getVersion().isPresent()) {
+            query.addCriteria(Criteria.where("_id").is(toUpdate.getId()).and("version").is(toUpdate.getVersion().get()));
+        } else {
+            query.addCriteria(Criteria.where("_id").is(toUpdate.getId()));
+        }
+        return query;
+    }
+
+    private void validateUpdateResultAgainstConcurrency(WriteResult writeResult, VersionedElement toUpdate) {
+        if (writeResult.getN() == 0) {
+            throw new ConcurrentTransactionDetectedException(
+                    String.format("%s was updated by concurrent transaction", toUpdate));
+        }
+
     }
 }

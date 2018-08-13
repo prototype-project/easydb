@@ -15,7 +15,7 @@ public class OperationResultDto {
 
     public static OperationResultDto of(OperationResult result) {
         return result.getElement()
-                .map(element -> new OperationResultDto(ElementQueryApiDto.of(element)))
+                .map(versionedElement -> new OperationResultDto(ElementQueryApiDto.of(versionedElement.toSimpleElement())))
                 .orElseGet(OperationResultDto::empty);
     }
 

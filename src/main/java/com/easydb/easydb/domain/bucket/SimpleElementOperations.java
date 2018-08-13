@@ -32,24 +32,34 @@ public class SimpleElementOperations {
         bucketRepository.removeElement(getBucketNameAccordinglyToSpace(bucketName), elementId);
     }
 
-    public void updateElement(Element toUpdate) {
-        bucketRepository.updateElement(
-                Element.of(toUpdate.getId(), getBucketNameAccordinglyToSpace(toUpdate.getBucketName()), toUpdate.getFields()));
+    public void updateElement(VersionedElement toUpdate) {
+        VersionedElement withBucketRenamed = toUpdate.getVersion()
+                .map(v -> VersionedElement.of(toUpdate.getId(), getBucketNameAccordinglyToSpace(toUpdate.getBucketName()),
+                        toUpdate.getFields(), v))
+                .orElseGet(() -> VersionedElement.of(toUpdate.getId(), getBucketNameAccordinglyToSpace(toUpdate.getBucketName()),
+                        toUpdate.getFields()));
+        bucketRepository.updateElement(withBucketRenamed);
     }
 
     public VersionedElement getElement(String bucketName, String id) {
         VersionedElement versionedElement = bucketRepository.getElement(getBucketNameAccordinglyToSpace(bucketName), id);
         return VersionedElement.of(versionedElement.getId(), bucketName,
-                versionedElement.getFields(), versionedElement.getVersion());
+                versionedElement.getFields(), versionedElement.getVersionOrThrowErrorIfEmpty());
+    }
+
+    public VersionedElement getElement(String bucketName, String id, long version) {
+        VersionedElement versionedElement = bucketRepository.getElement(getBucketNameAccordinglyToSpace(bucketName), id, version);
+        return VersionedElement.of(versionedElement.getId(), bucketName,
+                versionedElement.getFields(), versionedElement.getVersionOrThrowErrorIfEmpty());
     }
 
     long getNumberOfElements(String bucketName) {
         return bucketRepository.getNumberOfElements(getBucketNameAccordinglyToSpace(bucketName));
     }
 
-    List<Element> filterElements(BucketQuery query) {
+    List<VersionedElement> filterElements(BucketQuery query) {
         return bucketRepository.filterElements(rebuildToProperSpaceName(query)).stream()
-                .map(it -> Element.of(it.getId(), query.getBucketName(), it.getFields()))
+                .map(it -> VersionedElement.of(it.getId(), query.getBucketName(), it.getFields()))
                 .collect(Collectors.toList());
     }
 

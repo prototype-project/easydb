@@ -7,6 +7,7 @@ import com.easydb.easydb.domain.transactions.Operation;
 import com.easydb.easydb.domain.transactions.Operation.OperationType;
 import com.easydb.easydb.domain.transactions.TransactionManager;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TransactionalBucketService implements BucketService {
 
@@ -74,7 +75,9 @@ public class TransactionalBucketService implements BucketService {
 
     @Override
     public List<Element> filterElements(BucketQuery query) {
-        return simpleElementOperations.filterElements(query);
+        return simpleElementOperations.filterElements(query).stream()
+                .map(VersionedElement::toSimpleElement)
+                .collect(Collectors.toList());
     }
 
     @Override
