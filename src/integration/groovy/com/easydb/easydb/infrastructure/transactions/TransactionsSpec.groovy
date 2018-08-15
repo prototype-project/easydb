@@ -102,6 +102,32 @@ class TransactionsSpec extends IntegrationWithCleanedDatabaseSpec {
     }
 
     def "should prevent dirty writes"() {
+        given: "saved counter element with value 0"
+        Element element = ElementTestBuilder.builder()
+                .bucketName(TEST_BUCKET_NAME)
+                .fields([ElementField.of("counter", "0")])
+                .build()
+        bucketService.addElement(element)
 
+        when: "one transaction wants to update element"
+        String transactionId = transactionManager.beginTransaction(TEST_SPACE)
+        Operation updateOperation = OperationTestBuilder.builder()
+                .bucketName(TEST_BUCKET_NAME)
+                .type(Operation.OperationType.UPDATE)
+                .elementId(element.id)
+                .build()
+        OperationResult resultRead = transactionManager.addOperation(transactionId, updateOperation)
+
+        then:
+        !resultRead.element.isPresent()
+
+        and: "meantime element is deleted by another transaction"
+        bucketService.removeElement(TEST_BUCKET_NAME, element.id)
+
+        when: "when first transaction commits it should prevent dirty write and abort"
+        transactionManager.commitTransaction(transactionId)
+
+        then:
+        thrown(TransactionAbortedException)
     }
 }
