@@ -12,8 +12,7 @@ public class MongoSpaceRepository implements SpaceRepository {
     private final String SPACE_COLLECTION_NAME = "__SPACES";
     private final MongoTemplate mongoTemplate;
 
-    public MongoSpaceRepository(
-            MongoTemplate mongoTemplate) {
+    public MongoSpaceRepository(MongoTemplate mongoTemplate) {
         this.mongoTemplate = mongoTemplate;
     }
 
@@ -37,7 +36,7 @@ public class MongoSpaceRepository implements SpaceRepository {
 
     @Override
     public Space get(String spaceName) throws SpaceDoesNotExistException {
-        PersistentSpace persistentSpace = getPersistentElement(spaceName);
+        PersistentSpace persistentSpace = getPersistentSpace(spaceName);
         return Optional.ofNullable(persistentSpace)
                 .map(PersistentSpace::toDomain)
                 .orElseThrow(() -> new SpaceDoesNotExistException(spaceName));
@@ -47,7 +46,7 @@ public class MongoSpaceRepository implements SpaceRepository {
     public void remove(String spaceName) {
         ensureSpaceExists(spaceName);
 
-        mongoTemplate.remove(getPersistentElement(spaceName), SPACE_COLLECTION_NAME);
+        mongoTemplate.remove(getPersistentSpace(spaceName), SPACE_COLLECTION_NAME);
     }
 
     @Override
@@ -57,7 +56,7 @@ public class MongoSpaceRepository implements SpaceRepository {
         mongoTemplate.save(PersistentSpace.of(toUpdate), SPACE_COLLECTION_NAME);
     }
 
-    private PersistentSpace getPersistentElement(String spaceName) {
+    private PersistentSpace getPersistentSpace(String spaceName) {
         return mongoTemplate.findById(spaceName, PersistentSpace.class, SPACE_COLLECTION_NAME);
     }
 

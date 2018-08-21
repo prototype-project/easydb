@@ -2,7 +2,7 @@ package com.easydb.easydb.api;
 
 import com.easydb.easydb.domain.space.UUIDProvider;
 import com.easydb.easydb.domain.transactions.OperationResult;
-import com.easydb.easydb.domain.transactions.TransactionManager;
+import com.easydb.easydb.domain.transactions.DefaultTransactionManager;
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,31 +16,31 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/api/v1/transactions")
 class TransactionController {
 
-    private final TransactionManager transactionManager;
+    private final DefaultTransactionManager defaultTransactionManager;
     private final UUIDProvider uuidProvider;
 
-    TransactionController(TransactionManager transactionManager, UUIDProvider uuidProvider) {
-        this.transactionManager = transactionManager;
+    TransactionController(DefaultTransactionManager defaultTransactionManager, UUIDProvider uuidProvider) {
+        this.defaultTransactionManager = defaultTransactionManager;
         this.uuidProvider = uuidProvider;
     }
 
     @PostMapping("/{spaceName}")
     @ResponseStatus(value = HttpStatus.CREATED)
     String beginTransaction(@PathVariable("spaceName") String spaceName) {
-        return transactionManager.beginTransaction(spaceName);
+        return defaultTransactionManager.beginTransaction(spaceName);
     }
 
     @PostMapping("/{transactionId}/add-operation")
     @ResponseStatus(value = HttpStatus.CREATED)
     OperationResultDto addOperation(@PathVariable String transactionId,
                                  @RequestBody @Valid OperationDto dto) {
-        OperationResult operationResult = transactionManager.addOperation(transactionId, dto.toDomain(uuidProvider));
+        OperationResult operationResult = defaultTransactionManager.addOperation(transactionId, dto.toDomain(uuidProvider));
         return OperationResultDto.of(operationResult);
     }
 
     @PostMapping("/{transactionId}/commit")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
     void commitTransaction(@PathVariable String transactionId) {
-        transactionManager.commitTransaction(transactionId);
+        defaultTransactionManager.commitTransaction(transactionId);
     }
 }

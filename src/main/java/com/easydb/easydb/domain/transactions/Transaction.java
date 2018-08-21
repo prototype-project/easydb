@@ -2,6 +2,7 @@ package com.easydb.easydb.domain.transactions;
 
 import com.easydb.easydb.domain.bucket.VersionedElement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.Map;
 public class Transaction {
 
     public enum State {
+        // TODO change transactions states, add cleaning background process
         ACTIVE, ABORTED, COMMITED;
     }
 
@@ -17,10 +19,6 @@ public class Transaction {
     private final List<Operation> operations;
     private final Map<String, Long> readElements;
     private State state;
-
-    Transaction(String spaceName, String id) {
-        this(spaceName, id, new ArrayList<>(), new HashMap<>(), State.ACTIVE);
-    }
 
     public Transaction(String spaceName, String id,
                         List<Operation> operations,
@@ -31,6 +29,10 @@ public class Transaction {
         this.readElements = readElements;
         this.id = id;
         this.state = state;
+    }
+
+    Transaction(String spaceName, String id) {
+        this(spaceName, id, new ArrayList<>(), new HashMap<>(), State.ACTIVE);
     }
 
     public String getId() {
@@ -50,7 +52,7 @@ public class Transaction {
     }
 
     public Map<String, Long> getReadElements() {
-        return readElements;
+        return Collections.unmodifiableMap(readElements);
     }
 
     void addOperation(Operation operation) {

@@ -2,6 +2,8 @@ package com.easydb.easydb.infrastructure.bucket;
 
 import com.easydb.easydb.domain.bucket.BucketDoesNotExistException;
 import com.easydb.easydb.domain.bucket.BucketQuery;
+import com.easydb.easydb.domain.bucket.ElementAlreadyExistsException;
+import com.easydb.easydb.domain.transactions.ConcurrentTransactionDetectedException;
 import com.easydb.easydb.domain.bucket.VersionedElement;
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +13,7 @@ import com.easydb.easydb.domain.bucket.ElementDoesNotExistException;
 import com.easydb.easydb.domain.bucket.BucketRepository;
 import com.easydb.easydb.domain.bucket.Element;
 import com.mongodb.WriteResult;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -37,7 +40,12 @@ public class MongoBucketRepository implements BucketRepository {
 
     @Override
     public void insertElement(Element element) {
-        mongoTemplate.insert(PersistentBucketElement.of(element), element.getBucketName());
+        try {
+            mongoTemplate.insert(PersistentBucketElement.of(element), element.getBucketName());
+        } catch (DuplicateKeyException e) {
+            throw new ElementAlreadyExistsException(
+                    "Element " + element +" already exists");
+        }
     }
 
     @Override
@@ -62,15 +70,13 @@ public class MongoBucketRepository implements BucketRepository {
 
     @Override
     public void removeElement(String bucketName, String id) {
-        ensureBucketExists(bucketName);
+        ensureElementExists(bucketName, id);
 
         mongoTemplate.remove(getPersistentElement(bucketName, id), bucketName);
     }
 
     @Override
     public boolean elementExists(String bucketName, String elementId) {
-        ensureBucketExists(bucketName);
-
         try {
             getElement(bucketName, elementId);
             return true;
@@ -81,16 +87,11 @@ public class MongoBucketRepository implements BucketRepository {
 
     @Override
     public void updateElement(VersionedElement toUpdate) {
-        ensureBucketExists(toUpdate.getBucketName());
-
-        PersistentBucketElement persistedElement = getPersistentElement(toUpdate.getBucketName(), toUpdate.getId());
-        if (persistedElement == null) {
-            throw new ElementDoesNotExistException(toUpdate.getBucketName(), toUpdate.getId());
-        }
+        VersionedElement element = getElement(toUpdate.getBucketName(), toUpdate.getId());
 
         Query query = buildUpdateQuery(toUpdate);
         Update update = new Update();
-        update.set("version", persistedElement.getVersion() + 1);
+        update.set("version", element.getVersionOrThrowErrorIfEmpty() + 1);
         update.set("fields", toUpdate.getFields());
 
         WriteResult updateResult = mongoTemplate.updateFirst(query, update, toUpdate.getBucketName());
@@ -116,6 +117,10 @@ public class MongoBucketRepository implements BucketRepository {
         if (!bucketExists(bucketName)) {
             throw new BucketDoesNotExistException(bucketName);
         }
+    }
+
+    private void ensureElementExists(String bucketName, String id) {
+        getElement(bucketName, id);
     }
 
     private PersistentBucketElement getPersistentElement(String bucketName, String id) {

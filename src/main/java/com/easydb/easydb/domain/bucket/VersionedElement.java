@@ -22,7 +22,7 @@ public class VersionedElement {
     }
 
     public Element toSimpleElement() {
-        return new Element(element.getId(), element.getBucketName(), element.getFields());
+        return Element.of(element.getId(), element.getBucketName(), element.getFields());
     }
 
     public Optional<Long> getVersion() {
@@ -41,20 +41,17 @@ public class VersionedElement {
         return element.getId();
     }
 
-
-
     public long getVersionOrThrowErrorIfEmpty() {
         return version.orElseThrow(TryingToGetEmptyVersionException::new);
     }
 
     @Override
     public String toString() {
-        return String.format("Element(id=%s, bucketName=%s, fields=[...], version=%d)",
+        return String.format("VersionedElement(id=%s, bucketName=%s, fields=[...], version=%d)",
                 element.getId(), element.getBucketName(), getVersionOrThrowErrorIfEmpty());
     }
 
     static class TryingToGetEmptyVersionException extends RuntimeException {
-
         TryingToGetEmptyVersionException() {
             super("Cannot get empty version");
         }

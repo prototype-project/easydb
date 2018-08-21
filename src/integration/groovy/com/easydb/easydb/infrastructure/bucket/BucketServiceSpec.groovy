@@ -39,6 +39,14 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec {
         !bucketService.bucketExists(TEST_BUCKET_NAME)
     }
 
+    def "should throw error when trying to remove not existing bucket"() {
+        when:
+        bucketService.removeBucket("notExistingBucket")
+
+        then:
+        thrown BucketDoesNotExistException
+    }
+
     def "should add element to bucket"() {
         given:
         Element toCreate = builder().bucketName(TEST_BUCKET_NAME).build()
@@ -54,6 +62,19 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec {
         }
     }
 
+    def "should throw error when trying add already existing element"() {
+        given:
+        Element toCreate = builder().bucketName(TEST_BUCKET_NAME).build()
+
+        bucketService.addElement(toCreate)
+
+        when:
+        bucketService.addElement(toCreate)
+
+        then:
+        thrown ElementAlreadyExistsException
+    }
+
     def "should update space's buckets when adding first element to bucket"() {
         given:
         Element toCreate = builder().bucketName(TEST_BUCKET_NAME).build()
@@ -65,7 +86,6 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec {
         spaceRepository.get(TEST_SPACE).buckets == [TEST_BUCKET_NAME] as Set
     }
 
-
     def "should remove element from bucket"() {
         given:
         Element toCreate = builder().bucketName(TEST_BUCKET_NAME).build()
@@ -76,6 +96,28 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec {
 
         then:
         !bucketService.elementExists(TEST_BUCKET_NAME, toCreate.id)
+    }
+
+    def "should throw error when trying to remove element from not existing bucket"() {
+        when:
+        bucketService.removeElement("notExistingBucket", "notExistingElement")
+
+        then:
+        thrown BucketDoesNotExistException
+    }
+
+    def "should throw error when trying to remove not existing element"() {
+        given:
+        Element toCreate = builder().bucketName(TEST_BUCKET_NAME).build()
+
+        // creates bucket implicitly
+        bucketService.addElement(toCreate)
+
+        when:
+        bucketService.removeElement(TEST_BUCKET_NAME, "notExistingElement")
+
+        then:
+        thrown ElementDoesNotExistException
     }
 
     def "should update element in bucket"() {
@@ -217,6 +259,14 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec {
 
         expect:
         bucketService.getNumberOfElements(TEST_BUCKET_NAME) == 2
+    }
+
+    def "should throw error when trying to get number of elements from not existing bucket"() {
+        when:
+        bucketService.getNumberOfElements("notExistingBucket")
+
+        then:
+        thrown BucketDoesNotExistException
     }
 
     static BucketQuery getDefaultBucketQuery() {

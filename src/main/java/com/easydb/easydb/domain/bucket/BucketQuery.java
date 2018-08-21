@@ -30,10 +30,6 @@ public class BucketQuery {
         return new BucketQuery(name, limit, offset);
     }
 
-    public BucketQuery rename(String bucketName) {
-        return BucketQuery.of(bucketName, limit, offset);
-    }
-
     private void validateConstraints() {
         if (limit <= 0 || offset < 0) {
             throw new InvalidPaginationDataException();

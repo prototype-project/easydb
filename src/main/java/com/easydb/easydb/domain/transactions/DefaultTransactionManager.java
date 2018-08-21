@@ -5,13 +5,13 @@ import com.easydb.easydb.domain.bucket.factories.SimpleElementOperationsFactory;
 import com.easydb.easydb.domain.locker.factories.ElementsLockerFactory;
 import com.easydb.easydb.domain.space.SpaceRepository;
 import com.easydb.easydb.domain.space.UUIDProvider;
-import com.easydb.easydb.infrastructure.bucket.ConcurrentTransactionDetectedException;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TransactionManager {
-    private static final Logger logger = LoggerFactory.getLogger(TransactionManager.class);
+
+public class DefaultTransactionManager {
+    private static final Logger logger = LoggerFactory.getLogger(DefaultTransactionManager.class);
 
     private final UUIDProvider uuidProvider;
     private final TransactionRepository transactionRepository;
@@ -19,11 +19,11 @@ public class TransactionManager {
     private final ElementsLockerFactory lockerFactory;
     private final SimpleElementOperationsFactory simpleElementOperationsFactory;
 
-    public TransactionManager(UUIDProvider uuidProvider,
-                              TransactionRepository transactionRepository,
-                              SpaceRepository spaceRepository,
-                              ElementsLockerFactory lockerFactory,
-                              SimpleElementOperationsFactory simpleElementOperationsFactory) {
+    public DefaultTransactionManager(UUIDProvider uuidProvider,
+                                     TransactionRepository transactionRepository,
+                                     SpaceRepository spaceRepository,
+                                     ElementsLockerFactory lockerFactory,
+                                     SimpleElementOperationsFactory simpleElementOperationsFactory) {
         this.uuidProvider = uuidProvider;
         this.transactionRepository = transactionRepository;
         this.spaceRepository = spaceRepository;
@@ -41,6 +41,7 @@ public class TransactionManager {
     }
 
     public OperationResult addOperation(String transactionId, Operation operation) {
+        // TODO race conditions
         Transaction transaction = transactionRepository.get(transactionId);
 
         ensureElementAndBucketExist(transaction.getSpaceName(), operation);
@@ -86,10 +87,11 @@ public class TransactionManager {
     }
 
     private OperationResult getResultForOperation(Transaction t, Operation o) {
-        SimpleElementOperations simpleElementOperations = simpleElementOperationsFactory
-                .buildSimpleElementOperations(t.getSpaceName());
         try {
             if (o.getType().equals(Operation.OperationType.READ)) {
+                SimpleElementOperations simpleElementOperations = simpleElementOperationsFactory
+                        .buildSimpleElementOperations(t.getSpaceName());
+
                 return Optional.ofNullable(t.getReadElements().get(o.getElementId()))
                         .map(version -> OperationResult.of(simpleElementOperations.getElement(o.getBucketName(), o.getElementId(), version)))
                         .orElseGet(() -> OperationResult.of(simpleElementOperations.getElement(o.getBucketName(), o.getElementId())));

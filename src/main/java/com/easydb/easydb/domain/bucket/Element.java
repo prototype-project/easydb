@@ -16,7 +16,7 @@ public class Element {
     private final List<ElementField> fields;
     private final Map<String, ElementField> fieldsAsMap;
 
-    protected Element(String id, String bucketName, List<ElementField> fields) {
+    private Element(String id, String bucketName, List<ElementField> fields) {
         this.id = id;
         this.bucketName = bucketName;
         this.fields = ImmutableList.copyOf(fields);
@@ -59,5 +59,10 @@ public class Element {
     @Override
     public int hashCode() {
         return Objects.hash(bucketName, fields, id);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Element(id=%s, bucketName=%s, fields=[...]", id, bucketName);
     }
 }

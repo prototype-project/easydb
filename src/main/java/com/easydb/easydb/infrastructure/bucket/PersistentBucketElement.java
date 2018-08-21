@@ -27,20 +27,12 @@ class PersistentBucketElement {
         return new PersistentBucketElement(element.getId(), element.getFields(), 0);
     }
 
-    static PersistentBucketElement of(String id, List<ElementField> fields, long version) {
-        return new PersistentBucketElement(id, fields, version);
-    }
-
     VersionedElement toDomainVersionedElement(String bucketName) {
         return VersionedElement.of(id, bucketName, fields, version);
     }
 
     List<ElementField> getFields() {
         return fields;
-    }
-
-    long getVersion() {
-        return version;
     }
 }
 

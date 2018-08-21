@@ -9,7 +9,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// TODO rollback
+// TODO transaction rollback, add metrics about transaction time, aborted count itd...
 class TransactionEngine {
     private static final Logger logger = LoggerFactory.getLogger(TransactionEngine.class);
 
@@ -48,6 +48,7 @@ class TransactionEngine {
         return o.getType() == Operation.OperationType.UPDATE || o.getType() == Operation.OperationType.DELETE;
     }
 
+    // TODO add support for operations on buckets and spaces
     private void performOperation(Operation o, Transaction t) {
         Element element = Element.of(o.getElementId(), o.getBucketName(), o.getFields());
         switch (o.getType()) {

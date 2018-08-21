@@ -44,7 +44,8 @@ public class ZookeeperLocker implements ElementsLocker {
 
     private final String spaceName;
     private final CuratorFramework client;
-    // TODO think about clearing this map in case of errors during transaction
+
+    // TODO think about clearing this map in case of errors during transaction, is it needed to be thread local ?
     private final ThreadLocal<ConcurrentHashMap<ElementKey, InterProcessSemaphoreMutex>> locksMap =
             new ThreadLocal<>();
 
@@ -60,6 +61,7 @@ public class ZookeeperLocker implements ElementsLocker {
 
     @Override
     public void lockElement(String bucketName, String elementId) {
+        // TODO reentrant lock needed
         lockElement(bucketName, elementId, Duration.ofMillis(0));
     }
 
@@ -71,7 +73,7 @@ public class ZookeeperLocker implements ElementsLocker {
         try {
             acquired = curatorLock.acquire(timeout.toMillis(), TimeUnit.MILLISECONDS);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new ElementLockerException(e);
         }
         if (!acquired) {
             throw new LockTimeoutException(spaceName, bucketName, elementId, timeout);
@@ -90,7 +92,7 @@ public class ZookeeperLocker implements ElementsLocker {
         try {
             curatorLock.release();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new ElementLockerException(e);
         }
     }
 

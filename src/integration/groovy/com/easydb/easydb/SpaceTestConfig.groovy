@@ -14,6 +14,7 @@ class SpaceTestConfig {
     private static final String DB_NAME = "testSpace";
     private static final String SERVER_NAME = "testServer";
 
+    // TODO replace fongo with embedded mongodb server
     @Bean
     Mongo mongo() {
         Fongo fongo = new Fongo(SERVER_NAME)

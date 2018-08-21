@@ -5,7 +5,8 @@ import com.easydb.easydb.domain.space.Space;
 import com.easydb.easydb.domain.space.SpaceRepository;
 import com.easydb.easydb.domain.transactions.Operation;
 import com.easydb.easydb.domain.transactions.Operation.OperationType;
-import com.easydb.easydb.domain.transactions.TransactionManager;
+import com.easydb.easydb.domain.transactions.OptimizedTransactionManager;
+import com.easydb.easydb.domain.transactions.Transaction;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,19 +15,19 @@ public class TransactionalBucketService implements BucketService {
     private final String spaceName;
     private final SpaceRepository spaceRepository;
     private final BucketRepository bucketRepository;
-    private final TransactionManager transactionManager;
+    private final OptimizedTransactionManager optimizedTransactionManager;
     private final SimpleElementOperations simpleElementOperations;
 
     public TransactionalBucketService(String spaceName,
                                       SpaceRepository spaceRepository,
                                       BucketRepository bucketRepository,
                                       SimpleElementOperationsFactory simpleElementOperationsFactory,
-                                      TransactionManager transactionManager) {
+                                      OptimizedTransactionManager optimizedTransactionManager) {
         this.spaceName = spaceName;
         this.spaceRepository = spaceRepository;
         this.bucketRepository = bucketRepository;
         this.simpleElementOperations = simpleElementOperationsFactory.buildSimpleElementOperations(spaceName);
-        this.transactionManager = transactionManager;
+        this.optimizedTransactionManager = optimizedTransactionManager;
     }
 
     @Override
@@ -36,6 +37,7 @@ public class TransactionalBucketService implements BucketService {
 
     @Override
     public void removeBucket(String bucketName) {
+        // TODO race conditions, maybe transaction on whole bucket ?
         Space space = spaceRepository.get(spaceName);
         space.getBuckets().remove(bucketName);
         spaceRepository.update(space);
@@ -54,10 +56,11 @@ public class TransactionalBucketService implements BucketService {
 
     @Override
     public void removeElement(String bucketName, String elementId) {
-        String transactionId = transactionManager.beginTransaction(spaceName);
+        Transaction transaction = optimizedTransactionManager.beginTransaction(spaceName);
         Operation operation = Operation.of(OperationType.DELETE, bucketName, elementId);
-        transactionManager.addOperation(transactionId, operation);
-        transactionManager.commitTransaction(transactionId);
+        optimizedTransactionManager.addOperation(transaction, operation);
+        // TODO retries
+        optimizedTransactionManager.commitTransaction(transaction);
     }
 
     @Override
@@ -67,10 +70,11 @@ public class TransactionalBucketService implements BucketService {
 
     @Override
     public void updateElement(Element toUpdate) {
-        String transactionId = transactionManager.beginTransaction(spaceName);
+        Transaction transaction = optimizedTransactionManager.beginTransaction(spaceName);
         Operation operation = Operation.of(OperationType.UPDATE, toUpdate);
-        transactionManager.addOperation(transactionId, operation);
-        transactionManager.commitTransaction(transactionId);
+        optimizedTransactionManager.addOperation(transaction, operation);
+        // TODO retries
+        optimizedTransactionManager.commitTransaction(transaction);
     }
 
     @Override
@@ -86,6 +90,6 @@ public class TransactionalBucketService implements BucketService {
     }
 
     private String getBucketName(String bucketName) {
-        return simpleElementOperations.getBucketNameAccordinglyToSpace(bucketName);
+        return NamesResolver.resolve(spaceName, bucketName);
     }
 }

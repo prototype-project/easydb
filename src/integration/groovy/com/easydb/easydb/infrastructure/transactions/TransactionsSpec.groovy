@@ -12,14 +12,14 @@ import com.easydb.easydb.domain.space.SpaceService
 import com.easydb.easydb.domain.transactions.Operation
 import com.easydb.easydb.domain.transactions.OperationResult
 import com.easydb.easydb.domain.transactions.TransactionAbortedException
-import com.easydb.easydb.domain.transactions.TransactionManager
+import com.easydb.easydb.domain.transactions.DefaultTransactionManager
 import org.springframework.beans.factory.annotation.Autowired
 
 
 class TransactionsSpec extends IntegrationWithCleanedDatabaseSpec {
 
     @Autowired
-    TransactionManager transactionManager
+    DefaultTransactionManager transactionManager
 
     @Autowired
     SpaceService spaceService

@@ -10,12 +10,12 @@ public class OperationResult {
         this.element = element;
     }
 
-    public static OperationResult emptyResult() {
-        return new OperationResult(Optional.empty());
-    }
-
     public static OperationResult of(VersionedElement element) {
         return new OperationResult(Optional.of(element));
+    }
+
+    static OperationResult emptyResult() {
+        return new OperationResult(Optional.empty());
     }
 
     public Optional<VersionedElement> getElement() {

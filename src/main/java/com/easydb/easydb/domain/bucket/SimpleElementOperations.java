@@ -21,9 +21,12 @@ public class SimpleElementOperations {
     }
 
     public void addElement(Element element) {
+        // TODO race conditions with remove
         Space space = spaceRepository.get(spaceName);
-        space.getBuckets().add(element.getBucketName());
-        spaceRepository.update(space);
+        if (!space.getBuckets().contains(element.getBucketName())) {
+            space.getBuckets().add(element.getBucketName());
+            spaceRepository.update(space);
+        }
         bucketRepository.insertElement(
                 Element.of(element.getId(), getBucketNameAccordinglyToSpace(element.getBucketName()), element.getFields()));
     }
@@ -67,11 +70,11 @@ public class SimpleElementOperations {
         return bucketRepository.elementExists(getBucketNameAccordinglyToSpace(bucketName), elementId);
     }
 
-    String getBucketNameAccordinglyToSpace(String bucketName) {
-        return spaceName + ":" + bucketName;
+    private String getBucketNameAccordinglyToSpace(String bucketName) {
+        return NamesResolver.resolve(spaceName, bucketName);
     }
 
     private BucketQuery rebuildToProperSpaceName(BucketQuery query) {
-        return query.rename(getBucketNameAccordinglyToSpace(query.getBucketName()));
+        return BucketQuery.of(getBucketNameAccordinglyToSpace(query.getBucketName()), query.getLimit(), query.getOffset());
     }
 }

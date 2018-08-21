@@ -4,7 +4,8 @@ import com.easydb.easydb.domain.bucket.factories.SimpleElementOperationsFactory;
 import com.easydb.easydb.domain.locker.factories.ElementsLockerFactory;
 import com.easydb.easydb.domain.space.SpaceRepository;
 import com.easydb.easydb.domain.space.UUIDProvider;
-import com.easydb.easydb.domain.transactions.TransactionManager;
+import com.easydb.easydb.domain.transactions.DefaultTransactionManager;
+import com.easydb.easydb.domain.transactions.OptimizedTransactionManager;
 import com.easydb.easydb.domain.transactions.TransactionRepository;
 import com.easydb.easydb.infrastructure.transactions.MongoTransactionRepository;
 import org.springframework.context.annotation.Bean;
@@ -20,12 +21,21 @@ public class TransactionConfig {
     }
 
     @Bean
-    TransactionManager transactionManager(UUIDProvider uuidProvider,
-                                          TransactionRepository transactionRepository,
-                                          SpaceRepository spaceRepository,
-                                          ElementsLockerFactory lockerFactory,
-                                          SimpleElementOperationsFactory simpleElementOperationsFactory) {
-        return new TransactionManager(uuidProvider, transactionRepository, spaceRepository,
+    DefaultTransactionManager defaultTransactionManager(UUIDProvider uuidProvider,
+                                                        TransactionRepository transactionRepository,
+                                                        SpaceRepository spaceRepository,
+                                                        ElementsLockerFactory lockerFactory,
+                                                        SimpleElementOperationsFactory simpleElementOperationsFactory) {
+        return new DefaultTransactionManager(uuidProvider, transactionRepository, spaceRepository,
                 lockerFactory, simpleElementOperationsFactory);
+    }
+
+    @Bean
+    OptimizedTransactionManager optimizedTransactionManager(UUIDProvider uuidProvider,
+                                                            SpaceRepository spaceRepository,
+                                                            ElementsLockerFactory lockerFactory,
+                                                            SimpleElementOperationsFactory simpleElementOperationsFactory) {
+        return new OptimizedTransactionManager(uuidProvider, spaceRepository, lockerFactory,
+                simpleElementOperationsFactory);
     }
 }
