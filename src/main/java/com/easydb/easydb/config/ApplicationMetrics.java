@@ -5,7 +5,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Metrics;
 
 public class ApplicationMetrics {
-
+    // TODO more metrics
     private final MeterRegistry meterRegistry = Metrics.globalRegistry;
 
     private final Counter totalRequestsCounter;

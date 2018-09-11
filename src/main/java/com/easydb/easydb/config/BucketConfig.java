@@ -6,6 +6,7 @@ import com.easydb.easydb.domain.space.SpaceRepository;
 import com.easydb.easydb.domain.space.UUIDProvider;
 import com.easydb.easydb.domain.bucket.BucketRepository;
 import com.easydb.easydb.domain.transactions.OptimizedTransactionManager;
+import com.easydb.easydb.domain.transactions.TransactionRetryier;
 import com.easydb.easydb.infrastructure.bucket.MongoBucketRepository;
 import com.easydb.easydb.domain.bucket.factories.TransactionalBucketServiceFactory;
 import org.springframework.context.annotation.Bean;
@@ -35,8 +36,9 @@ public class BucketConfig {
     BucketServiceFactory bucketServiceFactory(
             BucketRepository bucketRepository, SpaceRepository spaceRepository,
             SimpleElementOperationsFactory simpleElementOperationsFactory,
-            OptimizedTransactionManager optimizedTransactionManager) {
+            OptimizedTransactionManager optimizedTransactionManager,
+            TransactionRetryier transactionRetryier) {
         return new TransactionalBucketServiceFactory(spaceRepository, bucketRepository,
-                simpleElementOperationsFactory, optimizedTransactionManager);
+                simpleElementOperationsFactory, optimizedTransactionManager, transactionRetryier);
     }
 }

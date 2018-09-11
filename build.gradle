@@ -45,7 +45,7 @@ configurations {
 }
 
 dependencies {
-    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: project.springBootVersion
     compile group: 'com.google.guava', name: 'guava', version: '19.0'
     compile group: 'org.springframework.data', name: 'spring-data-mongodb', version: '1.10.7.RELEASE'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.3'
@@ -59,6 +59,7 @@ dependencies {
     compile group: 'org.apache.curator', name: 'curator-framework', version: '4.0.0'
     compile group: 'org.apache.curator', name: 'curator-recipes', version: '4.0.0'
     compile group: 'net.sf.jopt-simple', name: 'jopt-simple', version: '5.0.4'
+    compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.2.RELEASE'
 
     testCompile 'org.codehaus.groovy:groovy-all:2.4.4'
     testCompile group: 'org.spockframework', name: 'spock-spring', version: '1.1-groovy-2.4'
@@ -66,6 +67,7 @@ dependencies {
     testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
     testCompile group: 'com.github.fakemongo', name: 'fongo', version: '2.1.0'
     testCompile group: 'org.apache.curator', name: 'curator-test', version: '4.0.0'
+    testCompile group: 'cglib', name: 'cglib-nodep', version: '3.2.4'
 }
 
 task integrationTest(type: Test) {

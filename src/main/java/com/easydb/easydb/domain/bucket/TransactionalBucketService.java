@@ -7,6 +7,7 @@ import com.easydb.easydb.domain.transactions.Operation;
 import com.easydb.easydb.domain.transactions.Operation.OperationType;
 import com.easydb.easydb.domain.transactions.OptimizedTransactionManager;
 import com.easydb.easydb.domain.transactions.Transaction;
+import com.easydb.easydb.domain.transactions.TransactionRetryier;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,17 +18,20 @@ public class TransactionalBucketService implements BucketService {
     private final BucketRepository bucketRepository;
     private final OptimizedTransactionManager optimizedTransactionManager;
     private final SimpleElementOperations simpleElementOperations;
+    private final TransactionRetryier transactionRetryier;
 
     public TransactionalBucketService(String spaceName,
                                       SpaceRepository spaceRepository,
                                       BucketRepository bucketRepository,
                                       SimpleElementOperationsFactory simpleElementOperationsFactory,
-                                      OptimizedTransactionManager optimizedTransactionManager) {
+                                      OptimizedTransactionManager optimizedTransactionManager,
+                                      TransactionRetryier transactionRetryier) {
         this.spaceName = spaceName;
         this.spaceRepository = spaceRepository;
         this.bucketRepository = bucketRepository;
         this.simpleElementOperations = simpleElementOperationsFactory.buildSimpleElementOperations(spaceName);
         this.optimizedTransactionManager = optimizedTransactionManager;
+        this.transactionRetryier = transactionRetryier;
     }
 
     @Override
@@ -59,8 +63,7 @@ public class TransactionalBucketService implements BucketService {
         Transaction transaction = optimizedTransactionManager.beginTransaction(spaceName);
         Operation operation = Operation.of(OperationType.DELETE, bucketName, elementId);
         optimizedTransactionManager.addOperation(transaction, operation);
-        // TODO retries
-        optimizedTransactionManager.commitTransaction(transaction);
+        transactionRetryier.performWithRetries(() -> optimizedTransactionManager.commitTransaction(transaction));
     }
 
     @Override
@@ -73,8 +76,7 @@ public class TransactionalBucketService implements BucketService {
         Transaction transaction = optimizedTransactionManager.beginTransaction(spaceName);
         Operation operation = Operation.of(OperationType.UPDATE, toUpdate);
         optimizedTransactionManager.addOperation(transaction, operation);
-        // TODO retries
-        optimizedTransactionManager.commitTransaction(transaction);
+        transactionRetryier.performWithRetries(() -> optimizedTransactionManager.commitTransaction(transaction));
     }
 
     @Override
