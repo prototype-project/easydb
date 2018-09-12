@@ -1,5 +1,6 @@
 package com.easydb.easydb.infrastructure.locker;
 
+import com.easydb.easydb.config.ApplicationMetrics;
 import com.easydb.easydb.domain.locker.ElementsLocker;
 import com.easydb.easydb.domain.locker.LockNotHoldException;
 import com.easydb.easydb.domain.locker.LockTimeoutException;
@@ -44,19 +45,21 @@ public class ZookeeperLocker implements ElementsLocker {
 
     private final String spaceName;
     private final CuratorFramework client;
+    private final ApplicationMetrics metrics;
 
     // TODO think about clearing this map in case of errors during transaction, is it needed to be thread local ?
     private final ThreadLocal<ConcurrentHashMap<ElementKey, InterProcessSemaphoreMutex>> locksMap =
             new ThreadLocal<>();
 
-    private ZookeeperLocker(String spaceName, CuratorFramework client) {
+    private ZookeeperLocker(String spaceName, CuratorFramework client, ApplicationMetrics metrics) {
         this.spaceName = spaceName;
         this.client = client;
+        this.metrics = metrics;
         locksMap.set(new ConcurrentHashMap<>());
     }
 
-    public static ZookeeperLocker of(String spaceName, CuratorFramework client) {
-        return new ZookeeperLocker(spaceName, client);
+    public static ZookeeperLocker of(String spaceName, CuratorFramework client, ApplicationMetrics metrics) {
+        return new ZookeeperLocker(spaceName, client, metrics);
     }
 
     @Override
@@ -73,9 +76,11 @@ public class ZookeeperLocker implements ElementsLocker {
         try {
             acquired = curatorLock.acquire(timeout.toMillis(), TimeUnit.MILLISECONDS);
         } catch (Exception e) {
+            metrics.getLockerErrorCounter(spaceName, bucketName).increment();
             throw new ElementLockerException(e);
         }
         if (!acquired) {
+            metrics.getLockerTimeoutsCounter(spaceName, bucketName).increment();
             throw new LockTimeoutException(spaceName, bucketName, elementId, timeout);
         } else {
             locksMap.get().put(ElementKey.of(bucketName, elementId), curatorLock);
@@ -86,12 +91,14 @@ public class ZookeeperLocker implements ElementsLocker {
     public void unlockElement(String bucketName, String elementId) {
         InterProcessSemaphoreMutex curatorLock = locksMap.get().remove(ElementKey.of(bucketName, elementId));
         if (curatorLock == null) {
+            metrics.getLockerErrorCounter(spaceName, bucketName);
             throw new LockNotHoldException(spaceName, bucketName, elementId);
         }
 
         try {
             curatorLock.release();
         } catch (Exception e) {
+            metrics.getLockerErrorCounter(spaceName, bucketName);
             throw new ElementLockerException(e);
         }
     }

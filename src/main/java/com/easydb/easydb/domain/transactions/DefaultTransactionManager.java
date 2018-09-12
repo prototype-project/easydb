@@ -1,5 +1,6 @@
 package com.easydb.easydb.domain.transactions;
 
+import com.easydb.easydb.config.ApplicationMetrics;
 import com.easydb.easydb.domain.bucket.SimpleElementOperations;
 import com.easydb.easydb.domain.bucket.factories.SimpleElementOperationsFactory;
 import com.easydb.easydb.domain.locker.factories.ElementsLockerFactory;
@@ -18,17 +19,20 @@ public class DefaultTransactionManager {
     private final SpaceRepository spaceRepository;
     private final ElementsLockerFactory lockerFactory;
     private final SimpleElementOperationsFactory simpleElementOperationsFactory;
+    private final ApplicationMetrics metrics;
 
     public DefaultTransactionManager(UUIDProvider uuidProvider,
                                      TransactionRepository transactionRepository,
                                      SpaceRepository spaceRepository,
                                      ElementsLockerFactory lockerFactory,
-                                     SimpleElementOperationsFactory simpleElementOperationsFactory) {
+                                     SimpleElementOperationsFactory simpleElementOperationsFactory,
+                                     ApplicationMetrics metrics) {
         this.uuidProvider = uuidProvider;
         this.transactionRepository = transactionRepository;
         this.spaceRepository = spaceRepository;
         this.lockerFactory = lockerFactory;
         this.simpleElementOperationsFactory = simpleElementOperationsFactory;
+        this.metrics = metrics;
     }
 
     public String beginTransaction(String spaceName) {
@@ -56,9 +60,10 @@ public class DefaultTransactionManager {
         return result;
     }
 
-    public void commitTransaction(String transactionId) {
+    public Transaction commitTransaction(String transactionId) {
         Transaction transaction = transactionRepository.get(transactionId);
         commit(transaction);
+        return transaction;
     }
 
     private void commit(Transaction transaction) {
@@ -69,6 +74,7 @@ public class DefaultTransactionManager {
             transactionEngine.commit(transaction);
         } catch (Exception e) {
             logger.error("Aborting transaction {} ...", transaction.getId(), e);
+            metrics.getAbortedTransactionCounter(transaction.getSpaceName()).increment();
             throw new TransactionAbortedException(
                     "Transaction " + transaction.getId() + " was aborted", e);
         }
@@ -93,12 +99,14 @@ public class DefaultTransactionManager {
                         .buildSimpleElementOperations(t.getSpaceName());
 
                 return Optional.ofNullable(t.getReadElements().get(o.getElementId()))
-                        .map(version -> OperationResult.of(simpleElementOperations.getElement(o.getBucketName(), o.getElementId(), version)))
-                        .orElseGet(() -> OperationResult.of(simpleElementOperations.getElement(o.getBucketName(), o.getElementId())));
+                        .map(version ->
+                                OperationResult.of(simpleElementOperations.getElement(o.getBucketName(), o.getElementId(), version), t.getSpaceName()))
+                        .orElseGet(() -> OperationResult.of(simpleElementOperations.getElement(o.getBucketName(), o.getElementId()), t.getSpaceName()));
             }
-            return OperationResult.emptyResult();
+            return OperationResult.emptyResult(t.getSpaceName());
         } catch (ConcurrentTransactionDetectedException e) {
             logger.error("Aborting transaction {} ...", t.getId(), e);
+            metrics.getAbortedTransactionCounter(t.getSpaceName()).increment();
             throw new TransactionAbortedException(
                     "Transaction " + t.getId() + " was aborted", e);
         }

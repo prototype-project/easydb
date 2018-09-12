@@ -10,7 +10,6 @@ import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
 import com.easydb.easydb.domain.bucket.factories.SimpleElementOperationsFactory
 import com.easydb.easydb.domain.space.SpaceRepository
 import com.easydb.easydb.domain.space.UUIDProvider
-import com.easydb.easydb.domain.transactions.Operation
 import com.easydb.easydb.domain.transactions.OptimizedTransactionManager
 import com.easydb.easydb.domain.transactions.Transaction
 import com.easydb.easydb.domain.transactions.TransactionAbortedException

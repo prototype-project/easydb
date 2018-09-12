@@ -1,5 +1,6 @@
 package com.easydb.easydb.domain.transactions;
 
+import com.easydb.easydb.config.ApplicationMetrics;
 import com.easydb.easydb.domain.bucket.SimpleElementOperations;
 import com.easydb.easydb.domain.bucket.factories.SimpleElementOperationsFactory;
 import com.easydb.easydb.domain.locker.factories.ElementsLockerFactory;
@@ -19,15 +20,18 @@ public class OptimizedTransactionManager {
     private final SpaceRepository spaceRepository;
     private final ElementsLockerFactory lockerFactory;
     private final SimpleElementOperationsFactory simpleElementOperationsFactory;
+    private final ApplicationMetrics metrics;
 
     public OptimizedTransactionManager(UUIDProvider uuidProvider,
                                        SpaceRepository spaceRepository,
                                        ElementsLockerFactory lockerFactory,
-                                       SimpleElementOperationsFactory simpleElementOperationsFactory) {
+                                       SimpleElementOperationsFactory simpleElementOperationsFactory,
+                                       ApplicationMetrics metrics) {
         this.uuidProvider = uuidProvider;
         this.spaceRepository = spaceRepository;
         this.lockerFactory = lockerFactory;
         this.simpleElementOperationsFactory = simpleElementOperationsFactory;
+        this.metrics = metrics;
     }
 
     public Transaction beginTransaction(String spaceName) {
@@ -49,6 +53,7 @@ public class OptimizedTransactionManager {
             transactionEngine.commit(transaction);
         } catch (Exception e) {
             logger.error("Aborting transaction {} ...", transaction.getId(), e);
+            metrics.getAbortedTransactionCounter(transaction.getSpaceName()).increment();
             throw new TransactionAbortedException(
                     "Transaction " + transaction.getId() + " was aborted", e);
         }

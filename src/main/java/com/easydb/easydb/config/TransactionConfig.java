@@ -33,18 +33,20 @@ public class TransactionConfig {
                                                         TransactionRepository transactionRepository,
                                                         SpaceRepository spaceRepository,
                                                         ElementsLockerFactory lockerFactory,
-                                                        SimpleElementOperationsFactory simpleElementOperationsFactory) {
+                                                        SimpleElementOperationsFactory simpleElementOperationsFactory,
+                                                        ApplicationMetrics metrics) {
         return new DefaultTransactionManager(uuidProvider, transactionRepository, spaceRepository,
-                lockerFactory, simpleElementOperationsFactory);
+                lockerFactory, simpleElementOperationsFactory, metrics);
     }
 
     @Bean
     OptimizedTransactionManager optimizedTransactionManager(UUIDProvider uuidProvider,
                                                             SpaceRepository spaceRepository,
                                                             ElementsLockerFactory lockerFactory,
-                                                            SimpleElementOperationsFactory simpleElementOperationsFactory) {
+                                                            SimpleElementOperationsFactory simpleElementOperationsFactory,
+                                                            ApplicationMetrics metrics) {
         return new OptimizedTransactionManager(uuidProvider, spaceRepository, lockerFactory,
-                simpleElementOperationsFactory);
+                simpleElementOperationsFactory, metrics);
     }
 
     @Bean

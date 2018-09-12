@@ -101,7 +101,7 @@ class BucketController {
                 .map(ElementQueryApiDto::of)
                 .collect(Collectors.toList());
 
-        metrics.getElementsRequestsCounter(spaceName, bucketName).increment();
+        metrics.getFilterElementsRequestsCounter(spaceName, bucketName).increment();
         return PaginatedElementsApiDto.of(
                 getNextPageLink(bucketService.getNumberOfElements(bucketName), limit, offset, request),
                 results);

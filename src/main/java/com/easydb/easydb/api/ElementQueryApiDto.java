@@ -2,7 +2,6 @@ package com.easydb.easydb.api;
 
 import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.bucket.ElementField;
-import com.easydb.easydb.domain.bucket.VersionedElement;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
