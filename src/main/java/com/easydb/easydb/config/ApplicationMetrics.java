@@ -5,7 +5,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Metrics;
 
 public class ApplicationMetrics {
-    // TODO more metrics
     private final MeterRegistry meterRegistry = Metrics.globalRegistry;
 
     private final Counter totalRequestsCounter;
@@ -64,6 +63,14 @@ public class ApplicationMetrics {
 
     public Counter getFilterElementsRequestsCounter(String spaceName, String bucketName) {
         return buildCounter(buildBucketApiCounterPath("filterElements", spaceName, bucketName));
+    }
+
+    public Counter getLockerCounter(String spaceName, String bucketName) {
+        return buildCounter(buildBucketCounterPath("lockElement", spaceName, bucketName));
+    }
+
+    public Counter getLockerUnlockedCounter(String spaceName, String bucketName) {
+        return buildCounter(buildBucketCounterPath("unlockElement", spaceName, bucketName));
     }
 
     public Counter getLockerErrorCounter(String spaceName, String bucketName) {

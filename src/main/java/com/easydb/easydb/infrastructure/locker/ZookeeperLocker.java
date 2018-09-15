@@ -66,6 +66,7 @@ public class ZookeeperLocker implements ElementsLocker {
     public void lockElement(String bucketName, String elementId) {
         // TODO reentrant lock needed
         lockElement(bucketName, elementId, Duration.ofMillis(0));
+        metrics.getLockerCounter(spaceName, bucketName).increment();
     }
 
     @Override
@@ -91,14 +92,15 @@ public class ZookeeperLocker implements ElementsLocker {
     public void unlockElement(String bucketName, String elementId) {
         InterProcessSemaphoreMutex curatorLock = locksMap.get().remove(ElementKey.of(bucketName, elementId));
         if (curatorLock == null) {
-            metrics.getLockerErrorCounter(spaceName, bucketName);
+            metrics.getLockerErrorCounter(spaceName, bucketName).increment();
             throw new LockNotHoldException(spaceName, bucketName, elementId);
         }
 
         try {
             curatorLock.release();
+            metrics.getLockerUnlockedCounter(spaceName, bucketName).increment();
         } catch (Exception e) {
-            metrics.getLockerErrorCounter(spaceName, bucketName);
+            metrics.getLockerErrorCounter(spaceName, bucketName).increment();
             throw new ElementLockerException(e);
         }
     }

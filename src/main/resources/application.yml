@@ -5,7 +5,8 @@ space:
 spring:
   data:
     mongodb:
-      uri: ${MONGODB_URI}
+#      uri: ${MONGODB_URI}
+      uri: "mongodb://localhost/easydb"
   application:
     name: easydb
   metrics:

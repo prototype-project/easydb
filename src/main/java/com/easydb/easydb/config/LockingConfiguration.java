@@ -32,7 +32,7 @@ public class LockingConfiguration {
     }
 
     @Bean
-    ElementsLockerFactory elementsLockerFactory(CuratorFramework client) {
-        return new ZookeeperElementsLockerFactory(client);
+    ElementsLockerFactory elementsLockerFactory(CuratorFramework client, ApplicationMetrics metrics) {
+        return new ZookeeperElementsLockerFactory(client, metrics);
     }
 }
