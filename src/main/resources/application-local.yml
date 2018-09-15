@@ -2,3 +2,7 @@ zookeeper:
   retryTimeoutMillis: 100
   retrySleepMillis: 100
 
+spring:
+  data:
+    mongodb:
+      uri: "mongodb://localhost/easydb"
