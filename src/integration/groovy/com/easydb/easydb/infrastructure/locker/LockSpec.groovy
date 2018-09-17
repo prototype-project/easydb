@@ -30,24 +30,19 @@ class LockSpec extends BaseIntegrationSpec {
         catch (LockNotHoldException ignored) {}
     }
 
-	def "should lock on element"() {
-        given:
-        locker.lockElement("testBucket", "123")
-
-        when:
-        locker.lockElement("testBucket", "123", Duration.ofMillis(300))
-
-        then:
-        thrown(LockTimeoutException)
-    }
-
     def "should unlock element"() {
         given:
         locker.lockElement("testBucket", "123")
 
         when:
         locker.unlockElement("testBucket", "123")
-        locker.lockElement("testBucket", "123")
+
+        Future<?> future = Executors.newSingleThreadExecutor().submit({
+            ElementsLocker locker = lockerFactory.build("SpaceX")
+            locker.lockElement("testBucket", "123", Duration.ofMillis(300))
+            locker.unlockElement("testBucket", "123")
+        })
+        future.get()
 
         then:
         noExceptionThrown()
@@ -69,9 +64,14 @@ class LockSpec extends BaseIntegrationSpec {
         long start = System.currentTimeMillis()
         long waitTime = 0
         try {
-            locker.lockElement("testBucket", "123", Duration.ofMillis(400))
+            Future<?> future = Executors.newSingleThreadExecutor().submit({
+                lockerFactory.build("SpaceX")
+                        .lockElement("testBucket", "123", Duration.ofMillis(400))
+            })
+            future.get()
         }
-        catch (LockTimeoutException e) {
+        catch (ExecutionException e) {
+            assert e.getCause() instanceof LockTimeoutException
             waitTime = System.currentTimeMillis() - start
         }
 
@@ -84,14 +84,18 @@ class LockSpec extends BaseIntegrationSpec {
         locker.lockElement("testBucket", "123")
 
         when:
-        locker.lockElement("testBucket", "456", Duration.ofMillis(300))
-        locker.unlockElement("testBucket", "456")
+        Future<?> future = Executors.newSingleThreadExecutor().submit({
+            ElementsLocker locker = lockerFactory.build("SpaceX")
+            locker.lockElement("testBucket", "456", Duration.ofMillis(300))
+            locker.unlockElement("testBucket", "456")
+        })
+        future.get()
 
         then:
         noExceptionThrown()
     }
 
-    def "should block another threads when lock is acquired with new locker object"() {
+    def "should block another threads"() {
         given:
         locker.lockElement("testBucket", "123")
 
@@ -99,7 +103,6 @@ class LockSpec extends BaseIntegrationSpec {
         Future<?> future = Executors.newSingleThreadExecutor().submit({
             lockerFactory.build("SpaceX")
                     .lockElement("testBucket", "123", Duration.ofMillis(300))
-            null
         })
 
         future.get()
@@ -109,20 +112,21 @@ class LockSpec extends BaseIntegrationSpec {
         e.getCause() instanceof LockTimeoutException
     }
 
-    def "should block another threads when lock is acquired with the same locker object"() {
+    def "lock should be re-entrant for the same thread"() {
         given:
         locker.lockElement("testBucket", "123")
 
         when:
-        Future<?> future = Executors.newSingleThreadExecutor().submit({
-            locker.lockElement("testBucket", "123", Duration.ofMillis(300))
-            null
-        })
-
-        future.get()
+        locker.lockElement("testBucket", "123")
 
         then:
-        def e = thrown(ExecutionException)
-        e.getCause() instanceof LockTimeoutException
+        noExceptionThrown()
+
+        when:
+        locker.unlockElement("testBucket", "123")
+        locker.unlockElement("testBucket", "123")
+
+        then:
+        noExceptionThrown()
     }
 }

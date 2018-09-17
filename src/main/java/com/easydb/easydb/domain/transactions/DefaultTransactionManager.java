@@ -62,7 +62,8 @@ public class DefaultTransactionManager {
 
     public Transaction commitTransaction(String transactionId) {
         Transaction transaction = transactionRepository.get(transactionId);
-        commit(transaction);
+        metrics.getCompoundTransactionTimer(transaction.getSpaceName())
+                .record(() -> commit(transaction));
         return transaction;
     }
 

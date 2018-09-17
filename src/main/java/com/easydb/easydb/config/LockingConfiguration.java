@@ -5,7 +5,7 @@ import com.easydb.easydb.infrastructure.locker.factories.ZookeeperElementsLocker
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.retry.RetryUntilElapsed;
+import org.apache.curator.retry.RetryForever;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -20,19 +20,19 @@ public class LockingConfiguration {
 
     @Bean(initMethod = "start", destroyMethod = "close")
     CuratorFramework curatorClient() {
-        RetryPolicy retryPolicy = new RetryUntilElapsed(properties.getRetryTimeoutMillis(), properties.getRetrySleepMillis());
+        RetryPolicy retryPolicy = new RetryForever(properties.getRetrySleepMillis());
 
         CuratorFrameworkFactory.Builder clientBuilder = CuratorFrameworkFactory.builder();
         clientBuilder.connectionTimeoutMs(properties.getConnectionTimeoutMillis());
         clientBuilder.sessionTimeoutMs(properties.getSessionTimeoutMillis());
         clientBuilder.connectString(properties.getConnectionString());
         clientBuilder.retryPolicy(retryPolicy);
-        //TODO set connection retry policy
         return clientBuilder.build();
     }
 
     @Bean
-    ElementsLockerFactory elementsLockerFactory(CuratorFramework client, ApplicationMetrics metrics) {
-        return new ZookeeperElementsLockerFactory(client, metrics);
+    ElementsLockerFactory elementsLockerFactory(CuratorFramework client, ZookeeperProperties properties,
+                                                ApplicationMetrics metrics) {
+        return new ZookeeperElementsLockerFactory(client, properties, metrics);
     }
 }

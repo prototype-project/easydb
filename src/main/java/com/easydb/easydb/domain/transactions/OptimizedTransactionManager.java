@@ -46,6 +46,11 @@ public class OptimizedTransactionManager {
     }
 
     public void commitTransaction(Transaction transaction) {
+        metrics.getSingleElementTransactionTimer(transaction.getSpaceName())
+                .record(() -> commit(transaction));
+    }
+
+    private void commit(Transaction transaction) {
         SimpleElementOperations simpleElementOperations =
                 simpleElementOperationsFactory.buildSimpleElementOperations(transaction.getSpaceName());
         TransactionEngine transactionEngine = new TransactionEngine(lockerFactory, simpleElementOperations);

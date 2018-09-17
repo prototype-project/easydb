@@ -9,7 +9,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// TODO transaction rollback, add metrics about transaction time, aborted count itd...
+// TODO transaction rollback
 class TransactionEngine {
     private static final Logger logger = LoggerFactory.getLogger(TransactionEngine.class);
 
@@ -36,6 +36,7 @@ class TransactionEngine {
             logger.error("Error during committing transaction {}. Making rollback...", transaction.getId());
             throw e;
         } finally {
+            // TODO think about corner cases (e.g. unlocking not already locked element)
             transaction.getOperations().forEach(o -> {
                 if (operationRequiresLock(o)) {
                     locker.unlockElement(o.getBucketName(), o.getElementId());
