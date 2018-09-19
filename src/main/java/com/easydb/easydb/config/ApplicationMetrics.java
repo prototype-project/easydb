@@ -66,12 +66,20 @@ public class ApplicationMetrics {
         return buildCounter(buildBucketApiPath("filterElements", spaceName, bucketName));
     }
 
-    public Counter getLockerCounter(String spaceName, String bucketName) {
+    public Counter getElementsLockerCounter(String spaceName, String bucketName) {
         return buildCounter(buildBucketPath("lockElement", spaceName, bucketName));
     }
 
-    public Counter getLockerUnlockedCounter(String spaceName, String bucketName) {
+    public Counter getElementsLockerUnlockedCounter(String spaceName, String bucketName) {
         return buildCounter(buildBucketPath("unlockElement", spaceName, bucketName));
+    }
+
+    public Counter getBucketLockerCounter(String spaceName, String bucketName) {
+        return buildCounter(buildBucketPath("lockBucket", spaceName, bucketName));
+    }
+
+    public Counter getBucketLockerUnlockedCounter(String spaceName, String bucketName) {
+        return buildCounter(buildBucketPath("unlockBucket", spaceName, bucketName));
     }
 
     public Counter getLockerErrorCounter(String spaceName, String bucketName) {

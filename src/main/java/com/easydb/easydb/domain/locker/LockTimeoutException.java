@@ -7,4 +7,11 @@ public class LockTimeoutException extends RuntimeException {
         super("Lock timeout after " + timeout.toMillis() + " millis" +
                 " on element - " + spaceName + "." + bucketName + "." + elementId);
     }
+
+    public LockTimeoutException(String spaceName, String bucketName, Duration timeout) {
+        super("Lock timeout after " + timeout.toMillis() + " millis" +
+                " on bucket - " + spaceName + "." + bucketName);
+    }
+
+
 }

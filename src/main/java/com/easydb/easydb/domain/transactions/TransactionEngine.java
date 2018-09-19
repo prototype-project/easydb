@@ -25,7 +25,6 @@ class TransactionEngine {
         ElementsLocker locker = lockerFactory.build(transaction.getSpaceName());
 
         try {
-            // TODO needed reentrant lock
             transaction.getOperations().forEach(o -> {
                 if (operationRequiresLock(o)) {
                     locker.lockElement(o.getBucketName(), o.getElementId());

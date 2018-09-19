@@ -1,5 +1,6 @@
 package com.easydb.easydb.domain.bucket;
 
+import com.easydb.easydb.domain.transactions.ConcurrentTransactionDetectedException;
 import java.util.List;
 
 public interface BucketRepository {
@@ -14,7 +15,7 @@ public interface BucketRepository {
             throws BucketDoesNotExistException, ElementDoesNotExistException;
 
     VersionedElement getElement(String bucketName, String id, long requiredVersion)
-            throws BucketDoesNotExistException, ElementDoesNotExistException;
+            throws BucketDoesNotExistException, ElementDoesNotExistException, ConcurrentTransactionDetectedException;
 
     void removeElement(String bucketName, String id) throws BucketDoesNotExistException, ElementDoesNotExistException;
 

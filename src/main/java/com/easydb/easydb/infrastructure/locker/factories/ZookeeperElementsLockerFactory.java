@@ -4,7 +4,7 @@ import com.easydb.easydb.config.ApplicationMetrics;
 import com.easydb.easydb.config.ZookeeperProperties;
 import com.easydb.easydb.domain.locker.ElementsLocker;
 import com.easydb.easydb.domain.locker.factories.ElementsLockerFactory;
-import com.easydb.easydb.infrastructure.locker.ZookeeperLocker;
+import com.easydb.easydb.infrastructure.locker.ZookeeperElementsLocker;
 import org.apache.curator.framework.CuratorFramework;
 
 public class ZookeeperElementsLockerFactory implements ElementsLockerFactory {
@@ -22,6 +22,6 @@ public class ZookeeperElementsLockerFactory implements ElementsLockerFactory {
 
     @Override
     public ElementsLocker build(String spaceName) {
-        return ZookeeperLocker.of(spaceName, properties, client, metrics);
+        return ZookeeperElementsLocker.of(spaceName, properties, client, metrics);
     }
 }

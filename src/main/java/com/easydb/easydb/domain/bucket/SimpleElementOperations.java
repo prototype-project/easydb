@@ -41,7 +41,8 @@ public class SimpleElementOperations {
                         toUpdate.getFields(), v))
                 .orElseGet(() -> VersionedElement.of(toUpdate.getId(), getBucketNameAccordinglyToSpace(toUpdate.getBucketName()),
                         toUpdate.getFields()));
-        bucketRepository.updateElement(withBucketRenamed);
+        bucketRepository.
+                updateElement(withBucketRenamed);
     }
 
     public VersionedElement getElement(String bucketName, String id) {

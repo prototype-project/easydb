@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 
-public class ZookeeperLocker implements ElementsLocker {
+public class ZookeeperElementsLocker implements ElementsLocker {
 
     static class ElementKey {
         private final String bucketName;
@@ -81,23 +81,23 @@ public class ZookeeperLocker implements ElementsLocker {
 
     private final Map<ElementKey, ElementLock> locksMap = new HashMap<>();
 
-    private ZookeeperLocker(String spaceName, ZookeeperProperties properties,
-                            CuratorFramework client, ApplicationMetrics metrics) {
+    private ZookeeperElementsLocker(String spaceName, ZookeeperProperties properties,
+                                    CuratorFramework client, ApplicationMetrics metrics) {
         this.spaceName = spaceName;
         this.client = client;
         this.metrics = metrics;
         this.properties = properties;
     }
 
-    public static ZookeeperLocker of(String spaceName, ZookeeperProperties properties,
-                                     CuratorFramework client, ApplicationMetrics metrics) {
-        return new ZookeeperLocker(spaceName, properties, client, metrics);
+    public static ZookeeperElementsLocker of(String spaceName, ZookeeperProperties properties,
+                                             CuratorFramework client, ApplicationMetrics metrics) {
+        return new ZookeeperElementsLocker(spaceName, properties, client, metrics);
     }
 
     @Override
     public void lockElement(String bucketName, String elementId) {
         lockElement(bucketName, elementId, Duration.ofMillis(properties.getLockerTimeoutMillis()));
-        metrics.getLockerCounter(spaceName, bucketName).increment();
+        metrics.getElementsLockerCounter(spaceName, bucketName).increment();
     }
 
     @Override
@@ -135,7 +135,7 @@ public class ZookeeperLocker implements ElementsLocker {
             if (elementLock.lockCount() == 0) {
                 locksMap.remove(ElementKey.of(bucketName, elementId));
             }
-            metrics.getLockerUnlockedCounter(spaceName, bucketName).increment();
+            metrics.getElementsLockerUnlockedCounter(spaceName, bucketName).increment();
         } catch (Exception e) {
             metrics.getLockerErrorCounter(spaceName, bucketName).increment();
             throw new ElementLockerException(e);
