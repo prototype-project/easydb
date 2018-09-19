@@ -28,3 +28,10 @@ sudo mkdir -p /data/db
 
 # install zookeeper
 sudo apt-get -y install zookeeperd
+
+# install puppet-agent
+wget http://apt.puppetlabs.com/puppet5-release-xenial.deb
+sudo dpkg -i puppet5-release-xenial.deb
+sudo apt-get -y update
+sudo apt-get -y install puppet
+
