@@ -2,6 +2,7 @@ space:
   spaceName:
     testSpace
 
+# TODO set mongo user and password
 spring:
   data:
     mongodb:
