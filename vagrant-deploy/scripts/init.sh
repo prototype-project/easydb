@@ -35,3 +35,10 @@ sudo dpkg -i puppet5-release-xenial.deb
 sudo apt-get -y update
 sudo apt-get -y install puppet
 
+wget https://downloads.puppetlabs.com/puppet/puppet-5.3.5.tar.gz
+tar -xzf puppet-5.3.5.tar.gz
+sudo ./puppet-5.3.5/install.rb
+
+rm puppet5-release-xenial.deb
+rm puppet-5.3.5.tar.gz
+rm -rf puppet-5.3.5
