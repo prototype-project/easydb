@@ -1,9 +1,7 @@
 package com.easydb.easydb.domain.transactions;
 
 import com.easydb.easydb.config.ApplicationMetrics;
-import com.easydb.easydb.domain.bucket.SimpleElementOperations;
 import com.easydb.easydb.domain.bucket.factories.SimpleElementOperationsFactory;
-import com.easydb.easydb.domain.locker.factories.ElementsLockerFactory;
 import com.easydb.easydb.domain.space.SpaceRepository;
 import com.easydb.easydb.domain.space.UUIDProvider;
 import org.slf4j.Logger;
@@ -18,18 +16,18 @@ public class OptimizedTransactionManager {
 
     private final UUIDProvider uuidProvider;
     private final SpaceRepository spaceRepository;
-    private final ElementsLockerFactory lockerFactory;
+    private final TransactionEngineFactory transactionEngineFactory;
     private final SimpleElementOperationsFactory simpleElementOperationsFactory;
     private final ApplicationMetrics metrics;
 
     public OptimizedTransactionManager(UUIDProvider uuidProvider,
                                        SpaceRepository spaceRepository,
-                                       ElementsLockerFactory lockerFactory,
+                                       TransactionEngineFactory transactionEngineFactory,
                                        SimpleElementOperationsFactory simpleElementOperationsFactory,
                                        ApplicationMetrics metrics) {
         this.uuidProvider = uuidProvider;
         this.spaceRepository = spaceRepository;
-        this.lockerFactory = lockerFactory;
+        this.transactionEngineFactory = transactionEngineFactory;
         this.simpleElementOperationsFactory = simpleElementOperationsFactory;
         this.metrics = metrics;
     }
@@ -51,9 +49,7 @@ public class OptimizedTransactionManager {
     }
 
     private void commit(Transaction transaction) {
-        SimpleElementOperations simpleElementOperations =
-                simpleElementOperationsFactory.buildSimpleElementOperations(transaction.getSpaceName());
-        TransactionEngine transactionEngine = new TransactionEngine(lockerFactory, simpleElementOperations);
+        TransactionEngine transactionEngine = transactionEngineFactory.build(transaction.getSpaceName());
         try {
             transactionEngine.commit(transaction);
         } catch (Exception e) {

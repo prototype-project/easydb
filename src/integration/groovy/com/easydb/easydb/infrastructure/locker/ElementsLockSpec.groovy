@@ -12,7 +12,7 @@ import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 
-class LockSpec extends BaseIntegrationSpec {
+class ElementsLockSpec extends BaseIntegrationSpec {
 
     @Autowired
     ElementsLockerFactory lockerFactory

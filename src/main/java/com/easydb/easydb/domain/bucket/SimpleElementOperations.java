@@ -21,7 +21,6 @@ public class SimpleElementOperations {
     }
 
     public void addElement(Element element) {
-        // TODO race conditions with remove
         Space space = spaceRepository.get(spaceName);
         if (!space.getBuckets().contains(element.getBucketName())) {
             space.getBuckets().add(element.getBucketName());
@@ -41,8 +40,7 @@ public class SimpleElementOperations {
                         toUpdate.getFields(), v))
                 .orElseGet(() -> VersionedElement.of(toUpdate.getId(), getBucketNameAccordinglyToSpace(toUpdate.getBucketName()),
                         toUpdate.getFields()));
-        bucketRepository.
-                updateElement(withBucketRenamed);
+        bucketRepository.updateElement(withBucketRenamed);
     }
 
     public VersionedElement getElement(String bucketName, String id) {

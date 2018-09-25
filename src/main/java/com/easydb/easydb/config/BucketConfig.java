@@ -2,13 +2,16 @@ package com.easydb.easydb.config;
 
 import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory;
 import com.easydb.easydb.domain.bucket.factories.SimpleElementOperationsFactory;
+import com.easydb.easydb.domain.locker.BucketLocker;
+import com.easydb.easydb.domain.locker.SpaceLocker;
 import com.easydb.easydb.domain.space.SpaceRepository;
 import com.easydb.easydb.domain.space.UUIDProvider;
 import com.easydb.easydb.domain.bucket.BucketRepository;
 import com.easydb.easydb.domain.transactions.OptimizedTransactionManager;
-import com.easydb.easydb.domain.transactions.TransactionRetryier;
+import com.easydb.easydb.domain.transactions.Retryier;
 import com.easydb.easydb.infrastructure.bucket.MongoBucketRepository;
 import com.easydb.easydb.domain.bucket.factories.TransactionalBucketServiceFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -37,8 +40,12 @@ public class BucketConfig {
             BucketRepository bucketRepository, SpaceRepository spaceRepository,
             SimpleElementOperationsFactory simpleElementOperationsFactory,
             OptimizedTransactionManager optimizedTransactionManager,
-            TransactionRetryier transactionRetryier) {
+            BucketLocker bucketLocker,
+            SpaceLocker spaceLocker,
+            @Qualifier("transactionRetryier")  Retryier transactionRetryier,
+            @Qualifier("lockerRetryier") Retryier lockerRetryier) {
         return new TransactionalBucketServiceFactory(spaceRepository, bucketRepository,
-                simpleElementOperationsFactory, optimizedTransactionManager, transactionRetryier);
+                simpleElementOperationsFactory, optimizedTransactionManager, bucketLocker,
+                spaceLocker, transactionRetryier, lockerRetryier);
     }
 }

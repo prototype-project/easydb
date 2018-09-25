@@ -97,7 +97,6 @@ public class ZookeeperElementsLocker implements ElementsLocker {
     @Override
     public void lockElement(String bucketName, String elementId) {
         lockElement(bucketName, elementId, Duration.ofMillis(properties.getLockerTimeoutMillis()));
-        metrics.getElementsLockerCounter(spaceName, bucketName).increment();
     }
 
     @Override
@@ -110,7 +109,7 @@ public class ZookeeperElementsLocker implements ElementsLocker {
             acquired = elementLock.curatorLock().acquire(timeout.toMillis(), TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             metrics.getLockerErrorCounter(spaceName, bucketName).increment();
-            throw new ElementLockerException(e);
+            throw new UnexpectedLockerException(e);
         }
         if (!acquired) {
             metrics.getLockerTimeoutsCounter(spaceName, bucketName).increment();
@@ -119,6 +118,7 @@ public class ZookeeperElementsLocker implements ElementsLocker {
             elementLock.incrementLockCount();
             locksMap.putIfAbsent(ElementKey.of(bucketName, elementId), elementLock);
         }
+        metrics.getElementsLockerCounter(spaceName, bucketName).increment();
     }
 
     @Override
@@ -126,7 +126,7 @@ public class ZookeeperElementsLocker implements ElementsLocker {
         ElementLock elementLock = locksMap.get(ElementKey.of(bucketName, elementId));
         if (elementLock == null) {
             metrics.getLockerErrorCounter(spaceName, bucketName).increment();
-            throw new LockNotHoldException(spaceName, bucketName, elementId);
+            throw new LockNotHoldException(buildLockPath(bucketName, elementId));
         }
 
         try {
@@ -138,7 +138,7 @@ public class ZookeeperElementsLocker implements ElementsLocker {
             metrics.getElementsLockerUnlockedCounter(spaceName, bucketName).increment();
         } catch (Exception e) {
             metrics.getLockerErrorCounter(spaceName, bucketName).increment();
-            throw new ElementLockerException(e);
+            throw new UnexpectedLockerException(e);
         }
     }
 

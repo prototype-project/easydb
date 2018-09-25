@@ -4,6 +4,7 @@ import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.bucket.SimpleElementOperations;
 import com.easydb.easydb.domain.bucket.VersionedElement;
 import com.easydb.easydb.domain.locker.ElementsLocker;
+import com.easydb.easydb.domain.locker.SpaceLocker;
 import com.easydb.easydb.domain.locker.factories.ElementsLockerFactory;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -14,10 +15,15 @@ class TransactionEngine {
     private static final Logger logger = LoggerFactory.getLogger(TransactionEngine.class);
 
     private final ElementsLockerFactory lockerFactory;
+    private final SpaceLocker spaceLocker;
+    private final Retryier lockerRetryier;
     private final SimpleElementOperations simpleElementOperations;
 
-    TransactionEngine(ElementsLockerFactory lockerFactory, SimpleElementOperations simpleElementOperations) {
+    TransactionEngine(ElementsLockerFactory lockerFactory, SpaceLocker spaceLocker, Retryier lockerRetryier,
+                      SimpleElementOperations simpleElementOperations) {
         this.lockerFactory = lockerFactory;
+        this.spaceLocker = spaceLocker;
+        this.lockerRetryier = lockerRetryier;
         this.simpleElementOperations = simpleElementOperations;
     }
 
@@ -26,7 +32,7 @@ class TransactionEngine {
 
         try {
             transaction.getOperations().forEach(o -> {
-                if (operationRequiresLock(o)) {
+                if (operationRequiresElementLock(o)) {
                     locker.lockElement(o.getBucketName(), o.getElementId());
                 }
             });
@@ -37,23 +43,27 @@ class TransactionEngine {
         } finally {
             // TODO think about corner cases (e.g. unlocking not already locked element)
             transaction.getOperations().forEach(o -> {
-                if (operationRequiresLock(o)) {
+                if (operationRequiresElementLock(o)) {
                     locker.unlockElement(o.getBucketName(), o.getElementId());
                 }
             });
         }
     }
 
-    private boolean operationRequiresLock(Operation o) {
+    private boolean operationRequiresElementLock(Operation o) {
         return o.getType() == Operation.OperationType.UPDATE || o.getType() == Operation.OperationType.DELETE;
     }
 
-    // TODO add support for operations on buckets and spaces
     private void performOperation(Operation o, Transaction t) {
         Element element = Element.of(o.getElementId(), o.getBucketName(), o.getFields());
         switch (o.getType()) {
             case CREATE:
-                simpleElementOperations.addElement(element);
+                lockerRetryier.performWithRetries(() -> spaceLocker.lockSpace(t.getSpaceName()));
+                try {
+                    simpleElementOperations.addElement(element);
+                } finally {
+                    spaceLocker.unlockSpace(t.getSpaceName());
+                }
                 break;
             case UPDATE:
                 performUpdateOperation(o, t);

@@ -6,70 +6,55 @@ import com.easydb.easydb.domain.locker.BucketLocker;
 import com.easydb.easydb.domain.locker.LockNotHoldException;
 import com.easydb.easydb.domain.locker.LockTimeoutException;
 import java.time.Duration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import org.apache.curator.framework.CuratorFramework;
-import org.apache.curator.framework.recipes.locks.InterProcessSemaphoreMutex;
 
 public class ZookeeperBucketLocker implements BucketLocker {
 
     private final ZookeeperProperties properties;
-    private final CuratorFramework client;
     private final ApplicationMetrics metrics;
-    private final String spaceName;
+    private final ZookeeperLocker zookeeperLocker;
 
-    public ZookeeperBucketLocker(String spaceName,
+    public ZookeeperBucketLocker(CuratorFramework client,
                                  ZookeeperProperties properties,
-                                 CuratorFramework client,
                                  ApplicationMetrics metrics) {
-        this.spaceName = spaceName;
         this.properties = properties;
-        this.client = client;
         this.metrics = metrics;
-    }
-
-    private final Map<String, InterProcessSemaphoreMutex> locksMap = new HashMap<>();
-
-    @Override
-    public void lockBucket(String bucketName) {
-        lockBucket(bucketName, Duration.ofMillis(properties.getLockerTimeoutMillis()));
-        metrics.getBucketLockerCounter(spaceName, bucketName).increment();
+        this.zookeeperLocker = new ZookeeperLocker(client);
     }
 
     @Override
-    public void lockBucket(String bucketName, Duration timeout) {
+    public void lockBucket(String spaceName, String bucketName) {
+        lockBucket(spaceName, bucketName, Duration.ofMillis(properties.getLockerTimeoutMillis()));
+    }
+
+    @Override
+    public void lockBucket(String spaceName, String bucketName, Duration timeout) {
         boolean acquired;
-        InterProcessSemaphoreMutex curatorLock = new InterProcessSemaphoreMutex(
-                client, buildLockPath(spaceName, bucketName));
+
         try {
-            acquired = curatorLock.acquire(timeout.toMillis(), TimeUnit.MILLISECONDS);
+            acquired = zookeeperLocker.lockOnPath(buildLockPath(spaceName, bucketName), timeout);
         } catch (Exception e) {
             metrics.getLockerErrorCounter(spaceName, bucketName).increment();
-            throw new ElementLockerException(e);
+            throw new UnexpectedLockerException(e);
         }
         if (!acquired) {
             metrics.getLockerTimeoutsCounter(spaceName, bucketName).increment();
             throw new LockTimeoutException(spaceName, bucketName, timeout);
-        } else {
-            locksMap.put(bucketName, curatorLock);
         }
+        metrics.getBucketLockerCounter(spaceName, bucketName).increment();
     }
 
     @Override
-    public void unlockBucket(String bucketName) {
-        InterProcessSemaphoreMutex curatorLock = locksMap.remove(bucketName);
-        if (curatorLock == null) {
-            metrics.getLockerErrorCounter(spaceName, bucketName).increment();
-            throw new LockNotHoldException(spaceName, bucketName);
-        }
-
+    public void unlockBucket(String spaceName, String bucketName) {
         try {
-            curatorLock.release();
+            zookeeperLocker.unlockOnPath(buildLockPath(spaceName, bucketName));
             metrics.getBucketLockerUnlockedCounter(spaceName, bucketName).increment();
+        } catch (LockNotHoldException e) {
+            metrics.getLockerErrorCounter(spaceName, bucketName).increment();
+            throw e;
         } catch (Exception e) {
             metrics.getLockerErrorCounter(spaceName, bucketName).increment();
-            throw new ElementLockerException(e);
+            throw new UnexpectedLockerException(e);
         }
     }
 

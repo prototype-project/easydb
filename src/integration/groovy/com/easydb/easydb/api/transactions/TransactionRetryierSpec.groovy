@@ -8,24 +8,38 @@ import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.bucket.TransactionalBucketService
 import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
 import com.easydb.easydb.domain.bucket.factories.SimpleElementOperationsFactory
+import com.easydb.easydb.domain.locker.BucketLocker
+import com.easydb.easydb.domain.locker.SpaceLocker
 import com.easydb.easydb.domain.space.SpaceRepository
 import com.easydb.easydb.domain.space.UUIDProvider
 import com.easydb.easydb.domain.transactions.OptimizedTransactionManager
 import com.easydb.easydb.domain.transactions.Transaction
 import com.easydb.easydb.domain.transactions.TransactionAbortedException
-import com.easydb.easydb.domain.transactions.TransactionRetryier
+import com.easydb.easydb.domain.transactions.Retryier
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 
 class TransactionRetryierSpec extends IntegrationWithCleanedDatabaseSpec {
 
     @Autowired
-    TransactionRetryier transactionRetryier
+    @Qualifier("transactionRetryier")
+    Retryier transactionRetryier
+
+    @Autowired
+    @Qualifier("lockerRetryier")
+    Retryier lockerRetryier
 
     @Autowired
     BucketServiceFactory bucketServiceFactory
 
     @Autowired
     UUIDProvider uuidProvider
+
+    @Autowired
+    SpaceLocker spaceLocker
+
+    @Autowired
+    BucketLocker bucketLocker
 
     BucketService mockedBucketService
 
@@ -35,7 +49,8 @@ class TransactionRetryierSpec extends IntegrationWithCleanedDatabaseSpec {
 
     def setup() {
         mockedBucketService = new TransactionalBucketService("testSpace", Mock(SpaceRepository),
-                Mock(BucketRepository), Mock(SimpleElementOperationsFactory), optimizedTransactionManagerMock, transactionRetryier)
+                Mock(BucketRepository), Mock(SimpleElementOperationsFactory), optimizedTransactionManagerMock,
+                bucketLocker, spaceLocker, transactionRetryier, lockerRetryier)
 
     }
 

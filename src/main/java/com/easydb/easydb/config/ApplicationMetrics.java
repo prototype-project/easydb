@@ -82,12 +82,28 @@ public class ApplicationMetrics {
         return buildCounter(buildBucketPath("unlockBucket", spaceName, bucketName));
     }
 
+    public Counter getSpaceLockerCounter(String spaceName) {
+        return buildCounter(buildSpacePath("lockSpace", spaceName));
+    }
+
+    public Counter getSpaceLockerUnlockedCounter(String spaceName) {
+        return buildCounter(buildSpacePath("unlockSpace", spaceName));
+    }
+
+    public Counter getLockerErrorCounter(String spaceName) {
+        return buildCounter(buildSpacePath("lockerErrors", spaceName));
+    }
+
     public Counter getLockerErrorCounter(String spaceName, String bucketName) {
         return buildCounter(buildBucketPath("lockerErrors", spaceName, bucketName));
     }
 
     public Counter getLockerTimeoutsCounter(String spaceName, String bucketName) {
-        return buildCounter(buildBucketPath("lockerTimetouts", spaceName, bucketName));
+        return buildCounter(buildBucketPath("lockerTimeouts", spaceName, bucketName));
+    }
+
+    public Counter getLockerTimeoutsCounter(String spaceName) {
+        return buildCounter(buildSpacePath("lockerTimeouts", spaceName));
     }
 
     public Counter getAbortedTransactionCounter(String spaceName) {
