@@ -99,6 +99,7 @@ public class ZookeeperElementsLocker implements ElementsLocker {
         lockElement(bucketName, elementId, Duration.ofMillis(properties.getLockerTimeoutMillis()));
     }
 
+    // TODO metrics on latency
     @Override
     public void lockElement(String bucketName, String elementId, Duration timeout) {
         boolean acquired;

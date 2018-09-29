@@ -18,6 +18,7 @@ class ZookeeperLocker {
         this.client = client;
     }
 
+    // TODO metrics on latency
     boolean lockOnPath(String path, Duration timeout) throws Exception {
         InterProcessSemaphoreMutex curatorLock = new InterProcessSemaphoreMutex(client, path);
         if (curatorLock.acquire(timeout.toMillis(), TimeUnit.MILLISECONDS)) {
