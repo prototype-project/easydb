@@ -21,7 +21,7 @@ import spock.lang.Specification
 @ActiveProfiles("integration")
 abstract class BaseIntegrationSpec extends Specification {
 
-    static ZOOKEEPER_PORT = 2181
+    static ZOOKEEPER_PORT = 2182
 
     RestTemplate restTemplate = new RestTemplate()
 

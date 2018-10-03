@@ -6,7 +6,7 @@ class { 'prometheus::server':
       'scrape_timeout'  => '10s',
       'static_configs'  => [
         { 'targets' => [ 'localhost:9090' ],
-          'labels'  => { 'alias' => 'Prometheus'}
+          'labels'  => { 'alias' => 'Easydb'}
         }
       ]
     }

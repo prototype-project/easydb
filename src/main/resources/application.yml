@@ -2,11 +2,7 @@ space:
   spaceName:
     testSpace
 
-# TODO set mongo user and password
 spring:
-  data:
-    mongodb:
-      uri: ${MONGODB_URI}
   application:
     name: easydb
   metrics:
@@ -21,3 +17,10 @@ management:
     web:
       exposure:
         include: '*'
+
+mongo:
+  databaseName: easydb
+  host: localhost
+  port: 27017
+  username: easydb
+  password: easydb

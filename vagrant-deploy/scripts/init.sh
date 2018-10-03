@@ -7,6 +7,7 @@ sudo apt-get -y install openjdk-8-jdk
 
 # install supervisor
 sudo apt-get -y install supervisor
+sudo mkdir -p /etc/supervisor/conf.d/
 
 # install mongodb
 MONGO_VERSION=4.0.2
