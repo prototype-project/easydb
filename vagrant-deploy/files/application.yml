@@ -19,4 +19,4 @@ mongo:
   host: localhost
   port: 27017
   username: easydb
-  password: 123456789
+  password: 123456

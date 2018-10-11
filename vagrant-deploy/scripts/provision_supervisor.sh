@@ -1,35 +1,52 @@
 #!/usr/bin/env bash
 
-sudo mkdir -p /var/log/
+mkdir -p /var/log/
 
 # prepare mongodb command
-sudo mkdir -p /data/db/
-sudo touch /var/log/mongodb.log
+mkdir -p /data/db/
+touch /var/log/mongodb.log
 
 # prepare easydb command
-sudo touch /var/log/easydb.log
+touch /var/log/easydb.log
 
 JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
 
 rsync -av --exclude=".*" --exclude "build" --exclude "vagrant-deploy" /vagrant_data/ /home/vagrant/easydb
-/home/vagrant/easydb/gradlew clean test integrationTest distZip -p /home/vagrant/easydb
+/home/vagrant/easydb/gradlew clean test integrationTest -p /home/vagrant/easydb
 
-sudo rm -rf /opt/easydb
+rm /home/vagrant/easydb/src/main/resources/*.yml
 
-sudo mkdir -p /opt/easydb/dist
-sudo mkdir -p /opt/easydb/resources
+/home/vagrant/easydb/gradlew clean distZip -p /home/vagrant/easydb
 
-sudo cp /home/vagrant/easydb/build/distributions/* /opt/easydb/dist
-sudo cp -r /home/vagrant/easydb/src/main/resources/ /opt/easydb/resources/
+rm -rf /opt/easydb
+
+mkdir -p /opt/easydb/dist
+mkdir -p /opt/easydb/resources
+
+cp /home/vagrant/easydb/build/distributions/* /opt/easydb/dist
+cp -r /home/vagrant/easydb/src/main/resources/ /opt/easydb/
+cp /home/vagrant/application.yml /opt/easydb/resources/application.yml
 
 rm -rf /home/vagrant/easydb
 
-sudo unzip /opt/easydb/dist/*.zip -d /opt/easydb/dist/
+unzip /opt/easydb/dist/*.zip -d /opt/easydb/dist/
 
 # run supervisor processes
-sudo cp /home/vagrant/supervisor.conf /etc/supervisor/conf.d/supervisor.conf
-sudo rm /home/vagrant/supervisor.conf
+cp /home/vagrant/supervisor.conf /etc/supervisor/conf.d/supervisor.conf
+rm /home/vagrant/supervisor.conf
 
-sudo supervisorctl reread
-sudo supervisorctl update
+supervisorctl reread
+supervisorctl update mongodb
+
+# create mongodb user
+mongo localhost:27017/easydb /home/vagrant/mongoInit.js
+while [ $? -ne 0 ]
+do
+  sleep 1s
+  mongo localhost:27017/easydb /home/vagrant/mongoInit.js
+done
+
+rm /home/vagrant/mongoInit.js
+
+supervisorctl update easydb
 

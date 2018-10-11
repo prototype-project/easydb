@@ -11,9 +11,13 @@ Vagrant.configure("2") do |config|
   config.vm.provider "virtualbox" do |vb|
         vb.memory = "2048"
   end
-  config.vm.provision "shell", path: "./scripts/init.sh"
   config.vm.provision "file", source: "./files/prometheus.pp", destination: "/home/vagrant/prometheus.pp"
   config.vm.provision "file", source: "./files/supervisor.conf", destination: "/home/vagrant/supervisor.conf"
-  config.vm.provision "shell", path: "./scripts/provision_prometheus.sh"
-  config.vm.provision "shell", path: "./scripts/provision_easydb.sh"
+  config.vm.provision "file", source: "./files/mongoInit.js", destination: "/home/vagrant/mongoInit.js"
+  config.vm.provision "file", source: "./files/application.yml", destination: "/home/vagrant/application.yml"
+  config.vm.provision "file", source: "./scripts/install.sh", destination: "/home/vagrant/install.sh"
+  config.vm.provision "file", source: "./scripts/provision_prometheus.sh", destination: "/home/vagrant/provision_prometheus.sh"
+  config.vm.provision "file", source: "./scripts/provision_supervisor.sh", destination: "/home/vagrant/provision_supervisor.sh"
+
+  config.vm.provision "shell", path: "./scripts/init.sh"
 end
