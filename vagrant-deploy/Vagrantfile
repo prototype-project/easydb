@@ -2,22 +2,57 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "ubuntu/xenial64"
+  config.vm.define "master-easydb" do |master|
+    master.vm.hostname = "master-easydb"
+    master.vm.box = "ubuntu/xenial64"
 
-  config.vm.network "private_network", ip: "10.10.10.11"
+    master.vm.provider "virtualbox" do |vb|
+      vb.name = "master-easydb"
+      vb.memory = "1024"
+    end
 
-  config.vm.synced_folder "../", "/vagrant_data"
+    master.vm.network "private_network", ip: "10.10.10.11"
 
-  config.vm.provider "virtualbox" do |vb|
-        vb.memory = "2048"
+    master.vm.synced_folder "../", "/vagrant_data"
+
+    master.vm.provision "file", source: "./files/prometheus.pp", destination: "/home/vagrant/prometheus.pp"
+
+    master.vm.provision "file", source: "./files/mongodb_config_server.conf", destination: "/home/vagrant/mongodb_config_server.conf"
+    master.vm.provision "file", source: "./files/mongodb_master_shard.conf", destination: "/home/vagrant/mongodb_shard.conf"
+    master.vm.provision "file", source: "./files/supervisor.conf", destination: "/home/vagrant/supervisor.conf"
+
+    master.vm.provision "file", source: "./files/mongoMasterShardInit.js", destination: "/home/vagrant/mongoMasterShardInit.js"
+    master.vm.provision "file", source: "./files/mongoConfigServerInit.js", destination: "/home/vagrant/mongoConfigServerInit.js"
+
+    master.vm.provision "file", source: "./files/application.yml", destination: "/home/vagrant/application.yml"
+
+    master.vm.provision "file", source: "./scripts/install.sh", destination: "/home/vagrant/install.sh"
+    master.vm.provision "file", source: "./scripts/provision_prometheus.sh", destination: "/home/vagrant/provision_prometheus.sh"
+    master.vm.provision "file", source: "./scripts/provision_supervisor_on_master.sh", destination: "/home/vagrant/provision_supervisor_on_master.sh"
+
+    master.vm.provision "shell", path: "./scripts/init_master.sh"
   end
-  config.vm.provision "file", source: "./files/prometheus.pp", destination: "/home/vagrant/prometheus.pp"
-  config.vm.provision "file", source: "./files/supervisor.conf", destination: "/home/vagrant/supervisor.conf"
-  config.vm.provision "file", source: "./files/mongoInit.js", destination: "/home/vagrant/mongoInit.js"
-  config.vm.provision "file", source: "./files/application.yml", destination: "/home/vagrant/application.yml"
-  config.vm.provision "file", source: "./scripts/install.sh", destination: "/home/vagrant/install.sh"
-  config.vm.provision "file", source: "./scripts/provision_prometheus.sh", destination: "/home/vagrant/provision_prometheus.sh"
-  config.vm.provision "file", source: "./scripts/provision_supervisor.sh", destination: "/home/vagrant/provision_supervisor.sh"
 
-  config.vm.provision "shell", path: "./scripts/init.sh"
+  config.vm.define "slave1-easydb" do |slave1|
+      slave1.vm.hostname = "slave1-easydb"
+      slave1.vm.box = "ubuntu/xenial64"
+
+      slave1.vm.provider "virtualbox" do |vb|
+        vb.name = "slave1-easydb"
+        vb.memory = "1024"
+      end
+
+      slave1.vm.network "private_network", ip: "10.10.10.12"
+
+      slave1.vm.synced_folder "../", "/vagrant_data"
+
+      slave1.vm.provision "file", source: "./files/supervisor.conf", destination: "/home/vagrant/supervisor.conf"
+      slave1.vm.provision "file", source: "./files/application.yml", destination: "/home/vagrant/application.yml"
+      slave1.vm.provision "file", source: "./files/mongod_slave_1.conf", destination: "/home/vagrant/mongod.conf"
+      slave1.vm.provision "file", source: "./scripts/install.sh", destination: "/home/vagrant/install.sh"
+      slave1.vm.provision "file", source: "./scripts/provision_supervisor_on_slave.sh", destination: "/home/vagrant/provision_supervisor_on_slave.sh"
+
+      slave1.vm.provision "shell", path: "./scripts/init_slave.sh"
+    end
+
 end
