@@ -3,10 +3,11 @@
 mkdir -p /var/log/
 
 # prepare mongodb command
-mkdir -p /data/db/
-touch /var/log/mongodb.log
+mkdir -p /data/mongodb/mongodb_shard
+touch /var/log/mongodb_shard.log
 
-cp $HOME/mongod.conf /etc/mongod.conf
+mkdir -p /etc/mongodb/
+cp $HOME/mongodb_shard.conf /etc/mongodb/mongodb_shard.conf
 
 # prepare easydb command
 touch /var/log/easydb.log
@@ -38,7 +39,7 @@ cp $HOME/supervisor.conf /etc/supervisor/conf.d/supervisor.conf
 rm $HOME/supervisor.conf
 
 supervisorctl reread
-supervisorctl update mongodb
+supervisorctl update mongodb_shard
 
-supervisorctl update easydb
+#supervisorctl update easydb
 
