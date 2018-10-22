@@ -63,6 +63,7 @@ dependencies {
     compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.2.RELEASE'
 
     testCompile group: 'org.spockframework', name: 'spock-spring', version: '1.1-groovy-2.4'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.23.0'
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: project.springBootVersion
     testCompile group: 'com.github.fakemongo', name: 'fongo', version: '2.1.0'
     testCompile group: 'org.apache.curator', name: 'curator-test', version: '4.0.0'

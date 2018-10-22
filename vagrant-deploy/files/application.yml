@@ -17,7 +17,7 @@ management:
 mongo:
   databaseName: easydb
   host: 10.10.10.11
-  port: 27017
+  port: 27019
   username: easydb
   password: 123456
 

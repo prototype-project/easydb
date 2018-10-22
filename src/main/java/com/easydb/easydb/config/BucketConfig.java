@@ -9,6 +9,8 @@ import com.easydb.easydb.domain.transactions.OptimizedTransactionManager;
 import com.easydb.easydb.domain.transactions.TransactionRetryier;
 import com.easydb.easydb.infrastructure.bucket.MongoBucketRepository;
 import com.easydb.easydb.domain.bucket.factories.TransactionalBucketServiceFactory;
+import com.mongodb.MongoClient;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -22,8 +24,10 @@ public class BucketConfig {
     }
 
     @Bean
-    BucketRepository bucketRepository(MongoTemplate mongoTemplate) {
-        return new MongoBucketRepository(mongoTemplate);
+    BucketRepository bucketRepository(MongoTemplate mongoTemplate, @Qualifier("mongoClient") MongoClient mongoClient,
+                                      @Qualifier("mongoAdminClient") MongoClient mongoAdminClient,
+                                      MongoProperties mongoProperties) {
+        return new MongoBucketRepository(mongoTemplate, mongoClient, mongoAdminClient, mongoProperties);
     }
 
     @Bean

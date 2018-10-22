@@ -26,13 +26,24 @@ public class MongoConfiguration extends AbstractMongoConfiguration {
 
     @Bean
     public Mongo mongo() throws Exception {
-        return new MongoClient(new ServerAddress(properties.getHost(), properties.getPort()),
-                Lists.newArrayList(MongoCredential.createCredential(properties.getUsername(), getDatabaseName(), properties.getPassword().toCharArray())));
+        return mongoClient();
     }
 
     @Bean
     public MongoTemplate mongoTemplate() throws Exception {
         return new MongoTemplate(mongo(), getDatabaseName());
     }
+
+    @Bean
+    MongoClient mongoClient() {
+        return new MongoClient(new ServerAddress(properties.getHost(), properties.getPort()),
+                Lists.newArrayList(MongoCredential.createCredential(properties.getUsername(), getDatabaseName(), properties.getPassword().toCharArray())));
+    }
+
+    @Bean
+    MongoClient mongoAdminClient() {
+        return new MongoClient(new ServerAddress(properties.getHost(), properties.getPort()));
+    }
+
 
 }

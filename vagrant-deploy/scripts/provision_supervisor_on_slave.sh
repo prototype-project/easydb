@@ -9,6 +9,8 @@ touch /var/log/mongodb_shard.log
 mkdir -p /etc/mongodb/
 cp $HOME/mongodb_shard.conf /etc/mongodb/mongodb_shard.conf
 
+rm $HOME/mongodb_shard.conf
+
 # prepare easydb command
 touch /var/log/easydb.log
 
@@ -35,11 +37,14 @@ rm -rf $HOME/easydb
 unzip /opt/easydb/dist/*.zip -d /opt/easydb/dist/
 
 # run supervisor processes
+
+# create mongodb shard
 cp $HOME/supervisor.conf /etc/supervisor/conf.d/supervisor.conf
 rm $HOME/supervisor.conf
 
 supervisorctl reread
 supervisorctl update mongodb_shard
 
-#supervisorctl update easydb
+# run easydb
+supervisorctl update easydb
 

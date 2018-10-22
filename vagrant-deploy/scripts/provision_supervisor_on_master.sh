@@ -81,9 +81,8 @@ done
 
 rm $HOME/mongoRouterInit.js
 
-mongo localhost:27017/easydb < $HOME/mongoCreateUser.js # firstly shard this collections
+mongo localhost:27019/easydb < $HOME/mongoCreateUser.js # firstly shard this collections
 rm $HOME/mongoCreateUser.js
 
-## create easydb
-#supervisorctl update easydb
-#
+# run easydb
+supervisorctl update easydb
