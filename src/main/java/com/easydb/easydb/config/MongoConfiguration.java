@@ -42,8 +42,8 @@ public class MongoConfiguration extends AbstractMongoConfiguration {
 
     @Bean
     MongoClient mongoAdminClient() {
-        return new MongoClient(new ServerAddress(properties.getHost(), properties.getPort()));
+        return new MongoClient(new ServerAddress(properties.getHost(), properties.getPort()),
+                Lists.newArrayList(MongoCredential.createCredential(properties.getAdminUsername(),
+                        properties.getAdminDatabaseName(), properties.getAdminPassword().toCharArray())));
     }
-
-
 }

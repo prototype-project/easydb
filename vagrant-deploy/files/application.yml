@@ -20,6 +20,9 @@ mongo:
   port: 27019
   username: easydb
   password: 123456
+  adminDatabaseName: admin
+  adminUsername: admin
+  adminPassword: 123456
 
 zookeeper:
   connectionString: "10.10.10.11:2181"
