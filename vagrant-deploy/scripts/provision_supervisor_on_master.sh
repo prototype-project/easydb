@@ -44,6 +44,7 @@ rm -rf $HOME/easydb
 
 unzip /opt/easydb/dist/*.zip -d /opt/easydb/dist/
 
+
 # run supervisor processes
 cp $HOME/supervisor.conf /etc/supervisor/conf.d/supervisor.conf
 rm $HOME/supervisor.conf

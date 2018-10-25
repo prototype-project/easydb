@@ -8,16 +8,6 @@ import io.micrometer.core.instrument.Timer;
 public class ApplicationMetrics {
     private final MeterRegistry meterRegistry = Metrics.globalRegistry;
 
-    private final Counter totalRequestsCounter;
-
-    public ApplicationMetrics() {
-        this.totalRequestsCounter = buildCounter("requests.total");
-    }
-
-    Counter getTotalRequestsCounter() {
-        return totalRequestsCounter;
-    }
-
     public Counter createSpaceRequestsCounter() {
         return buildCounter("api.createSpace");
     }
@@ -91,7 +81,7 @@ public class ApplicationMetrics {
     }
 
     public Timer getSingleElementTransactionTimer(String spaceName) {
-        return  buildSpaceTimer("singleElementTransactionTime", spaceName);
+        return buildSpaceTimer("singleElementTransactionTime", spaceName);
     }
 
     private Counter buildBucketCounter(String path, String spaceName, String bucketName) {

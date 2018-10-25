@@ -29,7 +29,7 @@ Vagrant.configure("2") do |config|
     master.vm.provision "file", source: "./files/application.yml", destination: "/home/vagrant/application.yml"
 
     master.vm.provision "file", source: "./scripts/install.sh", destination: "/home/vagrant/install.sh"
-    master.vm.provision "file", source: "./scripts/provision_prometheus.sh", destination: "/home/vagrant/provision_prometheus.sh"
+    master.vm.provision "file", source: "./scripts/provision_metrics.sh", destination: "/home/vagrant/provision_metrics.sh"
     master.vm.provision "file", source: "./scripts/provision_supervisor_on_master.sh", destination: "/home/vagrant/provision_supervisor.sh"
 
     master.vm.provision "shell", path: "./scripts/init_master.sh"

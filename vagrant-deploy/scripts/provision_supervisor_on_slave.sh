@@ -36,6 +36,7 @@ rm -rf $HOME/easydb
 
 unzip /opt/easydb/dist/*.zip -d /opt/easydb/dist/
 
+
 # run supervisor processes
 
 # create mongodb shard

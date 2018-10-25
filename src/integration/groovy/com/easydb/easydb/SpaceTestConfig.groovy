@@ -8,6 +8,7 @@ import org.bson.Document
 import org.bson.conversions.Bson
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Primary
 import org.springframework.data.mongodb.MongoDbFactory
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory
@@ -23,8 +24,7 @@ class SpaceTestConfig {
 
     @Bean
     Mongo mongo() {
-        Fongo fongo = new Fongo(SERVER_NAME)
-        return fongo.getMongo()
+        return mongoClient()
     }
 
     @Bean
@@ -34,6 +34,12 @@ class SpaceTestConfig {
 
     @Bean
     MongoClient mongoClient() {
+        Fongo fongo = new Fongo(SERVER_NAME)
+        return fongo.getMongo()
+    }
+
+    @Bean
+    MongoClient mongoAdminClient() {
         MongoClient mongoClient = mock(MongoClient)
         MongoDatabase mongoDatabase = mock(MongoDatabase)
         when(mongoDatabase.runCommand(any(Bson.class))).thenReturn(new Document())
