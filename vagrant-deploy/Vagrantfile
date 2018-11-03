@@ -16,6 +16,7 @@ Vagrant.configure("2") do |config|
     master.vm.synced_folder "../", "/vagrant_data"
 
     master.vm.provision "file", source: "./files/prometheus.pp", destination: "/home/vagrant/prometheus.pp"
+    master.vm.provision "file", source: "./files/grafana.pp", destination: "/home/vagrant/grafana.pp"
 
     master.vm.provision "file", source: "./files/mongodb_config_server.conf", destination: "/home/vagrant/mongodb_config_server.conf"
     master.vm.provision "file", source: "./files/mongodb_master_shard.conf", destination: "/home/vagrant/mongodb_shard.conf"

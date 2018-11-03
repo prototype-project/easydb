@@ -26,7 +26,11 @@ echo "mongodb-org-tools hold" | dpkg --set-selections
 mkdir -p /data/db
 
 # install zookeeper
-apt-get -y install zookeeperd
+ZOOKEEPER_VERSION=3.4.13
+wget https://www-us.apache.org/dist/zookeeper/zookeeper-${ZOOKEEPER_VERSION}/zookeeper-${ZOOKEEPER_VERSION}.tar.gz
+mkdir -p /opt/zookeeper
+tar -xf zookeeper-${ZOOKEEPER_VERSION}.tar.gz -C /opt/zookeeper/
+mv /opt/zookeeper-${ZOOKEEPER_VERSION} /opt/zookeeper
 
 # install puppet-agent
 wget http://apt.puppetlabs.com/puppet5-release-xenial.deb

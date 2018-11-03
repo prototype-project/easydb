@@ -50,6 +50,7 @@ cp $HOME/supervisor.conf /etc/supervisor/conf.d/supervisor.conf
 rm $HOME/supervisor.conf
 
 supervisorctl reread
+supervisorctl update zookeeper
 supervisorctl update mongodb_config_server
 supervisorctl update mongodb_shard
 supervisorctl update mongodb_router

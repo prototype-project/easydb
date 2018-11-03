@@ -28,8 +28,10 @@ public class ApplicationMetrics {
         return buildSpaceCounter("api.beginTransaction", spaceName);
     }
 
-    public Counter getAddOperationToTransactionRequestCounter(String spaceName) {
-        return buildSpaceCounter("api.addTransactionOperation", spaceName);
+    public Counter getAddOperationToTransactionRequestCounter(String spaceName, String bucketName,
+                                                              String operationType) {
+        return buildCounter("api.addTransactionOperation", "space", spaceName, "bucket", bucketName,
+                "operation", operationType);
     }
 
     public Counter getCommitTransactionRequestCounter(String spaceName) {
