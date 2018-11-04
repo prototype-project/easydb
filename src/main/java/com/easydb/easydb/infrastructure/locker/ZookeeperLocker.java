@@ -97,11 +97,21 @@ public class ZookeeperLocker implements ElementsLocker {
     @Override
     public void lockElement(String bucketName, String elementId) {
         lockElement(bucketName, elementId, Duration.ofMillis(properties.getLockerTimeoutMillis()));
-        metrics.getLockerCounter(spaceName, bucketName).increment();
     }
 
     @Override
     public void lockElement(String bucketName, String elementId, Duration timeout) {
+        metrics.getElementLockingTimer(spaceName, bucketName)
+                .record(() -> notMeasuredByTimeElementLocking(bucketName, elementId, timeout));
+    }
+
+    @Override
+    public void unlockElement(String bucketName, String elementId) {
+        metrics.getElementUnlockingTimer(spaceName, bucketName)
+                .record(() -> notMeasuredByTimeElementUnlocking(bucketName, elementId));
+    }
+
+    private void notMeasuredByTimeElementLocking(String bucketName, String elementId, Duration timeout) {
         boolean acquired;
         ElementLock elementLock = locksMap.getOrDefault(
                 ElementKey.of(bucketName, elementId),
@@ -118,11 +128,11 @@ public class ZookeeperLocker implements ElementsLocker {
         } else {
             elementLock.incrementLockCount();
             locksMap.putIfAbsent(ElementKey.of(bucketName, elementId), elementLock);
+            metrics.getLockerCounter(spaceName, bucketName).increment();
         }
     }
 
-    @Override
-    public void unlockElement(String bucketName, String elementId) {
+    private void notMeasuredByTimeElementUnlocking(String bucketName, String elementId) {
         ElementLock elementLock = locksMap.get(ElementKey.of(bucketName, elementId));
         if (elementLock == null) {
             metrics.getLockerErrorCounter(spaceName, bucketName).increment();

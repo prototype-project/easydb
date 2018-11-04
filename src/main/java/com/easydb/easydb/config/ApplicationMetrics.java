@@ -71,7 +71,7 @@ public class ApplicationMetrics {
     }
 
     public Counter getLockerTimeoutsCounter(String spaceName, String bucketName) {
-        return buildBucketCounter("lockerTimetouts", spaceName, bucketName);
+        return buildBucketCounter("lockerTimeouts", spaceName, bucketName);
     }
 
     public Counter getAbortedTransactionCounter(String spaceName) {
@@ -86,12 +86,24 @@ public class ApplicationMetrics {
         return buildSpaceTimer("singleElementTransactionTime", spaceName);
     }
 
+    public Timer getElementLockingTimer(String spaceName, String bucketName) {
+        return buildBucketTimer("lockingTime", spaceName, bucketName);
+    }
+
+    public Timer getElementUnlockingTimer(String spaceName, String bucketName) {
+        return buildBucketTimer("unlockingTime", spaceName, bucketName);
+    }
+
     private Counter buildBucketCounter(String path, String spaceName, String bucketName) {
         return buildCounter(path, "space", spaceName, "bucket", bucketName);
     }
 
     private Counter buildSpaceCounter(String path, String spaceName) {
         return buildCounter(path, "space", spaceName);
+    }
+
+    private Timer buildBucketTimer(String path, String spaceName, String bucketName) {
+        return buildTimer(path, "space", spaceName, "bucket", bucketName);
     }
 
     private Timer buildSpaceTimer(String path, String spaceName) {
