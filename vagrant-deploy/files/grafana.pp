@@ -15,11 +15,27 @@ class { 'grafana':
   },
 }
 
-
-grafana_dashboard { 'easydb_dashboard':
-  grafana_url       => 'http://localhost:9095',
-  grafana_user      => 'admin',
-  grafana_password  => 'admin',
-  grafana_api_path  => '/grafana/api',
-  content           => template('grafana_dashboard.json'),
+http_conn_validator { 'grafana-conn-validator' :
+  host     => '10.10.10.11',
+  port     => '9095',
+  use_ssl  => false,
+  test_url => '/public/img/grafana_icon.svg',
+  require  => Class['grafana'],
+}
+-> grafana_datasource { 'easydb':
+   grafana_url      => 'http://10.10.10.11:9095',
+   grafana_user     => 'admin',
+   grafana_password => 'admin',
+   grafana_api_path => '/api',
+   type             => 'prometheus',
+   url              => 'http://10.10.10.11:9090',
+   access_mode      => 'proxy',
+   is_default       => true,
+}
+-> grafana_dashboard { 'easydb':
+   grafana_url       => 'http://10.10.10.11:9095',
+   grafana_user      => 'admin',
+   grafana_password  => 'admin',
+   grafana_api_path  => '/api',
+   content           => template('/home/vagrant/grafana_dashboard.json'),
 }

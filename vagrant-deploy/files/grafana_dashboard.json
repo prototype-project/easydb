@@ -33,7 +33,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "easydb-prometheus",
+          "datasource": "easydb",
           "fill": 1,
           "gridPos": {
             "h": 9,
@@ -117,7 +117,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "easydb-prometheus",
+          "datasource": "easydb",
           "fill": 1,
           "gridPos": {
             "h": 9,
@@ -201,7 +201,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "easydb-prometheus",
+          "datasource": "easydb",
           "fill": 1,
           "gridPos": {
             "h": 9,
@@ -285,7 +285,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "easydb-prometheus",
+          "datasource": "easydb",
           "fill": 1,
           "gridPos": {
             "h": 9,
@@ -549,7 +549,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "easydb-prometheus",
+          "datasource": "easydb",
           "fill": 1,
           "gridPos": {
             "h": 9,
@@ -633,7 +633,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "easydb-prometheus",
+          "datasource": "easydb",
           "fill": 1,
           "gridPos": {
             "h": 9,
@@ -717,7 +717,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "easydb-prometheus",
+          "datasource": "easydb",
           "fill": 1,
           "gridPos": {
             "h": 9,
@@ -1064,7 +1064,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "easydb-prometheus",
+          "datasource": "easydb",
           "fill": 1,
           "gridPos": {
             "h": 9,
@@ -1148,7 +1148,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "easydb-prometheus",
+          "datasource": "easydb",
           "fill": 1,
           "gridPos": {
             "h": 9,
@@ -1232,7 +1232,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "easydb-prometheus",
+          "datasource": "easydb",
           "fill": 1,
           "gridPos": {
             "h": 9,
@@ -1316,7 +1316,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "easydb-prometheus",
+          "datasource": "easydb",
           "fill": 1,
           "gridPos": {
             "h": 9,
@@ -1399,7 +1399,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "easydb-prometheus",
+          "datasource": "easydb",
           "fill": 1,
           "gridPos": {
             "h": 9,
@@ -1483,7 +1483,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "easydb-prometheus",
+          "datasource": "easydb",
           "fill": 1,
           "gridPos": {
             "h": 9,
@@ -1581,7 +1581,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "easydb-prometheus",
+          "datasource": "easydb",
           "fill": 1,
           "gridPos": {
             "h": 9,
@@ -1664,7 +1664,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "easydb-prometheus",
+          "datasource": "easydb",
           "fill": 1,
           "gridPos": {
             "h": 9,
@@ -1747,7 +1747,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "easydb-prometheus",
+          "datasource": "easydb",
           "fill": 1,
           "gridPos": {
             "h": 9,
