@@ -12,13 +12,9 @@ touch /var/log/mongodb_shard.log
 touch /var/log/mongodb_router.log
 
 mkdir -p /etc/mongodb/
-cp $HOME/mongodb_config_server.conf /etc/mongodb/mongodb_config_server.conf
-cp $HOME/mongodb_shard.conf /etc/mongodb/mongodb_shard.conf
-cp $HOME/mongodb_router.conf /etc/mongodb/mongodb_router.conf
-
-rm $HOME/mongodb_config_server.conf
-rm $HOME/mongodb_shard.conf
-rm $HOME/mongodb_router.conf
+mv $HOME/mongodb_config_server.conf /etc/mongodb/
+mv $HOME/mongodb_shard.conf /etc/mongodb/
+mv $HOME/mongodb_router.conf /etc/mongodb/
 
 # prepare easydb command
 touch /var/log/easydb.log
@@ -26,7 +22,7 @@ touch /var/log/easydb.log
 export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
 
 rsync -av --exclude=".*" --exclude "build" --exclude "vagrant-deploy" /vagrant_data/ $HOME/easydb
-#$HOME/easydb/gradlew clean test integrationTest -p $HOME/easydb
+$HOME/easydb/gradlew clean test integrationTest -p $HOME/easydb
 
 rm $HOME/easydb/src/main/resources/*.yml
 
@@ -38,7 +34,7 @@ mkdir -p /opt/easydb/resources
 
 cp $HOME/easydb/build/distributions/* /opt/easydb/dist
 cp -r $HOME/easydb/src/main/resources/ /opt/easydb/
-cp $HOME/application.yml /opt/easydb/resources/application.yml
+mv $HOME/application.yml /opt/easydb/resources/
 
 rm -rf $HOME/easydb
 
@@ -46,8 +42,7 @@ unzip /opt/easydb/dist/*.zip -d /opt/easydb/dist/
 
 
 # run supervisor processes
-cp $HOME/supervisor.conf /etc/supervisor/conf.d/supervisor.conf
-rm $HOME/supervisor.conf
+mv $HOME/supervisor.conf /etc/supervisor/conf.d/
 
 supervisorctl reread
 supervisorctl update zookeeper

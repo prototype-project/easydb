@@ -24,6 +24,8 @@ import org.springframework.data.mongodb.core.query.Update;
 
 public class MongoBucketRepository implements BucketRepository {
 
+    private final static String MONGO_ADMIN_DATABASE_NAME = "admin";
+
     private final MongoTemplate mongoTemplate;
     private final MongoClient mongoClient;
     private final MongoClient mongoAdminClient;
@@ -142,7 +144,7 @@ public class MongoBucketRepository implements BucketRepository {
         BasicDBObject shardKey = new BasicDBObject("_id", "hashed");
         BasicDBObject shardCollection = new BasicDBObject("shardCollection", mongoProperties.getDatabaseName() + "." + bucketName);
         shardCollection.put("key", shardKey);
-        mongoAdminClient.getDatabase("admin")
+        mongoAdminClient.getDatabase(MONGO_ADMIN_DATABASE_NAME)
                 .runCommand(shardCollection);
     }
 

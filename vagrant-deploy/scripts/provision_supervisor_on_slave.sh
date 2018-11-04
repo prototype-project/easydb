@@ -7,9 +7,7 @@ mkdir -p /data/mongodb/mongodb_shard
 touch /var/log/mongodb_shard.log
 
 mkdir -p /etc/mongodb/
-cp $HOME/mongodb_shard.conf /etc/mongodb/mongodb_shard.conf
-
-rm $HOME/mongodb_shard.conf
+mv $HOME/mongodb_shard.conf /etc/mongodb/
 
 # prepare easydb command
 touch /var/log/easydb.log
@@ -17,7 +15,7 @@ touch /var/log/easydb.log
 export JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64"
 
 rsync -av --exclude=".*" --exclude "build" --exclude "vagrant-deploy" /vagrant_data/ $HOME/easydb
-#$HOME/easydb/gradlew clean test integrationTest -p $HOME/easydb
+$HOME/easydb/gradlew clean test integrationTest -p $HOME/easydb
 
 rm $HOME/easydb/src/main/resources/*.yml
 
@@ -30,7 +28,7 @@ mkdir -p /opt/easydb/resources
 
 cp $HOME/easydb/build/distributions/* /opt/easydb/dist
 cp -r $HOME/easydb/src/main/resources/ /opt/easydb/
-cp $HOME/application.yml /opt/easydb/resources/application.yml
+mv $HOME/application.yml /opt/easydb/resources/
 
 rm -rf $HOME/easydb
 
@@ -40,8 +38,7 @@ unzip /opt/easydb/dist/*.zip -d /opt/easydb/dist/
 # run supervisor processes
 
 # create mongodb shard
-cp $HOME/supervisor.conf /etc/supervisor/conf.d/supervisor.conf
-rm $HOME/supervisor.conf
+mv $HOME/supervisor.conf /etc/supervisor/conf.d/
 
 supervisorctl reread
 supervisorctl update mongodb_shard

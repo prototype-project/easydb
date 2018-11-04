@@ -31,6 +31,7 @@ wget https://www-us.apache.org/dist/zookeeper/zookeeper-${ZOOKEEPER_VERSION}/zoo
 mkdir -p /opt/zookeeper
 tar -xf zookeeper-${ZOOKEEPER_VERSION}.tar.gz -C /opt/zookeeper/
 mv /opt/zookeeper-${ZOOKEEPER_VERSION} /opt/zookeeper
+rm zookeeper-${ZOOKEEPER_VERSION}.tar.gz
 
 # install puppet-agent
 wget http://apt.puppetlabs.com/puppet5-release-xenial.deb
