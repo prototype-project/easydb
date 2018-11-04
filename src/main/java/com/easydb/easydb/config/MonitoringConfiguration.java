@@ -10,9 +10,4 @@ public class MonitoringConfiguration {
     ApplicationMetrics applicationMetrics() {
         return new ApplicationMetrics();
     }
-
-    @Bean
-    MetricsFilter metricsFilter() {
-        return new MetricsFilter(applicationMetrics());
-    }
 }

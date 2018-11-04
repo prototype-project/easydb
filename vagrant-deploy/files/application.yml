@@ -16,7 +16,13 @@ management:
 
 mongo:
   databaseName: easydb
-  host: localhost
-  port: 27017
+  host: 10.10.10.11
+  port: 27019
   username: easydb
-  password: 123456789
+  password: 123456
+  adminDatabaseName: admin
+  adminUsername: admin
+  adminPassword: 123456
+
+zookeeper:
+  connectionString: "10.10.10.11:2181"

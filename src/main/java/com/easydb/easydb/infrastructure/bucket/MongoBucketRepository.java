@@ -1,10 +1,13 @@
 package com.easydb.easydb.infrastructure.bucket;
 
+import com.easydb.easydb.config.MongoProperties;
 import com.easydb.easydb.domain.bucket.BucketDoesNotExistException;
 import com.easydb.easydb.domain.bucket.BucketQuery;
 import com.easydb.easydb.domain.bucket.ElementAlreadyExistsException;
 import com.easydb.easydb.domain.transactions.ConcurrentTransactionDetectedException;
 import com.easydb.easydb.domain.bucket.VersionedElement;
+import com.mongodb.BasicDBObject;
+import com.mongodb.MongoClient;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -21,10 +24,20 @@ import org.springframework.data.mongodb.core.query.Update;
 
 public class MongoBucketRepository implements BucketRepository {
 
-    private final MongoTemplate mongoTemplate;
+    private final static String MONGO_ADMIN_DATABASE_NAME = "admin";
 
-    public MongoBucketRepository(MongoTemplate mongoTemplate) {
+    private final MongoTemplate mongoTemplate;
+    private final MongoClient mongoClient;
+    private final MongoClient mongoAdminClient;
+    private final MongoProperties mongoProperties;
+
+    public MongoBucketRepository(MongoTemplate mongoTemplate, MongoClient mongoClient,
+                                 MongoClient mongoAdminClient,
+                                 MongoProperties mongoProperties) {
         this.mongoTemplate = mongoTemplate;
+        this.mongoClient = mongoClient;
+        this.mongoAdminClient = mongoAdminClient;
+        this.mongoProperties = mongoProperties;
     }
 
     @Override
@@ -41,6 +54,7 @@ public class MongoBucketRepository implements BucketRepository {
     @Override
     public void insertElement(Element element) {
         try {
+            createShardIfInsertingFirstElement(element.getBucketName());
             mongoTemplate.insert(PersistentBucketElement.of(element), element.getBucketName());
         } catch (DuplicateKeyException e) {
             throw new ElementAlreadyExistsException(
@@ -117,6 +131,21 @@ public class MongoBucketRepository implements BucketRepository {
         if (!bucketExists(bucketName)) {
             throw new BucketDoesNotExistException(bucketName);
         }
+    }
+
+    private void createShardIfInsertingFirstElement(String bucketName) {
+        if (!bucketExists(bucketName)) {
+           createShardedCollection(bucketName);
+        }
+    }
+
+    private void createShardedCollection(String bucketName) {
+        mongoClient.getDatabase(mongoProperties.getDatabaseName()).createCollection(bucketName);
+        BasicDBObject shardKey = new BasicDBObject("_id", "hashed");
+        BasicDBObject shardCollection = new BasicDBObject("shardCollection", mongoProperties.getDatabaseName() + "." + bucketName);
+        shardCollection.put("key", shardKey);
+        mongoAdminClient.getDatabase(MONGO_ADMIN_DATABASE_NAME)
+                .runCommand(shardCollection);
     }
 
     private void ensureElementExists(String bucketName, String id) {

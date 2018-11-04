@@ -1,6 +1,5 @@
 package com.easydb.easydb.api;
 
-import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.bucket.ElementField;
 import com.easydb.easydb.domain.space.UUIDProvider;
 import com.easydb.easydb.domain.transactions.Operation;
@@ -53,6 +52,14 @@ public class OperationDto {
             return Operation.of(type, bucketName, uuidProvider.generateUUID(), toDomainFields());
         }
         return Operation.of(type, bucketName, elementId, toDomainFields());
+    }
+
+    OperationType getType() {
+        return type;
+    }
+
+    String getBucketName() {
+        return bucketName;
     }
 
     private void validate() {

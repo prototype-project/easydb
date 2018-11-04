@@ -2,6 +2,8 @@ monitoring.enabled: false
 
 zookeeper:
   retrySleepMillis: 100
+  connectionString: "localhost:2182"
+
 
 transactions:
   transactionAttempts: 2

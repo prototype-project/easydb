@@ -13,6 +13,7 @@ buildscript {
 apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'eclipse'
+apply plugin: 'application'
 apply plugin: 'org.springframework.boot'
 
 group = 'com.easydb'
@@ -56,35 +57,38 @@ dependencies {
     compile group: 'org.springframework.boot', name: 'spring-boot-actuator', version: project.springBootVersion
     compile group: 'io.micrometer', name: 'micrometer-spring-legacy', version: '1.0.4'
     compile group: 'io.micrometer', name: 'micrometer-registry-prometheus', version: '1.0.4'
-    compile group: 'org.apache.curator', name: 'curator-framework', version: '4.0.0'
-    compile group: 'org.apache.curator', name: 'curator-recipes', version: '4.0.0'
+    compile group: 'org.apache.curator', name: 'curator-framework', version: '2.12.0'
+    compile group: 'org.apache.curator', name: 'curator-recipes', version: '2.12.0'
     compile group: 'net.sf.jopt-simple', name: 'jopt-simple', version: '5.0.4'
     compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.2.RELEASE'
 
     testCompile group: 'org.spockframework', name: 'spock-spring', version: '1.1-groovy-2.4'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.23.0'
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: project.springBootVersion
     testCompile group: 'com.github.fakemongo', name: 'fongo', version: '2.1.0'
-    testCompile group: 'org.apache.curator', name: 'curator-test', version: '4.0.0'
+    testCompile group: 'org.apache.curator', name: 'curator-test', version: '2.12.0'
     testCompile group: 'cglib', name: 'cglib-nodep', version: '3.2.4'
     testCompile 'org.codehaus.groovy:groovy-all:2.4.4'
     testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
 }
 
 task integrationTest(type: Test) {
-    testClassesDir = sourceSets.integration.output.classesDir
+    testClassesDirs = sourceSets.integration.output.classesDirs
     classpath = sourceSets.integration.runtimeClasspath
+    mustRunAfter test
 }
 
 check.dependsOn integrationTest
-integrationTest.mustRunAfter test
 
-task run {
-    doFirst {
-        String env = project.hasProperty('environment') ? project.property('environment') : 'local'
-        String port = project.hasProperty('port') ? project.property('port') : '8080'
-        bootRun.args = ["--environment=" + env, "--port=" + port]
-    }
-}
+mainClassName = "com.easydb.easydb.EasydbApplication"
+
+//task run {
+//    doFirst {
+//        String env = project.hasProperty('environment') ? project.property('environment') : 'local'
+//        String port = project.hasProperty('port') ? project.property('port') : '8080'
+//        bootRun.args = ["--environment=" + env, "--port=" + port]
+//    }
+//}
 
 bootRun {
     dependsOn run

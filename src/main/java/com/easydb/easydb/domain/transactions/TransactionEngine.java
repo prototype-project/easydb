@@ -38,7 +38,7 @@ class TransactionEngine {
             });
             transaction.getOperations().forEach(o -> performOperation(o, transaction));
         } catch (Exception e) {
-            logger.error("Error during committing transaction {}. Making rollback...", transaction.getId());
+            logger.error("Error during committing transaction {}. Making rollback...", transaction.getId(), e);
             throw e;
         } finally {
             // TODO think about corner cases (e.g. unlocking not already locked element)

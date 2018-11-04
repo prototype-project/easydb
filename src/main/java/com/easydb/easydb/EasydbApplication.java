@@ -7,7 +7,7 @@ import org.springframework.boot.web.servlet.ServletComponentScan;
 @SpringBootApplication
 @ServletComponentScan
 public class EasydbApplication {
-	public static void main(String[] args) {
-		SpringApplication.run(EasydbApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(EasydbApplication.class, args);
+    }
 }

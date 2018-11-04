@@ -40,9 +40,10 @@ class TransactionController {
     @PostMapping("/{transactionId}/add-operation")
     @ResponseStatus(value = HttpStatus.CREATED)
     OperationResultDto addOperation(@PathVariable String transactionId,
-                                 @RequestBody @Valid OperationDto dto) {
+                                    @RequestBody @Valid OperationDto dto) {
         OperationResult operationResult = defaultTransactionManager.addOperation(transactionId, dto.toDomain(uuidProvider));
-        metrics.getAddOperationToTransactionRequestCounter(operationResult.getSpaceName()).increment();
+        metrics.getAddOperationToTransactionRequestCounter(operationResult.getSpaceName(), dto.getBucketName(),
+                dto.getType().toString()).increment();
         return OperationResultDto.of(operationResult);
     }
 
@@ -50,6 +51,6 @@ class TransactionController {
     @ResponseStatus(value = HttpStatus.ACCEPTED)
     void commitTransaction(@PathVariable String transactionId) {
         String spaceName = defaultTransactionManager.commitTransaction(transactionId).getSpaceName();
-        metrics.getCommitTransactionRequestCounter(spaceName).getId();
+        metrics.getCommitTransactionRequestCounter(spaceName).increment();
     }
 }
