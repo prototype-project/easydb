@@ -99,7 +99,6 @@ public class ZookeeperElementsLocker implements ElementsLocker {
         lockElement(bucketName, elementId, Duration.ofMillis(properties.getLockerTimeoutMillis()));
     }
 
-    // TODO metrics on latency
     @Override
     public void lockElement(String bucketName, String elementId, Duration timeout) {
         boolean acquired;
@@ -109,11 +108,11 @@ public class ZookeeperElementsLocker implements ElementsLocker {
         try {
             acquired = elementLock.curatorLock().acquire(timeout.toMillis(), TimeUnit.MILLISECONDS);
         } catch (Exception e) {
-            metrics.getLockerErrorCounter(spaceName, bucketName).increment();
+            metrics.getElementLockerErrorCounter(spaceName, bucketName).increment();
             throw new UnexpectedLockerException(e);
         }
         if (!acquired) {
-            metrics.getLockerTimeoutsCounter(spaceName, bucketName).increment();
+            metrics.getBucketLockerTimeoutsCounter(spaceName, bucketName).increment();
             throw new LockTimeoutException(spaceName, bucketName, elementId, timeout);
         } else {
             elementLock.incrementLockCount();
@@ -126,7 +125,7 @@ public class ZookeeperElementsLocker implements ElementsLocker {
     public void unlockElement(String bucketName, String elementId) {
         ElementLock elementLock = locksMap.get(ElementKey.of(bucketName, elementId));
         if (elementLock == null) {
-            metrics.getLockerErrorCounter(spaceName, bucketName).increment();
+            metrics.getElementLockerErrorCounter(spaceName, bucketName).increment();
             throw new LockNotHoldException(buildLockPath(bucketName, elementId));
         }
 
@@ -138,7 +137,7 @@ public class ZookeeperElementsLocker implements ElementsLocker {
             }
             metrics.getElementsLockerUnlockedCounter(spaceName, bucketName).increment();
         } catch (Exception e) {
-            metrics.getLockerErrorCounter(spaceName, bucketName).increment();
+            metrics.getElementLockerErrorCounter(spaceName, bucketName).increment();
             throw new UnexpectedLockerException(e);
         }
     }

@@ -19,7 +19,7 @@ public class ZookeeperBucketLocker implements BucketLocker {
                                  ApplicationMetrics metrics) {
         this.properties = properties;
         this.metrics = metrics;
-        this.zookeeperLocker = new ZookeeperLocker(client);
+        this.zookeeperLocker = new ZookeeperLocker(client, metrics);
     }
 
     @Override
@@ -34,11 +34,11 @@ public class ZookeeperBucketLocker implements BucketLocker {
         try {
             acquired = zookeeperLocker.lockOnPath(buildLockPath(spaceName, bucketName), timeout);
         } catch (Exception e) {
-            metrics.getLockerErrorCounter(spaceName, bucketName).increment();
+            metrics.getBucketLockerErrorCounter(spaceName, bucketName).increment();
             throw new UnexpectedLockerException(e);
         }
         if (!acquired) {
-            metrics.getLockerTimeoutsCounter(spaceName, bucketName).increment();
+            metrics.getBucketLockerTimeoutsCounter(spaceName, bucketName).increment();
             throw new LockTimeoutException(spaceName, bucketName, timeout);
         }
         metrics.getBucketLockerCounter(spaceName, bucketName).increment();
@@ -50,10 +50,10 @@ public class ZookeeperBucketLocker implements BucketLocker {
             zookeeperLocker.unlockOnPath(buildLockPath(spaceName, bucketName));
             metrics.getBucketLockerUnlockedCounter(spaceName, bucketName).increment();
         } catch (LockNotHoldException e) {
-            metrics.getLockerErrorCounter(spaceName, bucketName).increment();
+            metrics.getBucketLockerErrorCounter(spaceName, bucketName).increment();
             throw e;
         } catch (Exception e) {
-            metrics.getLockerErrorCounter(spaceName, bucketName).increment();
+            metrics.getBucketLockerErrorCounter(spaceName, bucketName).increment();
             throw new UnexpectedLockerException(e);
         }
     }

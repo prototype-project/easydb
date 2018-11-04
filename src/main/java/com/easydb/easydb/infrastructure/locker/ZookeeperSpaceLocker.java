@@ -19,7 +19,7 @@ public class ZookeeperSpaceLocker implements SpaceLocker {
                                 ApplicationMetrics metrics) {
         this.properties = properties;
         this.metrics = metrics;
-        this.zookeeperLocker = new ZookeeperLocker(client);
+        this.zookeeperLocker = new ZookeeperLocker(client, metrics);
     }
 
     @Override
@@ -34,11 +34,11 @@ public class ZookeeperSpaceLocker implements SpaceLocker {
         try {
             acquired = zookeeperLocker.lockOnPath(buildLockPath(spaceName), timeout);
         } catch (Exception e) {
-            metrics.getLockerErrorCounter(spaceName).increment();
+            metrics.getSpaceLockerErrorCounter(spaceName).increment();
             throw new UnexpectedLockerException(e);
         }
         if (!acquired) {
-            metrics.getLockerTimeoutsCounter(spaceName).increment();
+            metrics.getSpaceLockerTimeoutsCounter(spaceName).increment();
             throw new LockTimeoutException(spaceName, timeout);
         }
         metrics.getSpaceLockerCounter(spaceName).increment();
@@ -50,10 +50,10 @@ public class ZookeeperSpaceLocker implements SpaceLocker {
             zookeeperLocker.unlockOnPath(buildLockPath(spaceName));
             metrics.getSpaceLockerUnlockedCounter(spaceName).increment();
         } catch (LockNotHoldException e) {
-            metrics.getLockerErrorCounter(spaceName).increment();
+            metrics.getSpaceLockerErrorCounter(spaceName).increment();
             throw e;
         } catch (Exception e) {
-            metrics.getLockerErrorCounter(spaceName).increment();
+            metrics.getSpaceLockerErrorCounter(spaceName).increment();
             throw new UnexpectedLockerException(e);
         }
     }

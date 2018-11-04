@@ -12,6 +12,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.Future
 
 class SpaceLockSpec extends BaseIntegrationSpec {
+
     @Autowired
     SpaceLocker locker
 
