@@ -24,20 +24,6 @@ public class ApplicationMetrics {
         return buildSpaceCounter("api.deleteBucket", spaceName);
     }
 
-    public Counter getBeginTransactionRequestsCounter(String spaceName) {
-        return buildSpaceCounter("api.beginTransaction", spaceName);
-    }
-
-    public Counter getAddOperationToTransactionRequestCounter(String spaceName, String bucketName,
-                                                              String operationType) {
-        return buildCounter("api.addTransactionOperation", "space", spaceName, "bucket", bucketName,
-                "operation", operationType);
-    }
-
-    public Counter getCommitTransactionRequestCounter(String spaceName) {
-        return buildSpaceCounter("api.commitTransaction", spaceName);
-    }
-
     public Counter addElementRequestsCounter(String spaceName, String bucketName) {
         return buildBucketCounter("api.addElement", spaceName, bucketName);
     }
@@ -54,72 +40,106 @@ public class ApplicationMetrics {
         return buildBucketCounter("api.getElement", spaceName, bucketName);
     }
 
-    public Counter getFilterElementsRequestsCounter(String spaceName, String bucketName) {
+    public Counter filterElementsRequestsCounter(String spaceName, String bucketName) {
         return buildBucketCounter("api.filterElements", spaceName, bucketName);
     }
 
-    public Counter getElementsLockerCounter(String spaceName, String bucketName) {
+    public Counter elementsLockerCounter(String spaceName, String bucketName) {
         return buildBucketCounter("lockElement", spaceName, bucketName);
     }
 
-    public Counter getElementsLockerUnlockedCounter(String spaceName, String bucketName) {
+    public Counter elementsLockerUnlockedCounter(String spaceName, String bucketName) {
         return buildBucketCounter("unlockElement", spaceName, bucketName);
     }
 
-    public Counter getBucketLockerCounter(String spaceName, String bucketName) {
+    public Counter bucketLockerCounter(String spaceName, String bucketName) {
         return buildBucketCounter("lockBucket", spaceName, bucketName);
     }
 
-    public Counter getBucketLockerUnlockedCounter(String spaceName, String bucketName) {
+    public Counter bucketLockerUnlockedCounter(String spaceName, String bucketName) {
         return buildBucketCounter("unlockBucket", spaceName, bucketName);
     }
 
-    public Counter getSpaceLockerCounter(String spaceName) {
+    public Counter spaceLockerCounter(String spaceName) {
         return buildSpaceCounter("lockSpace", spaceName);
     }
 
-    public Counter getSpaceLockerUnlockedCounter(String spaceName) {
+    public Counter spaceLockerUnlockedCounter(String spaceName) {
         return buildSpaceCounter("unlockSpace", spaceName);
     }
 
-    public Counter getSpaceLockerErrorCounter(String spaceName) {
+    public Counter spaceLockerErrorCounter(String spaceName) {
         return buildSpaceCounter("spaceLockerErrors", spaceName);
     }
 
-    public Counter getBucketLockerErrorCounter(String spaceName, String bucketName) {
+    public Counter bucketLockerErrorCounter(String spaceName, String bucketName) {
         return buildBucketCounter("bucketLockerErrors", spaceName, bucketName);
     }
 
-    public Counter getElementLockerErrorCounter(String spaceName, String bucketName) {
-        return buildBucketCounter("elementLockerCounter", spaceName, bucketName);
+    public Counter elementLockerErrorCounter(String spaceName, String bucketName) {
+        return buildBucketCounter("elementLockerErrors", spaceName, bucketName);
     }
 
-    public Counter getSpaceLockerTimeoutsCounter(String spaceName) {
+    public Counter spaceLockerTimeoutsCounter(String spaceName) {
         return buildSpaceCounter("spaceLockerTimeouts", spaceName);
     }
 
-    public Counter getBucketLockerTimeoutsCounter(String spaceName, String bucketName) {
+    public Counter bucketLockerTimeoutsCounter(String spaceName, String bucketName) {
         return buildBucketCounter("bucketLockerTimeouts", spaceName, bucketName);
     }
 
-    public Counter getAbortedTransactionCounter(String spaceName) {
+    public Counter elementLockerTimeoutsCounter(String spaceName, String bucketName) {
+        return buildBucketCounter("elementLockerTimeouts", spaceName, bucketName);
+    }
+
+    public Counter beginTransactionRequestsCounter(String spaceName) {
+        return buildSpaceCounter("api.beginTransaction", spaceName);
+    }
+
+    public Counter addOperationToTransactionRequestCounter(String spaceName, String bucketName,
+                                                           String operationType) {
+        return buildCounter("api.addTransactionOperation", "space", spaceName, "bucket", bucketName,
+                "operation", operationType);
+    }
+
+    public Counter commitTransactionRequestCounter(String spaceName) {
+        return buildSpaceCounter("api.commitTransaction", spaceName);
+    }
+
+    public Counter abortedTransactionCounter(String spaceName) {
         return buildSpaceCounter("abortedTransactions", spaceName);
     }
 
-    public Timer getCompoundTransactionTimer(String spaceName) {
+    public Timer compoundTransactionTimer(String spaceName) {
         return buildSpaceTimer("compoundTransactionTime", spaceName);
     }
 
-    public Timer getSingleElementTransactionTimer(String spaceName) {
+    public Timer singleElementTransactionTimer(String spaceName) {
         return buildSpaceTimer("singleElementTransactionTime", spaceName);
     }
 
-    public Timer getLockingTimer() {
-        return buildTimer("lockingTime");
+    public Timer spaceLockingTimer(String spaceName) {
+        return buildSpaceTimer("spaceLockingTime", spaceName);
     }
 
-    public Timer getUnlockingTimer() {
-        return buildTimer("unlockingTime");
+    public Timer spaceUnlockingTimer(String spaceName) {
+        return buildSpaceTimer("spaceUnlockingTime", spaceName);
+    }
+
+    public Timer bucketLockingTimer(String spaceName, String bucketName) {
+        return buildBucketTimer("bucketLockingTime", spaceName, bucketName);
+    }
+
+    public Timer bucketUnLockingTimer(String spaceName, String bucketName) {
+        return buildBucketTimer("bucketUnlockingTime", spaceName, bucketName);
+    }
+
+    public Timer elementLockingTimer(String spaceName, String bucketName) {
+        return buildBucketTimer("elementLockingTime", spaceName, bucketName);
+    }
+
+    public Timer elementUnlockingTimer(String spaceName, String bucketName) {
+        return buildBucketTimer("elementUnlockingTime", spaceName, bucketName);
     }
 
     private Counter buildBucketCounter(String path, String spaceName, String bucketName) {
@@ -132,6 +152,10 @@ public class ApplicationMetrics {
 
     private Timer buildSpaceTimer(String path, String spaceName) {
         return buildTimer(path, "space", spaceName);
+    }
+
+    private Timer buildBucketTimer(String path, String spaceName, String bucketName) {
+        return buildTimer(path, "space", spaceName, "bucket", bucketName);
     }
 
     private Counter buildCounter(String path, String... tags) {

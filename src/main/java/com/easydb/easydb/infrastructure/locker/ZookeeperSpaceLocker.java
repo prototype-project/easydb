@@ -19,7 +19,7 @@ public class ZookeeperSpaceLocker implements SpaceLocker {
                                 ApplicationMetrics metrics) {
         this.properties = properties;
         this.metrics = metrics;
-        this.zookeeperLocker = new ZookeeperLocker(client, metrics);
+        this.zookeeperLocker = new ZookeeperLocker(client);
     }
 
     @Override
@@ -29,31 +29,41 @@ public class ZookeeperSpaceLocker implements SpaceLocker {
 
     @Override
     public void lockSpace(String spaceName, Duration timeout) {
+        metrics.spaceLockingTimer(spaceName).record(
+                () -> lockWithoutTimer(spaceName, timeout));
+    }
+
+    @Override
+    public void unlockSpace(String spaceName) {
+        metrics.spaceUnlockingTimer(spaceName).record(
+                () -> unlockWithoutTimer(spaceName));
+    }
+
+    private void lockWithoutTimer(String spaceName, Duration timeout) {
         boolean acquired;
 
         try {
             acquired = zookeeperLocker.lockOnPath(buildLockPath(spaceName), timeout);
         } catch (Exception e) {
-            metrics.getSpaceLockerErrorCounter(spaceName).increment();
+            metrics.spaceLockerErrorCounter(spaceName).increment();
             throw new UnexpectedLockerException(e);
         }
         if (!acquired) {
-            metrics.getSpaceLockerTimeoutsCounter(spaceName).increment();
+            metrics.spaceLockerTimeoutsCounter(spaceName).increment();
             throw new LockTimeoutException(spaceName, timeout);
         }
-        metrics.getSpaceLockerCounter(spaceName).increment();
+        metrics.spaceLockerCounter(spaceName).increment();
     }
 
-    @Override
-    public void unlockSpace(String spaceName) {
+    private void unlockWithoutTimer(String spaceName) {
         try {
             zookeeperLocker.unlockOnPath(buildLockPath(spaceName));
-            metrics.getSpaceLockerUnlockedCounter(spaceName).increment();
+            metrics.spaceLockerUnlockedCounter(spaceName).increment();
         } catch (LockNotHoldException e) {
-            metrics.getSpaceLockerErrorCounter(spaceName).increment();
+            metrics.spaceLockerErrorCounter(spaceName).increment();
             throw e;
         } catch (Exception e) {
-            metrics.getSpaceLockerErrorCounter(spaceName).increment();
+            metrics.spaceLockerErrorCounter(spaceName).increment();
             throw new UnexpectedLockerException(e);
         }
     }

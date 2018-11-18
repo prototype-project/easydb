@@ -44,7 +44,7 @@ public class OptimizedTransactionManager {
     }
 
     public void commitTransaction(Transaction transaction) {
-        metrics.getSingleElementTransactionTimer(transaction.getSpaceName())
+        metrics.singleElementTransactionTimer(transaction.getSpaceName())
                 .record(() -> commit(transaction));
     }
 
@@ -54,7 +54,7 @@ public class OptimizedTransactionManager {
             transactionEngine.commit(transaction);
         } catch (Exception e) {
             logger.error("Aborting transaction {} ...", transaction.getId(), e);
-            metrics.getAbortedTransactionCounter(transaction.getSpaceName()).increment();
+            metrics.abortedTransactionCounter(transaction.getSpaceName()).increment();
             throw new TransactionAbortedException(
                     "Transaction " + transaction.getId() + " was aborted", e);
         }

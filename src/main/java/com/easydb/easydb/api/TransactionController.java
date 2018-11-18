@@ -4,7 +4,6 @@ import com.easydb.easydb.config.ApplicationMetrics;
 import com.easydb.easydb.domain.space.UUIDProvider;
 import com.easydb.easydb.domain.transactions.OperationResult;
 import com.easydb.easydb.domain.transactions.DefaultTransactionManager;
-import com.easydb.easydb.domain.transactions.Transaction;
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,7 +32,7 @@ class TransactionController {
     @ResponseStatus(value = HttpStatus.CREATED)
     String beginTransaction(@PathVariable("spaceName") String spaceName) {
         String transactionId = defaultTransactionManager.beginTransaction(spaceName);
-        metrics.getBeginTransactionRequestsCounter(spaceName).increment();
+        metrics.beginTransactionRequestsCounter(spaceName).increment();
         return transactionId;
     }
 
@@ -42,7 +41,7 @@ class TransactionController {
     OperationResultDto addOperation(@PathVariable String transactionId,
                                     @RequestBody @Valid OperationDto dto) {
         OperationResult operationResult = defaultTransactionManager.addOperation(transactionId, dto.toDomain(uuidProvider));
-        metrics.getAddOperationToTransactionRequestCounter(operationResult.getSpaceName(), dto.getBucketName(),
+        metrics.addOperationToTransactionRequestCounter(operationResult.getSpaceName(), dto.getBucketName(),
                 dto.getType().toString()).increment();
         return OperationResultDto.of(operationResult);
     }
@@ -51,6 +50,6 @@ class TransactionController {
     @ResponseStatus(value = HttpStatus.ACCEPTED)
     void commitTransaction(@PathVariable String transactionId) {
         String spaceName = defaultTransactionManager.commitTransaction(transactionId).getSpaceName();
-        metrics.getCommitTransactionRequestCounter(spaceName).increment();
+        metrics.commitTransactionRequestCounter(spaceName).increment();
     }
 }

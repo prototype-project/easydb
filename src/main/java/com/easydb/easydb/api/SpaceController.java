@@ -1,4 +1,4 @@
- package com.easydb.easydb.api;
+package com.easydb.easydb.api;
 
 import com.easydb.easydb.config.ApplicationMetrics;
 import com.easydb.easydb.domain.space.Space;

@@ -60,7 +60,7 @@ public class DefaultTransactionManager {
 
     public Transaction commitTransaction(String transactionId) {
         Transaction transaction = transactionRepository.get(transactionId);
-        metrics.getCompoundTransactionTimer(transaction.getSpaceName())
+        metrics.compoundTransactionTimer(transaction.getSpaceName())
                 .record(() -> commit(transaction));
         return transaction;
     }
@@ -72,7 +72,7 @@ public class DefaultTransactionManager {
             transactionEngine.commit(transaction);
         } catch (Exception e) {
             logger.error("Aborting transaction {} ...", transaction.getId(), e);
-            metrics.getAbortedTransactionCounter(transaction.getSpaceName()).increment();
+            metrics.abortedTransactionCounter(transaction.getSpaceName()).increment();
             throw new TransactionAbortedException(
                     "Transaction " + transaction.getId() + " was aborted", e);
         }
@@ -104,7 +104,7 @@ public class DefaultTransactionManager {
             return OperationResult.emptyResult(t.getSpaceName());
         } catch (ConcurrentTransactionDetectedException e) {
             logger.error("Aborting transaction {} ...", t.getId(), e);
-            metrics.getAbortedTransactionCounter(t.getSpaceName()).increment();
+            metrics.abortedTransactionCounter(t.getSpaceName()).increment();
             throw new TransactionAbortedException(
                     "Transaction " + t.getId() + " was aborted", e);
         }
