@@ -1,0 +1,37 @@
+FROM ubuntu:16.04
+
+# install puppet-agent
+RUN apt-get -y update && \
+    apt-get -y install wget && \
+    apt-get -y install curl && \
+    wget http://apt.puppetlabs.com/puppet5-release-xenial.deb && \
+    dpkg -i puppet5-release-xenial.deb && \
+    apt-get -y install puppet && \
+    wget https://downloads.puppetlabs.com/puppet/puppet-5.3.5.tar.gz && \
+    tar -xzf puppet-5.3.5.tar.gz && \
+    ./puppet-5.3.5/install.rb && \
+    rm puppet5-release-xenial.deb && \
+    rm puppet-5.3.5.tar.gz && \
+    rm -rf puppet-5.3.5 && \
+    curl -L https://packagecloud.io/grafana/stable/gpgkey | apt-key add - && \
+    apt-get -y update
+
+ADD files/prometheus.pp /tmp/prometheus.pp
+ADD files/grafana.pp /tmp/grafana.pp
+ADD files/grafana_dashboard.json /tmp/grafana_dashboard.json
+
+EXPOSE 9090
+EXPOSE 9095
+
+# install prometheus and grafana
+RUN puppet module install puppet-prometheus --version 6.2.0 && \
+    puppet module install puppetlabs-apt && \
+    puppet module install puppet-grafana --version 5.0.0 && \
+    puppet module install puppet-healthcheck --version 0.4.1
+
+RUN puppet apply /tmp/prometheus.pp && \
+    puppet apply /tmp/grafana.pp
+
+CMD puppet apply /tmp/prometheus.pp && \
+    puppet apply /tmp/grafana.pp && \
+    tail -f /dev/null

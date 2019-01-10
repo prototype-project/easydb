@@ -18,7 +18,7 @@ public class SpaceDefinitionControllerExceptionHandler extends ResponseEntityExc
 
     @ExceptionHandler(value = {SpaceDoesNotExistException.class})
     ResponseEntity<ApiError> handleSpaceDoesNotExistException(SpaceDoesNotExistException ex) {
-        return mapError(ApiError.of("SPACE_DOES_NOT_EXISTS", HttpStatus.NOT_FOUND, ex.getMessage()));
+        return mapError(ApiError.of("SPACE_DOES_NOT_EXIST", HttpStatus.NOT_FOUND, ex.getMessage()));
     }
 
     private ResponseEntity<ApiError> mapError(ApiError apiError) {

@@ -1,0 +1,26 @@
+FROM ubuntu:18.04
+
+ENV JAVA_HOME "/usr/lib/jvm/java-8-openjdk-amd64"
+ENV SPRING_CONFIG_LOCATION "/opt/easydb/resources/application.yml"
+
+    # install java8
+RUN apt-get -y update && \
+    apt-get -y install software-properties-common && \
+    add-apt-repository ppa:openjdk-r/ppa 2>/dev/null && \
+    apt-get -y update && \
+    apt-get -y install openjdk-8-jdk
+
+    # intall easydb
+RUN mkdir -p /var/log/ && \
+    touch /var/log/easydb.log && \
+    mkdir -p /opt/easydb/dist && \
+    mkdir -p /opt/easydb/resources
+
+ADD build/bin /opt/easydb/dist/bin
+ADD build/lib /opt/easydb/dist/lib
+ADD build/resources /opt/easydb/resources
+ADD files/application.yml /opt/easydb/resources/application.yml
+
+EXPOSE 9000
+
+CMD /opt/easydb/dist/bin/easydb -port 9000 -environment production

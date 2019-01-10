@@ -13,4 +13,3 @@ puppet module install puppet-healthcheck --version 0.4.1
 puppet apply $HOME/grafana.pp
 rm $HOME/grafana.pp
 rm $HOME/grafana_dashboard.json
-

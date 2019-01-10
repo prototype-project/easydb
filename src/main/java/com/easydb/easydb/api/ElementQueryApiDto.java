@@ -15,23 +15,15 @@ public class ElementQueryApiDto {
 
     private String id;
 
-    private String bucketName;
-
     private List<ElementFieldApiDto> fields;
 
     @JsonCreator
     private ElementQueryApiDto(
             @JsonProperty("id") String id,
-            @JsonProperty("bucketName") String bucketName,
             @JsonProperty("fields") List<ElementFieldApiDto> fields) {
         this.id = id;
-        this.bucketName = bucketName;
         Collections.sort(fields);
         this.fields = ImmutableList.copyOf(fields);
-    }
-
-    public String getBucketName() {
-        return bucketName;
     }
 
     public List<ElementFieldApiDto> getFields() {
@@ -47,7 +39,7 @@ public class ElementQueryApiDto {
         List<ElementFieldApiDto> apiFields = fields.stream()
                 .map(it -> new ElementFieldApiDto(it.getName(), it.getValue()))
                 .collect(Collectors.toList());
-        return new ElementQueryApiDto(domainElement.getId(), domainElement.getBucketName(), apiFields);
+        return new ElementQueryApiDto(domainElement.getId(), apiFields);
     }
 
     @Override
@@ -60,8 +52,7 @@ public class ElementQueryApiDto {
             return false;
         } else {
             ElementQueryApiDto other = (ElementQueryApiDto) obj;
-            return Objects.equals(id, other.id) && Objects.equals(bucketName, other.bucketName)
-                    && Objects.equals(fields, other.fields);
+            return Objects.equals(id, other.id) && Objects.equals(fields, other.fields);
         }
     }
 

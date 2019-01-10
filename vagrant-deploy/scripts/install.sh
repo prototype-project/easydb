@@ -28,8 +28,7 @@ mkdir -p /data/db
 # install zookeeper
 ZOOKEEPER_VERSION=3.4.13
 wget https://www-us.apache.org/dist/zookeeper/zookeeper-${ZOOKEEPER_VERSION}/zookeeper-${ZOOKEEPER_VERSION}.tar.gz
-mkdir -p /opt/zookeeper
-tar -xf zookeeper-${ZOOKEEPER_VERSION}.tar.gz -C /opt/zookeeper/
+tar -xf zookeeper-${ZOOKEEPER_VERSION}.tar.gz -C /opt/
 mv /opt/zookeeper-${ZOOKEEPER_VERSION} /opt/zookeeper
 rm zookeeper-${ZOOKEEPER_VERSION}.tar.gz
 
@@ -46,3 +45,17 @@ tar -xzf puppet-5.3.5.tar.gz
 rm puppet5-release-xenial.deb
 rm puppet-5.3.5.tar.gz
 rm -rf puppet-5.3.5
+
+# prometheus
+puppet module install puppet-prometheus --version 6.2.0
+puppet apply $HOME/prometheus.pp
+rm $HOME/prometheus.pp
+
+# grafana
+puppet module install puppetlabs-apt
+puppet module install puppet-grafana --version 5.0.0
+puppet module install puppet-healthcheck --version 0.4.1
+
+puppet apply $HOME/grafana.pp
+rm $HOME/grafana.pp
+rm $HOME/grafana_dashboard.json

@@ -1,0 +1,25 @@
+FROM ubuntu:18.04
+
+ENV MONGO_VERSION 4.0.2
+
+    # install mongodb
+RUN apt-get -y update && \
+    apt-get -y install software-properties-common && \
+    apt-get install -y gnupg && \
+    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4 && \
+    echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-4.0.list && \
+    apt-get -y update && \
+    apt-get -y install mongodb-org=${MONGO_VERSION} mongodb-org-server=${MONGO_VERSION} mongodb-org-shell=${MONGO_VERSION} mongodb-org-mongos=${MONGO_VERSION} mongodb-org-tools=${MONGO_VERSION}
+
+RUN mkdir -p /var/log/
+
+    # prepare mongodb command
+RUN mkdir -p /data/mongodb/ && \
+    touch /var/log/mongodb.log && \
+    mkdir -p /etc/mongodb/
+
+ADD files/mongodb.conf /etc/mongodb/mongodb.conf
+
+EXPOSE 27017
+
+CMD /usr/bin/mongod --config /etc/mongodb/mongodb.conf

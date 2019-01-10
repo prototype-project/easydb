@@ -30,10 +30,10 @@ class TransactionController {
 
     @PostMapping("/{spaceName}")
     @ResponseStatus(value = HttpStatus.CREATED)
-    String beginTransaction(@PathVariable("spaceName") String spaceName) {
+    TransactionDto beginTransaction(@PathVariable("spaceName") String spaceName) {
         String transactionId = defaultTransactionManager.beginTransaction(spaceName);
         metrics.beginTransactionRequestsCounter(spaceName).increment();
-        return transactionId;
+        return new TransactionDto(transactionId);
     }
 
     @PostMapping("/{transactionId}/add-operation")

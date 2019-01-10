@@ -18,7 +18,7 @@ class TransactionControllerExceptionHandler extends ResponseEntityExceptionHandl
 
     @ExceptionHandler(value = {TransactionAbortedException.class})
     ResponseEntity<ApiError> handleTransactionAbortion(TransactionAbortedException ex) {
-        return mapError(ApiError.of("TRANSACTION_ABORTED", HttpStatus.CONFLICT, ex.getMessage()));
+        return mapError(ApiError.of("TRANSACTION_ABORTED", HttpStatus.OK, ex.getMessage()));
     }
 
     private ResponseEntity<ApiError> mapError(ApiError apiError) {

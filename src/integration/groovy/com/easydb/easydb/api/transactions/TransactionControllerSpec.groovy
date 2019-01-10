@@ -6,6 +6,7 @@ import com.easydb.easydb.OperationTestBuilder
 import com.easydb.easydb.TestHttpOperations
 import com.easydb.easydb.api.ElementFieldApiDto
 import com.easydb.easydb.api.OperationResultDto
+import com.easydb.easydb.api.TransactionDto
 import com.easydb.easydb.domain.bucket.BucketService
 import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
 import com.easydb.easydb.domain.bucket.ElementField
@@ -38,16 +39,16 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
 
     def "should create transaction with ACTIVE status"() {
         when:
-        ResponseEntity<String> response = beginTransaction(spaceName)
+        ResponseEntity<TransactionDto> response = beginTransaction(spaceName)
 
         then:
         response.statusCodeValue == 201
-        repository.get(response.body).getState() == Transaction.State.ACTIVE
+        repository.get(response.body.transactionId).getState() == Transaction.State.ACTIVE
     }
 
     def "should add operation to transaction"() {
         given:
-        def transactionId = beginTransaction(spaceName).body
+        def transactionId = beginTransaction(spaceName).body.transactionId
 
         def operation = OperationTestBuilder
                 .builder()
@@ -104,7 +105,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
 
     def "should throw 400 when adding create operation with given element id"() {
         given:
-        def transactionId = beginTransaction(spaceName).body
+        def transactionId = beginTransaction(spaceName).body.transactionId
 
         def operation = OperationTestBuilder
                 .builder()
@@ -121,7 +122,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
 
     def "should throw 400 when adding operation other than create without element id"() {
         given:
-        def transactionId = beginTransaction(spaceName).body
+        def transactionId = beginTransaction(spaceName).body.transactionId
 
         def operation = OperationTestBuilder.builder()
                 .type(Operation.OperationType.UPDATE)
@@ -168,7 +169,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
 
         def elementId = addElement(spaceName, element).body.id
 
-        def transactionId = beginTransaction(spaceName).body
+        def transactionId = beginTransaction(spaceName).body.transactionId
 
         def operation = OperationTestBuilder.builder()
                 .type(Operation.OperationType.UPDATE)
@@ -187,7 +188,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
 
     def "should throw 400 when adding create operation without fields given"() {
         given:
-        def transactionId = beginTransaction(spaceName).body
+        def transactionId = beginTransaction(spaceName).body.transactionId
 
         def operation = OperationTestBuilder.builder()
                 .type(Operation.OperationType.CREATE)
@@ -206,7 +207,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
 
     def "should throw 400 when adding operation with invalid fields"() {
         given:
-        def transactionId = beginTransaction(spaceName).body
+        def transactionId = beginTransaction(spaceName).body.transactionId
 
         def operationWithoutFieldName = OperationTestBuilder.builder()
                 .type(Operation.OperationType.CREATE)
@@ -239,7 +240,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
 
     def "should throw 404 when adding operation for not existing element"() {
         given:
-        def transactionId = beginTransaction(spaceName).body
+        def transactionId = beginTransaction(spaceName).body.transactionId
 
         def element = ElementTestBuilder.builder()
                 .bucketName(TEST_BUCKET_NAME)
@@ -264,7 +265,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
 
     def "should throw 404 when adding operation for not existing bucket"() {
         given:
-        def transactionId = beginTransaction(spaceName).body
+        def transactionId = beginTransaction(spaceName).body.transactionId
 
         def operation = OperationTestBuilder.builder()
                 .type(Operation.OperationType.DELETE)
@@ -281,7 +282,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
 
     def "should commit transaction"() {
         given:
-        def transactionId = beginTransaction(spaceName).body
+        def transactionId = beginTransaction(spaceName).body.transactionId
         def element1ToCreate = ElementTestBuilder.builder()
                 .fields([ElementField.of("name", "Antek")])
                 .bucketName(TEST_BUCKET_NAME)
@@ -333,7 +334,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
 
         def elementDto = addElement(spaceName, element).body
 
-        def transactionId = beginTransaction(spaceName).body
+        def transactionId = beginTransaction(spaceName).body.transactionId
 
         def operation = OperationTestBuilder.builder()
                 .bucketName(TEST_BUCKET_NAME)
@@ -345,7 +346,6 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
 
         then:
         result.element.isPresent()
-        result.element.get().bucketName == element.bucketName
         result.element.get().fields == elementDto.fields
     }
 }

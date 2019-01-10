@@ -1,0 +1,22 @@
+FROM ubuntu:18.04
+
+ENV ZOOKEEPER_VERSION 3.4.12
+ENV JAVA_HOME "/usr/lib/jvm/java-8-openjdk-amd64"
+
+    # install java8
+RUN apt-get -y update && \
+    apt-get -y install software-properties-common && \
+    add-apt-repository ppa:openjdk-r/ppa 2>/dev/null && \
+    apt-get -y update && \
+    apt-get -y install openjdk-8-jdk
+
+# install zookeeper
+RUN apt-get install -y wget && \
+    wget https://www-us.apache.org/dist/zookeeper/stable/zookeeper-${ZOOKEEPER_VERSION}.tar.gz && \
+    tar -xf zookeeper-${ZOOKEEPER_VERSION}.tar.gz -C /opt/ && \
+    mv /opt/zookeeper-${ZOOKEEPER_VERSION} /opt/zookeeper && \
+    rm zookeeper-${ZOOKEEPER_VERSION}.tar.gz
+
+EXPOSE 2181
+
+CMD /bin/bash /opt/zookeeper/bin/zkServer.sh start-foreground /opt/zookeeper/conf/zoo_sample.cfg

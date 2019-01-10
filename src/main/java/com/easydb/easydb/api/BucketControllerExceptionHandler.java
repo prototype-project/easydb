@@ -15,12 +15,12 @@ public class BucketControllerExceptionHandler extends ResponseEntityExceptionHan
 
     @ExceptionHandler(value = {BucketDoesNotExistException.class})
     ResponseEntity<ApiError> handleBucketDoesNotExistException(BucketDoesNotExistException ex) {
-        return mapError(ApiError.of("BUCKET_DOES_NOT_EXISTS", HttpStatus.NOT_FOUND, ex.getMessage()));
+        return mapError(ApiError.of("BUCKET_DOES_NOT_EXIST", HttpStatus.NOT_FOUND, ex.getMessage()));
     }
 
     @ExceptionHandler(value = {ElementDoesNotExistException.class})
     ResponseEntity<ApiError> handleElementDoesNotExistException(ElementDoesNotExistException ex) {
-        return mapError(ApiError.of("ELEMENT_DOES_NOT_EXISTS", HttpStatus.NOT_FOUND, ex.getMessage()));
+        return mapError(ApiError.of("ELEMENT_DOES_NOT_EXIST", HttpStatus.NOT_FOUND, ex.getMessage()));
     }
 
     @ExceptionHandler(value = {InvalidPaginationDataException.class})

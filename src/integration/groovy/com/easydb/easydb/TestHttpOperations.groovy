@@ -4,6 +4,7 @@ import com.easydb.easydb.api.ElementQueryApiDto
 import com.easydb.easydb.api.OperationResultDto
 import com.easydb.easydb.api.PaginatedElementsApiDto
 import com.easydb.easydb.api.SpaceDefinitionApiDto
+import com.easydb.easydb.api.TransactionDto
 import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.bucket.ElementField
 import com.easydb.easydb.domain.transactions.Operation
@@ -84,10 +85,10 @@ trait TestHttpOperations {
                 SpaceDefinitionApiDto.class)
     }
 
-    ResponseEntity<String> beginTransaction(String spaceName) {
+    ResponseEntity<TransactionDto> beginTransaction(String spaceName) {
         return restTemplate.postForEntity(
                 localUrl("/api/v1/transactions/${spaceName}"),
-                Void, String
+                Void, TransactionDto
         )
     }
 

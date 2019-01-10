@@ -9,7 +9,7 @@ public class OperationResultDto {
     private final Optional<ElementQueryApiDto> element;
 
     @JsonCreator
-    public OperationResultDto(@JsonProperty("element") ElementQueryApiDto element) {
+    private OperationResultDto(@JsonProperty("element") ElementQueryApiDto element) {
         this.element = Optional.ofNullable(element);
     }
 
