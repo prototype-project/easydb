@@ -19,6 +19,11 @@ RUN mkdir -p /data/mongodb/ && \
     mkdir -p /etc/mongodb/
 
 ADD files/mongodb.conf /etc/mongodb/mongodb.conf
+ADD files/mongoCreateUser.js /tmp/mongoCreateUser.js
+ADD files/mongoCreateUser.sh /tmp/mongoCreateUser.sh
+
+    # cerate mongodb user
+RUN sh /tmp/mongoCreateUser.sh
 
 EXPOSE 27017
 

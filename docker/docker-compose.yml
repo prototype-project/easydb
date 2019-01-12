@@ -1,0 +1,26 @@
+version: "3"
+services:
+  easydb:
+    build:
+      context: ""
+      dockerfile: Easydb
+    image: easydb/app
+    depends_on:
+      - monitoring
+      - mongo
+      - zookeeper
+  monitoring:
+    build:
+      context: ""
+      dockerfile: Monitoring
+    image: easydb/monitoring
+  mongo:
+    build:
+      context: ""
+      dockerfile: Mongo
+    image: easydb/mongo
+  zookeeper:
+    build:
+      context: ""
+      dockerfile: Zookeeper
+    image: easydb/zookeeper
