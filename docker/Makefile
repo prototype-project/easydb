@@ -28,3 +28,9 @@ stop:
 	@docker rm `docker ps -a -f "ancestor=easydb/monitoring" -q` 2> /dev/null || true
 	@docker rm `docker ps -a -f "ancestor=easydb/mongo" -q` 2> /dev/null || true
 	@docker rm `docker ps -a -f "ancestor=easydb/zookeeper" -q` 2> /dev/null || true
+
+clean:
+	rm -rf ./logs
+	rm -rf ./data
+	@echo "Removing temporary docker images..."
+	@docker rmi `docker images "dangling=true" -q` -f 2> /dev/null || true

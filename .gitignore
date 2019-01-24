@@ -1,6 +1,8 @@
 .gradle
 /build/
 !gradle/wrapper/gradle-wrapper.jar
+docker/data
+docker/logs
 
 ### STS ###
 .apt_generated

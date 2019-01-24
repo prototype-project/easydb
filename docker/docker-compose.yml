@@ -5,6 +5,8 @@ services:
       context: ""
       dockerfile: Easydb
     image: easydb/app
+    volumes:
+      - ./logs/:/var/log/easydb/
     depends_on:
       - monitoring
       - mongo
@@ -19,6 +21,9 @@ services:
       context: ""
       dockerfile: Mongo
     image: easydb/mongo
+    volumes:
+      - ./logs:/var/log/easydb/
+      - ./data/easydb/mongodb:/data/easydb/mongodb
   zookeeper:
     build:
       context: ""

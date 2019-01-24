@@ -11,8 +11,8 @@ RUN apt-get -y update && \
     apt-get -y install openjdk-8-jdk
 
     # intall easydb
-RUN mkdir -p /var/log/ && \
-    touch /var/log/easydb.log && \
+RUN mkdir -p /var/log/easydb && \
+    touch /var/log/easydb/easydb.log && \
     mkdir -p /opt/easydb/dist && \
     mkdir -p /opt/easydb/resources
 

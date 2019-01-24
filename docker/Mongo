@@ -11,11 +11,10 @@ RUN apt-get -y update && \
     apt-get -y update && \
     apt-get -y install mongodb-org=${MONGO_VERSION} mongodb-org-server=${MONGO_VERSION} mongodb-org-shell=${MONGO_VERSION} mongodb-org-mongos=${MONGO_VERSION} mongodb-org-tools=${MONGO_VERSION}
 
-RUN mkdir -p /var/log/
-
     # prepare mongodb command
-RUN mkdir -p /data/mongodb/ && \
-    touch /var/log/mongodb.log && \
+RUN mkdir -p /data/easydb/mongodb/ && \
+    mkdir -p /var/log/easydb/ && \
+    touch /var/log/easydb/mongodb.log && \
     mkdir -p /etc/mongodb/
 
 ADD files/mongodb.conf /etc/mongodb/mongodb.conf
