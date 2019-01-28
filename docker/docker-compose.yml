@@ -6,7 +6,7 @@ services:
       dockerfile: Easydb
     image: easydb/app
     volumes:
-      - ./logs/:/var/log/easydb/
+      - log-volume:/var/log/easydb/
     depends_on:
       - monitoring
       - mongo
@@ -22,10 +22,16 @@ services:
       dockerfile: Mongo
     image: easydb/mongo
     volumes:
-      - ./logs:/var/log/easydb/
-      - ./data/easydb/mongodb:/data/easydb/mongodb
+      - log-volume:/var/log/easydb/
+      - mongo-data-volume:/data/easydb/mongodb
   zookeeper:
     build:
       context: ""
       dockerfile: Zookeeper
     image: easydb/zookeeper
+    volumes:
+      - log-volume:/var/log/easydb
+
+volumes:
+  log-volume:
+  mongo-data-volume:

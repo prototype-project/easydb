@@ -2,6 +2,8 @@ FROM ubuntu:18.04
 
 ENV ZOOKEEPER_VERSION 3.4.12
 ENV JAVA_HOME "/usr/lib/jvm/java-8-openjdk-amd64"
+ENV ZOO_LOG_DIR=/var/log/easydb
+ENV ZOO_LOG4J_PROP='INFO,ROLLINGFILE'
 
     # install java8
 RUN apt-get -y update && \
@@ -17,6 +19,9 @@ RUN apt-get install -y wget && \
     mv /opt/zookeeper-${ZOOKEEPER_VERSION} /opt/zookeeper && \
     rm zookeeper-${ZOOKEEPER_VERSION}.tar.gz
 
+ADD files/zookeeper.cfg /opt/zookeeper/conf/zookeeper.cfg
+ADD files/zookeeper-log4j.properties /opt/zookeeper/conf/log4j.properties
+
 EXPOSE 2181
 
-CMD /bin/bash /opt/zookeeper/bin/zkServer.sh start-foreground /opt/zookeeper/conf/zoo_sample.cfg
+CMD /bin/bash /opt/zookeeper/bin/zkServer.sh start-foreground /opt/zookeeper/conf/zookeeper.cfg
