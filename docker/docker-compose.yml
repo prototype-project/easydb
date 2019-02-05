@@ -1,37 +1,74 @@
 version: "3"
 services:
-  easydb:
+  nginx:
+    build:
+      context: ""
+      dockerfile: Nginx
+    image: easydb/load_balancer
+    depends_on:
+      - easydb1
+      - easydb2
+    networks:
+      - easydb
+    ports:
+      - "8000:8080"
+
+  easydb1:
     build:
       context: ""
       dockerfile: Easydb
     image: easydb/app
-    volumes:
-      - log-volume:/var/log/easydb/
     depends_on:
       - monitoring
       - mongo
       - zookeeper
+    networks:
+      - easydb
+
+  easydb2:
+    build:
+      context: ""
+      dockerfile: Easydb
+    image: easydb/app
+    depends_on:
+      - monitoring
+      - mongo
+      - zookeeper
+    networks:
+      - easydb
+
   monitoring:
     build:
       context: ""
       dockerfile: Monitoring
     image: easydb/monitoring
+    networks:
+      - easydb
+    ports:
+      - "9090:9090"
+      - "9095:9095"
+
   mongo:
     build:
       context: ""
       dockerfile: Mongo
     image: easydb/mongo
     volumes:
-      - log-volume:/var/log/easydb/
       - mongo-data-volume:/data/easydb/mongodb
+    networks:
+      - easydb
+
   zookeeper:
     build:
       context: ""
       dockerfile: Zookeeper
     image: easydb/zookeeper
-    volumes:
-      - log-volume:/var/log/easydb
+    networks:
+      - easydb
+
 
 volumes:
-  log-volume:
   mongo-data-volume:
+
+networks:
+  easydb:

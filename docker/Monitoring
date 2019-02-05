@@ -1,37 +1,46 @@
 FROM ubuntu:16.04
 
-# install puppet-agent
+ENV PUPPET_VERSION "5.5.3"
+
+# install puppet
 RUN apt-get -y update && \
     apt-get -y install wget && \
     apt-get -y install curl && \
     wget http://apt.puppetlabs.com/puppet5-release-xenial.deb && \
     dpkg -i puppet5-release-xenial.deb && \
     apt-get -y install puppet && \
-    wget https://downloads.puppetlabs.com/puppet/puppet-5.3.5.tar.gz && \
-    tar -xzf puppet-5.3.5.tar.gz && \
-    ./puppet-5.3.5/install.rb && \
+    wget https://downloads.puppetlabs.com/puppet/puppet-${PUPPET_VERSION}.tar.gz && \
+    tar -xzf puppet-${PUPPET_VERSION}.tar.gz && \
+    ./puppet-${PUPPET_VERSION}/install.rb && \
     rm puppet5-release-xenial.deb && \
-    rm puppet-5.3.5.tar.gz && \
-    rm -rf puppet-5.3.5 && \
-    curl -L https://packagecloud.io/grafana/stable/gpgkey | apt-key add - && \
-    apt-get -y update
+    rm puppet-${PUPPET_VERSION}.tar.gz && \
+    rm -rf puppet-${PUPPET_VERSION}
 
-ADD files/prometheus.pp /tmp/prometheus.pp
-ADD files/grafana.pp /tmp/grafana.pp
-ADD files/grafana_dashboard.json /tmp/grafana_dashboard.json
+# intall grafana
+RUN echo 'deb https://packages.grafana.com/oss/deb stable main' > /etc/apt/sources.list.d/grafana.list && \
+    curl https://packages.grafana.com/gpg.key | apt-key add - && \
+    apt-get install -y apt-transport-https && \
+    apt-get update && \
+    apt-get install -y grafana
 
-EXPOSE 9090
-EXPOSE 9095
-
-# install prometheus and grafana
+# install prometheus
 RUN puppet module install puppet-prometheus --version 6.2.0 && \
     puppet module install puppetlabs-apt && \
     puppet module install puppet-grafana --version 5.0.0 && \
     puppet module install puppet-healthcheck --version 0.4.1
 
-RUN puppet apply /tmp/prometheus.pp && \
+ADD files/prometheus.pp /tmp/prometheus.pp
+ADD files/grafana.pp /tmp/grafana.pp
+ADD files/grafana_dashboard.json /tmp/grafana_dashboard.json
+ADD files/grafana.ini /etc/grafana/grafana.ini
+
+RUN service grafana-server start && \
+    puppet apply /tmp/prometheus.pp && \
     puppet apply /tmp/grafana.pp
 
+EXPOSE 9090
+EXPOSE 9095
+
 CMD puppet apply /tmp/prometheus.pp && \
-    puppet apply /tmp/grafana.pp && \
+    service grafana-server start && \
     tail -f /dev/null

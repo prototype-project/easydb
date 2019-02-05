@@ -6,7 +6,7 @@ class { 'prometheus::server':
       'scrape_timeout'  => '10s',
       'metrics_path' => '/prometheus',
       'static_configs'  => [
-        { 'targets' => [],
+        { 'targets' => ["easydb1:9000", "easydb2:9000"],
           'labels'  => { 'alias' => 'Easydb'}
         }
       ]

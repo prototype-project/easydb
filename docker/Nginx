@@ -1,0 +1,5 @@
+FROM bitnami/nginx:1.14.2
+
+ADD files/nginx.conf /opt/bitnami/nginx/conf/vhosts/my_vhost.conf
+
+EXPOSE 8080
