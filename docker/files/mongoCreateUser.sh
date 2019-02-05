@@ -6,3 +6,5 @@ do
   sleep 1s
   mongo localhost:27017/easydb < tmp/mongoCreateUser.js
 done
+
+mongo localhost:27017/admin < tmp/mongoCreateAdminUser.js

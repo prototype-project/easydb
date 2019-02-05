@@ -54,7 +54,7 @@ public class MongoBucketRepository implements BucketRepository {
     @Override
     public void insertElement(Element element) {
         try {
-            createShardIfInsertingFirstElement(element.getBucketName());
+//            createShardIfInsertingFirstElement(element.getBucketName());
             mongoTemplate.insert(PersistentBucketElement.of(element), element.getBucketName());
         } catch (DuplicateKeyException e) {
             throw new ElementAlreadyExistsException(

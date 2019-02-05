@@ -19,6 +19,7 @@ RUN mkdir -p /data/easydb/mongodb/ && \
 
 ADD files/mongodb.conf /etc/mongodb/mongodb.conf
 ADD files/mongoCreateUser.js /tmp/mongoCreateUser.js
+ADD files/mongoCreateAdminUser.js /tmp/mongoCreateAdminUser.js
 ADD files/mongoCreateUser.sh /tmp/mongoCreateUser.sh
 
     # cerate mongodb user
