@@ -3,7 +3,7 @@ package com.easydb.easydb.api.bucket
 import com.easydb.easydb.BaseIntegrationSpec
 import com.easydb.easydb.ElementTestBuilder
 import com.easydb.easydb.TestHttpOperations
-import com.easydb.easydb.api.PaginatedElementsApiDto
+import com.easydb.easydb.api.PaginatedElementsDto
 import com.easydb.easydb.domain.bucket.ElementField
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -13,9 +13,11 @@ class BucketElementsPaginationSpec extends BaseIntegrationSpec implements TestHt
 
     def setup() {
         spaceName = addSampleSpace().body.spaceName
+        createTestBucket(spaceName)
         addElement(spaceName, buildElementBody(
                 ElementTestBuilder
                         .builder()
+                        .bucketName(TEST_BUCKET_NAME)
                         .clearFields()
                         .addField(ElementField.of("firstName", "Daniel"))
                         .addField(ElementField.of("lastName", "Faderski"))
@@ -24,6 +26,7 @@ class BucketElementsPaginationSpec extends BaseIntegrationSpec implements TestHt
         addElement(spaceName, buildElementBody(
                 ElementTestBuilder
                         .builder()
+                        .bucketName(TEST_BUCKET_NAME)
                         .clearFields()
                         .addField(ElementField.of("firstName", "Daniel"))
                         .addField(ElementField.of("lastName", "Faderski"))
@@ -32,6 +35,7 @@ class BucketElementsPaginationSpec extends BaseIntegrationSpec implements TestHt
         addElement(spaceName, buildElementBody(
                 ElementTestBuilder
                         .builder()
+                        .bucketName(TEST_BUCKET_NAME)
                         .clearFields()
                         .addField(ElementField.of("firstName", "Daniel"))
                         .addField(ElementField.of("lastName", "Faderski"))
@@ -40,7 +44,7 @@ class BucketElementsPaginationSpec extends BaseIntegrationSpec implements TestHt
 
     def "should properly paginate results by offset when all elements was fetched"() {
         when:
-        PaginatedElementsApiDto paginated = getElements(spaceName, 1, 2)
+        PaginatedElementsDto paginated = getElements(spaceName, 1, 2)
 
         then:
         paginated.getResults().size() == 2
@@ -49,7 +53,7 @@ class BucketElementsPaginationSpec extends BaseIntegrationSpec implements TestHt
 
     def "should properly paginate results by offset when there are still more elements to fetch"() {
         when:
-        PaginatedElementsApiDto paginated = getElements(spaceName, 0, 1)
+        PaginatedElementsDto paginated = getElements(spaceName, 0, 1)
 
         then:
         paginated.getResults().size() == 1
@@ -72,7 +76,7 @@ class BucketElementsPaginationSpec extends BaseIntegrationSpec implements TestHt
 
     def "should properly paginate results by limit when all elements was fetched"() {
         when:
-        PaginatedElementsApiDto paginated = getElements(spaceName, 0, 4)
+        PaginatedElementsDto paginated = getElements(spaceName, 0, 4)
 
         then:
         paginated.getResults().size() == 3
@@ -81,7 +85,7 @@ class BucketElementsPaginationSpec extends BaseIntegrationSpec implements TestHt
 
     def "should properly paginate results by limit when there are still more elements to fetch"() {
         when:
-        PaginatedElementsApiDto paginated = getElements(spaceName, 0, 2)
+        PaginatedElementsDto paginated = getElements(spaceName, 0, 2)
 
         then:
         paginated.getResults().size() == 2

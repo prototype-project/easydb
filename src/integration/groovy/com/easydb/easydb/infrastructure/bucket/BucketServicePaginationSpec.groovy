@@ -34,6 +34,7 @@ class BucketServicePaginationSpec extends IntegrationWithCleanedDatabaseSpec {
 
     def "should return empty list when there is no elements"() {
         given:
+        bucketService.createBucket(TEST_BUCKET_NAME)
         BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, 1, 0)
 
         when:
@@ -72,6 +73,7 @@ class BucketServicePaginationSpec extends IntegrationWithCleanedDatabaseSpec {
     }
 
     def createElements() {
+        bucketService.createBucket(TEST_BUCKET_NAME)
         bucketService.addElement(ElementTestBuilder.builder().bucketName(TEST_BUCKET_NAME).fields([ElementField.of('firstName', 'John')]).build())
         bucketService.addElement(ElementTestBuilder.builder().bucketName(TEST_BUCKET_NAME).fields([ElementField.of('firstName', 'Anna')]).build())
         bucketService.addElement(ElementTestBuilder.builder().bucketName(TEST_BUCKET_NAME).fields([ElementField.of('firstName', 'Maria')]).build())

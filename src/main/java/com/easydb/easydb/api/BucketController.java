@@ -16,7 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "/api/v1")
+@RequestMapping(value = "/api/v1/spaces/{spaceName}/buckets")
 class BucketController {
 
     private final UUIDProvider uuidProvider;
@@ -32,27 +32,34 @@ class BucketController {
         this.bucketServiceFactory = bucketServiceFactory;
     }
 
-    @DeleteMapping(path = "/{spaceName}/{bucketName}")
+    @DeleteMapping(path = "/{bucketName}")
     @ResponseStatus(value = HttpStatus.OK)
     void deleteBucket(@PathVariable("spaceName") String spaceName, @PathVariable("bucketName") String bucketName) {
         bucketServiceFactory.buildBucketService(spaceName).removeBucket(bucketName);
         metrics.deleteBucketRequestsCounter(spaceName).increment();
     }
 
-    @PostMapping(path = "/{spaceName}/{bucketName}")
+    @PostMapping
     @ResponseStatus(value = HttpStatus.CREATED)
-    ElementQueryApiDto addElement(
+    void createBucket(@PathVariable("spaceName") String spaceName, @RequestBody @Valid BucketDefinitionDto toCreate) {
+        bucketServiceFactory.buildBucketService(spaceName).createBucket(toCreate.getName());
+        metrics.createBucketRequestsCounter(spaceName);
+    }
+
+    @PostMapping(path = "/{bucketName}/elements")
+    @ResponseStatus(value = HttpStatus.CREATED)
+    ElementQueryDto addElement(
             @PathVariable("spaceName") String spaceName,
             @PathVariable("bucketName") String bucketName,
-            @RequestBody @Valid ElementCrudApiDto toCreate) {
+            @RequestBody @Valid ElementCrudDto toCreate) {
         Element element = toCreate.toDomain(uuidProvider.generateUUID(), bucketName);
         bucketServiceFactory.buildBucketService(spaceName).addElement(element);
 
         metrics.addElementRequestsCounter(spaceName, bucketName).increment();
-        return ElementQueryApiDto.of(element);
+        return ElementQueryDto.of(element);
     }
 
-    @DeleteMapping(path = "/{spaceName}/{bucketName}/{elementId}")
+    @DeleteMapping(path = "/{bucketName}/elements/{elementId}")
     @ResponseStatus(value = HttpStatus.OK)
     void deleteElement(
             @PathVariable("spaceName") String spaceName,
@@ -62,32 +69,32 @@ class BucketController {
         metrics.deleteElementRequestsCounter(spaceName, bucketName).increment();
     }
 
-    @PutMapping(path = "/{spaceName}/{bucketName}/{elementId}")
+    @PutMapping(path = "/{bucketName}/elements/{elementId}")
     @ResponseStatus(value = HttpStatus.OK)
     void updateElement(
             @PathVariable("spaceName") String spaceName,
             @PathVariable("bucketName") String bucketName,
             @PathVariable("elementId") String elementId,
-            @RequestBody @Valid ElementCrudApiDto toUpdate) {
+            @RequestBody @Valid ElementCrudDto toUpdate) {
         bucketServiceFactory.buildBucketService(spaceName).updateElement(toUpdate.toDomain(elementId, bucketName));
         metrics.updateElementRequestsCounter(spaceName, bucketName).increment();
     }
 
-    @GetMapping(path = "/{spaceName}/{bucketName}/{elementId}")
+    @GetMapping(path = "/{bucketName}/elements/{elementId}")
     @ResponseStatus(value = HttpStatus.OK)
-    ElementQueryApiDto getElement(
+    ElementQueryDto getElement(
             @PathVariable("spaceName") String spaceName,
             @PathVariable("bucketName") String bucketName,
             @PathVariable("elementId") String elementId) {
         BucketService bucketService = bucketServiceFactory.buildBucketService(spaceName);
 
         metrics.getElementRequestsCounter(spaceName, bucketName).increment();
-        return ElementQueryApiDto.of(bucketService.getElement(bucketName, elementId));
+        return ElementQueryDto.of(bucketService.getElement(bucketName, elementId));
     }
 
-    @GetMapping(path = "/{spaceName}/{bucketName}")
+    @GetMapping(path = "/{bucketName}/elements")
     @ResponseStatus(value = HttpStatus.OK)
-    PaginatedElementsApiDto filterElements(
+    PaginatedElementsDto filterElements(
             @PathVariable("spaceName") String spaceName,
             @PathVariable("bucketName") String bucketName,
             @RequestParam(value = "limit", defaultValue = "20") int limit,
@@ -97,12 +104,12 @@ class BucketController {
 
         BucketQuery query = BucketQuery.of(bucketName, limit, offset);
 
-        List<ElementQueryApiDto> results = bucketService.filterElements(query).stream()
-                .map(ElementQueryApiDto::of)
+        List<ElementQueryDto> results = bucketService.filterElements(query).stream()
+                .map(ElementQueryDto::of)
                 .collect(Collectors.toList());
 
         metrics.filterElementsRequestsCounter(spaceName, bucketName).increment();
-        return PaginatedElementsApiDto.of(
+        return PaginatedElementsDto.of(
                 getNextPageLink(bucketService.getNumberOfElements(bucketName), limit, offset, request),
                 results);
     }

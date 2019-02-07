@@ -46,6 +46,11 @@ public class MongoBucketRepository implements BucketRepository {
     }
 
     @Override
+    public void createBucket(String name) {
+        mongoTemplate.createCollection(name);
+    }
+
+    @Override
     public void removeBucket(String bucketName) {
         ensureBucketExists(bucketName);
         mongoTemplate.dropCollection(bucketName);
@@ -53,12 +58,14 @@ public class MongoBucketRepository implements BucketRepository {
 
     @Override
     public void insertElement(Element element) {
+        ensureBucketExists(element.getBucketName());
+
         try {
-//            createShardIfInsertingFirstElement(element.getBucketName());
+//            createShardIfInsertingFirstElement(element.getName());
             mongoTemplate.insert(PersistentBucketElement.of(element), element.getBucketName());
         } catch (DuplicateKeyException e) {
             throw new ElementAlreadyExistsException(
-                    "Element " + element +" already exists");
+                    "Element " + element + " already exists");
         }
     }
 
@@ -114,6 +121,8 @@ public class MongoBucketRepository implements BucketRepository {
 
     @Override
     public List<VersionedElement> filterElements(BucketQuery query) {
+        ensureBucketExists(query.getBucketName());
+
         Query mongoQuery = fromBucketQuery(query);
         return mongoTemplate.find(mongoQuery, PersistentBucketElement.class, query.getBucketName()).stream()
                 .map(it -> it.toDomainVersionedElement(query.getBucketName()))
@@ -133,6 +142,7 @@ public class MongoBucketRepository implements BucketRepository {
         }
     }
 
+    // TODO only in sharding mongo mode
     private void createShardIfInsertingFirstElement(String bucketName) {
         if (!bucketExists(bucketName)) {
            createShardedCollection(bucketName);

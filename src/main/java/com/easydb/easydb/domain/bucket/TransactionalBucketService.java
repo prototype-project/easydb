@@ -10,6 +10,7 @@ import com.easydb.easydb.domain.transactions.Operation.OperationType;
 import com.easydb.easydb.domain.transactions.OptimizedTransactionManager;
 import com.easydb.easydb.domain.transactions.Transaction;
 import com.easydb.easydb.domain.transactions.Retryier;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,12 +53,13 @@ public class TransactionalBucketService implements BucketService {
 
     @Override
     public void removeBucket(String bucketName) {
+        Space space = spaceRepository.get(spaceName);
+        space.getBuckets().remove(bucketName);
+
         lockerRetryier.performWithRetries(() -> spaceLocker.lockSpace(spaceName));
         lockerRetryier.performWithRetries(() -> bucketLocker.lockBucket(spaceName, bucketName));
 
         try {
-            Space space = spaceRepository.get(spaceName);
-            space.getBuckets().remove(bucketName);
             spaceRepository.update(space);
             bucketRepository.removeBucket(getBucketName(bucketName));
         } finally {
@@ -67,14 +69,26 @@ public class TransactionalBucketService implements BucketService {
     }
 
     @Override
-    public void addElement(Element element) {
-        // TODO maybe needs optimization to lock only when bucket not in space
+    public void createBucket(String bucketName) {
+        if (bucketExists(bucketName)) {
+            throw new BucketAlreadyExistsException(bucketName);
+        }
+
+        Space space = spaceRepository.get(spaceName);
+        space.getBuckets().add(bucketName);
+
         lockerRetryier.performWithRetries(() -> spaceLocker.lockSpace(spaceName));
         try {
-            simpleElementOperations.addElement(element);
+            spaceRepository.update(space);
+            bucketRepository.createBucket(getBucketName(bucketName));
         } finally {
             spaceLocker.unlockSpace(spaceName);
         }
+    }
+
+    @Override
+    public void addElement(Element element) {
+        simpleElementOperations.addElement(element);
     }
 
     @Override

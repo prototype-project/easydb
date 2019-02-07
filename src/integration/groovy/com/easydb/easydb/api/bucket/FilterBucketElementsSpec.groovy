@@ -20,7 +20,7 @@ class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOp
 //
 //    def "should filter com.easydb.easydb.element.bucket elements by single field"() {
 //        when:
-//        PaginatedElementsApiDto filteredElements = getElementsByFullUrl(spaceName, 0, 7, [firstName: firstName])
+//        PaginatedElementsDto filteredElements = getElementsByFullUrl(spaceName, 0, 7, [firstName: firstName])
 //
 //        then:
 //        filteredElements.results.size() == expectedSize
@@ -45,7 +45,7 @@ class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOp
 //        }
 //
 //        when:
-//        PaginatedElementsApiDto filteredElements = getElementsByFullUrl(spaceName, 0, 7, filters)
+//        PaginatedElementsDto filteredElements = getElementsByFullUrl(spaceName, 0, 7, filters)
 //
 //        then:
 //        filteredElements.results.size() == expectedSize
@@ -68,7 +68,7 @@ class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOp
 //        ]
 //
 //        when:
-//        PaginatedElementsApiDto filteredElements = getElementsByFullUrl(spaceName, 0, 7, filters)
+//        PaginatedElementsDto filteredElements = getElementsByFullUrl(spaceName, 0, 7, filters)
 //
 //        then:
 //        filteredElements.results.size() == 0

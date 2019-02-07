@@ -15,14 +15,12 @@ class TransactionEngine {
     private static final Logger logger = LoggerFactory.getLogger(TransactionEngine.class);
 
     private final ElementsLockerFactory lockerFactory;
-    private final SpaceLocker spaceLocker;
     private final Retryier lockerRetryier;
     private final SimpleElementOperations simpleElementOperations;
 
-    TransactionEngine(ElementsLockerFactory lockerFactory, SpaceLocker spaceLocker, Retryier lockerRetryier,
+    TransactionEngine(ElementsLockerFactory lockerFactory, Retryier lockerRetryier,
                       SimpleElementOperations simpleElementOperations) {
         this.lockerFactory = lockerFactory;
-        this.spaceLocker = spaceLocker;
         this.lockerRetryier = lockerRetryier;
         this.simpleElementOperations = simpleElementOperations;
     }
@@ -33,7 +31,7 @@ class TransactionEngine {
         try {
             transaction.getOperations().forEach(o -> {
                 if (operationRequiresElementLock(o)) {
-                    locker.lockElement(o.getBucketName(), o.getElementId());
+                    lockerRetryier.performWithRetries(() -> locker.lockElement(o.getBucketName(), o.getElementId()));
                 }
             });
             transaction.getOperations().forEach(o -> performOperation(o, transaction));
@@ -58,12 +56,7 @@ class TransactionEngine {
         Element element = Element.of(o.getElementId(), o.getBucketName(), o.getFields());
         switch (o.getType()) {
             case CREATE:
-                lockerRetryier.performWithRetries(() -> spaceLocker.lockSpace(t.getSpaceName()));
-                try {
-                    simpleElementOperations.addElement(element);
-                } finally {
-                    spaceLocker.unlockSpace(t.getSpaceName());
-                }
+                simpleElementOperations.addElement(element);
                 break;
             case UPDATE:
                 performUpdateOperation(o, t);

@@ -6,16 +6,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Optional;
 
 public class OperationResultDto {
-    private final Optional<ElementQueryApiDto> element;
+    private final Optional<ElementQueryDto> element;
 
     @JsonCreator
-    private OperationResultDto(@JsonProperty("element") ElementQueryApiDto element) {
+    private OperationResultDto(@JsonProperty("element") ElementQueryDto element) {
         this.element = Optional.ofNullable(element);
     }
 
     public static OperationResultDto of(OperationResult result) {
         return result.getElement()
-                .map(versionedElement -> new OperationResultDto(ElementQueryApiDto.of(versionedElement.toSimpleElement())))
+                .map(versionedElement -> new OperationResultDto(ElementQueryDto.of(versionedElement.toSimpleElement())))
                 .orElseGet(OperationResultDto::empty);
     }
 
@@ -23,7 +23,7 @@ public class OperationResultDto {
         return new OperationResultDto(null);
     }
 
-    public Optional<ElementQueryApiDto> getElement() {
+    public Optional<ElementQueryDto> getElement() {
         return element;
     }
 }

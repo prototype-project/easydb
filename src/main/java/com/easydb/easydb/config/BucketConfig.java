@@ -34,9 +34,8 @@ public class BucketConfig {
     }
 
     @Bean
-    SimpleElementOperationsFactory simpleElementOperationsFactory(SpaceRepository spaceRepository,
-                                                                  BucketRepository bucketRepository) {
-        return new SimpleElementOperationsFactory(spaceRepository, bucketRepository);
+    SimpleElementOperationsFactory simpleElementOperationsFactory(BucketRepository bucketRepository) {
+        return new SimpleElementOperationsFactory(bucketRepository);
     }
 
     @Bean

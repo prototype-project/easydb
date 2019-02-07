@@ -20,6 +20,7 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec {
 
     def setup() {
         bucketService = bucketServiceFactory.buildBucketService(TEST_SPACE)
+        bucketService.createBucket(TEST_BUCKET_NAME)
     }
 
     def cleanup() {
@@ -29,9 +30,6 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec {
     }
 
     def "should remove bucket"() {
-        given:
-        bucketService.addElement(builder().bucketName(TEST_BUCKET_NAME).build())
-
         when:
         bucketService.removeBucket(TEST_BUCKET_NAME)
 
@@ -75,14 +73,8 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec {
         thrown ElementAlreadyExistsException
     }
 
-    def "should update space's buckets when adding first element to bucket"() {
-        given:
-        Element toCreate = builder().bucketName(TEST_BUCKET_NAME).build()
-
-        when:
-        bucketService.addElement(toCreate)
-
-        then:
+    def "should update space's buckets when creating bucket"() {
+        expect:
         spaceRepository.get(TEST_SPACE).buckets == [TEST_BUCKET_NAME] as Set
     }
 
@@ -110,7 +102,6 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec {
         given:
         Element toCreate = builder().bucketName(TEST_BUCKET_NAME).build()
 
-        // creates bucket implicitly
         bucketService.addElement(toCreate)
 
         when:
@@ -142,7 +133,7 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec {
 
     def "should throw exception when trying to update element in nonexistent bucket"() {
         given:
-        Element toUpdate = builder().bucketName(TEST_BUCKET_NAME).fields(
+        Element toUpdate = builder().bucketName("nonExistentBucket").fields(
                 [ElementField.of('lastName', 'Snow')]
         ).build()
 
@@ -155,11 +146,6 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec {
 
     def "should throw exception when trying to update nonexistent element"() {
         given:
-        Element toCreate = builder().bucketName(TEST_BUCKET_NAME).build()
-
-        bucketService.addElement(toCreate)
-
-        and:
         Element toUpdate = builder().bucketName(TEST_BUCKET_NAME)
                 .fields([ElementField.of('firstName', 'Snow')])
                 .id("nonexistentId")
@@ -228,23 +214,15 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec {
         }
     }
 
-    def "should return empty list when trying to get elements from nonexistent bucket"() {
+    def "should throw exception when trying to get elements from nonexistent bucket"() {
         when:
-        List<Element> elementsFromBucket = bucketService.filterElements(getDefaultBucketQuery())
+        bucketService.filterElements(BucketQuery.of("nonExistentBucket", 20, 0))
 
         then:
-        elementsFromBucket.size() == 0
+        thrown(BucketDoesNotExistException)
     }
 
     def "should return empty list when getting all elements from empty bucket"() {
-        given:
-        Element toCreate = builder().bucketName(TEST_BUCKET_NAME).build()
-
-        bucketService.addElement(toCreate)
-
-        and:
-        bucketService.removeElement(TEST_BUCKET_NAME, toCreate.getId())
-
         when:
         List<Element> elementsFromBucket = bucketService.filterElements(getDefaultBucketQuery())
 

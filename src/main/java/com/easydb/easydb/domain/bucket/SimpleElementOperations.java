@@ -1,31 +1,21 @@
 package com.easydb.easydb.domain.bucket;
 
-import com.easydb.easydb.domain.space.Space;
-import com.easydb.easydb.domain.space.SpaceRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class SimpleElementOperations {
 
     private final String spaceName;
-    private final SpaceRepository spaceRepository;
     private final BucketRepository bucketRepository;
 
     public SimpleElementOperations(
             String spaceName,
-            SpaceRepository spaceRepository,
             BucketRepository bucketRepository) {
         this.spaceName = spaceName;
-        this.spaceRepository = spaceRepository;
         this.bucketRepository = bucketRepository;
     }
 
     public void addElement(Element element) {
-        Space space = spaceRepository.get(spaceName);
-        if (!space.getBuckets().contains(element.getBucketName())) {
-            space.getBuckets().add(element.getBucketName());
-            spaceRepository.update(space);
-        }
         bucketRepository.insertElement(
                 Element.of(element.getId(), getBucketNameAccordinglyToSpace(element.getBucketName()), element.getFields()));
     }

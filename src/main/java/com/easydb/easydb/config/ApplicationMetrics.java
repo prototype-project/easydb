@@ -20,6 +20,10 @@ public class ApplicationMetrics {
         return buildCounter("api.getSpace");
     }
 
+    public Counter createBucketRequestsCounter(String spaceName) {
+        return buildSpaceCounter("api.createBucket", spaceName);
+    }
+
     public Counter deleteBucketRequestsCounter(String spaceName) {
         return buildSpaceCounter("api.deleteBucket", spaceName);
     }

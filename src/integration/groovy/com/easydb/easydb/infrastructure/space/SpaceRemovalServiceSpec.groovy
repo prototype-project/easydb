@@ -9,16 +9,14 @@ import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.space.Space
 import com.easydb.easydb.domain.space.SpaceDoesNotExistException
 import com.easydb.easydb.domain.space.SpaceRepository
-import com.easydb.easydb.domain.space.SpaceService
+import com.easydb.easydb.domain.space.SpaceRemovalService
 import org.springframework.beans.factory.annotation.Autowired
 
 
-class SpaceServiceSpec extends BaseIntegrationSpec {
-
-    public static final String TEST_SPACE = "testSpace"
+class SpaceRemovalServiceSpec extends BaseIntegrationSpec {
 
     @Autowired
-    SpaceService spaceService
+    SpaceRemovalService spaceRemovalService
 
     @Autowired SpaceRepository spaceRepository
 
@@ -27,24 +25,17 @@ class SpaceServiceSpec extends BaseIntegrationSpec {
     @Autowired
     BucketServiceFactory bucketServiceFactory
 
-    def cleanup() {
-        try {
-            spaceService.remove(TEST_SPACE)
-        } catch (SpaceDoesNotExistException ignored) {}
-    }
-
-    def "should remove all space's buckets when removing space"() {
+    def "should remove all spaces buckets when removing space"() {
         given:
-        spaceRepository.save(Space.of(TEST_SPACE))
-        BucketService bucketService = bucketServiceFactory.buildBucketService(TEST_SPACE)
-        Element sampleElement = ElementTestBuilder.builder().build()
-        bucketService.addElement(sampleElement)
+        spaceRepository.save(Space.of("testSpace"))
+        BucketService bucketService = bucketServiceFactory.buildBucketService("testSpace")
+        bucketService.createBucket("testBucket")
 
         when:
-        spaceService.remove(TEST_SPACE)
+        spaceRemovalService.remove("testSpace")
 
         then:
-        !spaceRepository.exists(TEST_SPACE)
-        !bucketService.bucketExists(sampleElement.bucketName)
+        !spaceRepository.exists("testSpace")
+        !bucketService.bucketExists("testBucket")
     }
 }

@@ -1,5 +1,6 @@
 package com.easydb.easydb.api;
 
+import com.easydb.easydb.domain.bucket.BucketAlreadyExistsException;
 import com.easydb.easydb.domain.bucket.BucketDoesNotExistException;
 import com.easydb.easydb.domain.bucket.ElementAlreadyExistsException;
 import com.easydb.easydb.domain.bucket.ElementDoesNotExistException;
@@ -16,6 +17,11 @@ public class BucketControllerExceptionHandler extends ResponseEntityExceptionHan
     @ExceptionHandler(value = {BucketDoesNotExistException.class})
     ResponseEntity<ApiError> handleBucketDoesNotExistException(BucketDoesNotExistException ex) {
         return mapError(ApiError.of("BUCKET_DOES_NOT_EXIST", HttpStatus.NOT_FOUND, ex.getMessage()));
+    }
+
+    @ExceptionHandler(value = {BucketAlreadyExistsException.class})
+    ResponseEntity<ApiError> handleBucketAlreadyExistsException(BucketAlreadyExistsException ex) {
+        return mapError(ApiError.of("BUCKET_ALREADY_EXISTS", HttpStatus.BAD_REQUEST, ex.getMessage()));
     }
 
     @ExceptionHandler(value = {ElementDoesNotExistException.class})

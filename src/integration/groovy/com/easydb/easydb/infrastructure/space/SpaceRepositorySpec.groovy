@@ -70,8 +70,7 @@ class SpaceRepositorySpec extends BaseIntegrationSpec {
         given:
         spaceRepository.save(Space.of(TEST_SPACE))
         BucketService bucketService = bucketServiceFactory.buildBucketService(TEST_SPACE)
-        Element sampleElement = ElementTestBuilder.builder().bucketName("sampleBucket").build()
-        bucketService.addElement(sampleElement)
+        bucketService.createBucket("sampleBucket")
 
         when:
         spaceRepository.update(Space.of(TEST_SPACE, ["sampleBucket"] as Set))

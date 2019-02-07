@@ -11,22 +11,22 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class ElementQueryApiDto {
+public class ElementQueryDto {
 
     private String id;
 
-    private List<ElementFieldApiDto> fields;
+    private List<ElementFieldDto> fields;
 
     @JsonCreator
-    private ElementQueryApiDto(
+    private ElementQueryDto(
             @JsonProperty("id") String id,
-            @JsonProperty("fields") List<ElementFieldApiDto> fields) {
+            @JsonProperty("fields") List<ElementFieldDto> fields) {
         this.id = id;
         Collections.sort(fields);
         this.fields = ImmutableList.copyOf(fields);
     }
 
-    public List<ElementFieldApiDto> getFields() {
+    public List<ElementFieldDto> getFields() {
         return fields;
     }
 
@@ -34,12 +34,12 @@ public class ElementQueryApiDto {
         return id;
     }
 
-    public static ElementQueryApiDto of(Element domainElement) {
+    public static ElementQueryDto of(Element domainElement) {
         List<ElementField> fields = domainElement.getFields();
-        List<ElementFieldApiDto> apiFields = fields.stream()
-                .map(it -> new ElementFieldApiDto(it.getName(), it.getValue()))
+        List<ElementFieldDto> apiFields = fields.stream()
+                .map(it -> new ElementFieldDto(it.getName(), it.getValue()))
                 .collect(Collectors.toList());
-        return new ElementQueryApiDto(domainElement.getId(), apiFields);
+        return new ElementQueryDto(domainElement.getId(), apiFields);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class ElementQueryApiDto {
         } else if (obj.getClass() != this.getClass()) {
             return false;
         } else {
-            ElementQueryApiDto other = (ElementQueryApiDto) obj;
+            ElementQueryDto other = (ElementQueryDto) obj;
             return Objects.equals(id, other.id) && Objects.equals(fields, other.fields);
         }
     }

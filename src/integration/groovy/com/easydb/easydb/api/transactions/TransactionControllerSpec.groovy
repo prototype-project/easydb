@@ -4,7 +4,7 @@ import com.easydb.easydb.BaseIntegrationSpec
 import com.easydb.easydb.ElementTestBuilder
 import com.easydb.easydb.OperationTestBuilder
 import com.easydb.easydb.TestHttpOperations
-import com.easydb.easydb.api.ElementFieldApiDto
+import com.easydb.easydb.api.ElementFieldDto
 import com.easydb.easydb.api.OperationResultDto
 import com.easydb.easydb.api.TransactionDto
 import com.easydb.easydb.domain.bucket.BucketService
@@ -35,6 +35,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
     def setup() {
         spaceName = addSampleSpace().body.spaceName
         this.bucketService = bucketServiceFactory.buildBucketService(spaceName)
+        createTestBucket(spaceName)
     }
 
     def "should create transaction with ACTIVE status"() {
@@ -321,7 +322,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
         then:
         getElements(spaceName).results.size() == 1
         getElement(spaceName, TEST_BUCKET_NAME, element1Id).fields.toSet() ==
-                [new ElementFieldApiDto("name", "Tadzik"), new ElementFieldApiDto("age", "30")].toSet()
+                [new ElementFieldDto("name", "Tadzik"), new ElementFieldDto("age", "30")].toSet()
 
     }
 

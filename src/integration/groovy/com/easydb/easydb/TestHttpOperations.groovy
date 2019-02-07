@@ -1,9 +1,9 @@
 package com.easydb.easydb
 
-import com.easydb.easydb.api.ElementQueryApiDto
+import com.easydb.easydb.api.ElementQueryDto
 import com.easydb.easydb.api.OperationResultDto
-import com.easydb.easydb.api.PaginatedElementsApiDto
-import com.easydb.easydb.api.SpaceDefinitionApiDto
+import com.easydb.easydb.api.PaginatedElementsDto
+import com.easydb.easydb.api.SpaceDefinitionDto
 import com.easydb.easydb.api.TransactionDto
 import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.bucket.ElementField
@@ -18,54 +18,66 @@ trait TestHttpOperations {
 
     static String TEST_BUCKET_NAME = "bucketPeoples"
 
-    PaginatedElementsApiDto getElements(String spaceName, int offset=0, int limit=10, Map<String, String> filters = [:]) {
+    PaginatedElementsDto getElements(String spaceName, int offset = 0, int limit = 10, Map<String, String> filters = [:]) {
         String filtersAsString = ''
         filters.forEach({ key, val -> filtersAsString = filtersAsString + '&' + key + '=' + val })
         getElementsByFullUrl(buildUrl(spaceName, TEST_BUCKET_NAME, limit, offset, filtersAsString))
     }
 
-    PaginatedElementsApiDto getElementsByFullUrl(String fullUrl) {
+    PaginatedElementsDto getElementsByFullUrl(String fullUrl) {
         restTemplate.getForEntity(
                 fullUrl,
-                PaginatedElementsApiDto.class).body
+                PaginatedElementsDto.class).body
     }
 
-    ElementQueryApiDto getElement(String spaceName, String bucketName, String id) {
+    ElementQueryDto getElement(String spaceName, String bucketName, String id) {
         restTemplate.getForEntity(
-                localUrl("/api/v1/$spaceName/$bucketName/$id"), ElementQueryApiDto).body
+                buildElementUrl(spaceName, bucketName, id), ElementQueryDto).body
     }
 
-    String buildUrl(String spaceId, String bucketName, int limit, int offset, String filters = '') {
-        localUrl(String.format("/api/v1/%s/%s?limit=%d&offset=%d&%s", spaceId, bucketName, limit, offset, filters))
-    }
-
-    ResponseEntity<ElementQueryApiDto> addElement(String spaceName, String bucketName, String body) {
+    ResponseEntity<ElementQueryDto> addElement(String spaceName, String bucketName, String body) {
         return restTemplate.exchange(
-                localUrl('/api/v1/' + spaceName + '/'+ bucketName),
+                buildElementUrl(spaceName, bucketName),
                 HttpMethod.POST,
                 httpJsonEntity(body),
-                ElementQueryApiDto.class)
+                ElementQueryDto.class)
     }
 
-    ResponseEntity<ElementQueryApiDto> addElement(String spaceName, String body) {
+    ResponseEntity<ElementQueryDto> addElement(String spaceName, String body) {
         addElement(spaceName, TEST_BUCKET_NAME, body)
     }
 
-    ResponseEntity<ElementQueryApiDto> addSampleElement(String spaceName) {
+    ResponseEntity<ElementQueryDto> addSampleElement(String spaceName) {
         addElement(spaceName, TEST_BUCKET_NAME, sampleElementBody())
     }
 
-    ResponseEntity<ElementQueryApiDto> addElement(String spaceName, Element element) {
+    ResponseEntity<ElementQueryDto> addElement(String spaceName, Element element) {
         return restTemplate.exchange(
-                localUrl('/api/v1/' + spaceName + '/'+ element.bucketName),
+                buildElementUrl(spaceName, element.bucketName),
                 HttpMethod.POST,
                 httpJsonEntity(buildElementBody(element)),
-                ElementQueryApiDto.class)
+                ElementQueryDto.class)
     }
 
-    String sampleElementBody() {
-        buildElementBody(
-                ElementTestBuilder.builder().build())
+    def createTestBucket(String spaceName) {
+        createBucket(spaceName, TEST_BUCKET_NAME)
+    }
+
+    ResponseEntity<Void> createBucket(String spaceName, String bucketName) {
+        return restTemplate.exchange(
+                buildBucketUrl(spaceName),
+                HttpMethod.POST,
+                httpJsonEntity(buildBucketBody(bucketName)),
+                Void.class
+        )
+    }
+
+    def deleteTestBucket(String spaceName) {
+        deleteBucket(spaceName, TEST_BUCKET_NAME)
+    }
+
+    def deleteBucket(String spaceName, String bucketName) {
+        restTemplate.delete(buildBucketUrl(spaceName, bucketName))
     }
 
     String sampleUpdateElementBody() {
@@ -78,11 +90,11 @@ trait TestHttpOperations {
                         .build())
     }
 
-    ResponseEntity<SpaceDefinitionApiDto> addSampleSpace() {
+    ResponseEntity<SpaceDefinitionDto> addSampleSpace() {
         return restTemplate.postForEntity(
-                localUrl("/api/v1/spaces/"),
+                buildSpaceUrl(),
                 Void,
-                SpaceDefinitionApiDto.class)
+                SpaceDefinitionDto.class)
     }
 
     ResponseEntity<TransactionDto> beginTransaction(String spaceName) {
@@ -110,16 +122,43 @@ trait TestHttpOperations {
 
     String buildElementBody(Element element) {
         JsonOutput.toJson([
-                fields: element.fields.collect {["name": it.name, "value": it.value]}
+                fields: element.fields.collect { ["name": it.name, "value": it.value] }
         ])
     }
 
     String buildOperationBody(Operation operation) {
         JsonOutput.toJson([
-                type: operation.type,
-                fields: operation.fields.collect {["name": it.name, "value": it.value]},
+                type      : operation.type,
+                fields    : operation.fields.collect { ["name": it.name, "value": it.value] },
                 bucketName: operation.bucketName,
-                elementId: operation.elementId
+                elementId : operation.elementId
         ])
+    }
+
+    String buildSpaceUrl(String spaceName = "") {
+        return localUrl("/api/v1/spaces/${spaceName}")
+    }
+
+    String buildBucketUrl(String spaceName, String bucketName = "") {
+        return buildSpaceUrl(spaceName) + "/buckets/${bucketName}"
+    }
+
+    String buildElementUrl(String spaceName, String bucketName, String elementId = "") {
+        return buildBucketUrl(spaceName, bucketName) + "/elements/${elementId}"
+    }
+
+    String buildBucketBody(String bucketName) {
+        JsonOutput.toJson([
+                bucketName: bucketName
+        ])
+    }
+
+    private String sampleElementBody() {
+        buildElementBody(
+                ElementTestBuilder.builder().build())
+    }
+
+    private String buildUrl(String spaceId, String bucketName, int limit, int offset, String filters = '') {
+        localUrl(String.format("/api/v1/spaces/%s/buckets/%s/elements?limit=%d&offset=%d&%s", spaceId, bucketName, limit, offset, filters))
     }
 }

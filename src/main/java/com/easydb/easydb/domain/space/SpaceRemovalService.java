@@ -6,7 +6,7 @@ import com.easydb.easydb.domain.locker.BucketLocker;
 import com.easydb.easydb.domain.locker.SpaceLocker;
 import com.easydb.easydb.domain.transactions.Retryier;
 
-public class SpaceService {
+public class SpaceRemovalService {
 
     private final SpaceRepository spaceRepository;
     private final BucketRepository bucketRepository;
@@ -14,8 +14,8 @@ public class SpaceService {
     private final BucketLocker bucketLocker;
     private final Retryier lockerRetryier;
 
-    public SpaceService(SpaceRepository spaceRepository, BucketRepository bucketRepository,
-                        SpaceLocker spaceLocker, BucketLocker bucketLocker, Retryier lockerRetryier) {
+    public SpaceRemovalService(SpaceRepository spaceRepository, BucketRepository bucketRepository,
+                               SpaceLocker spaceLocker, BucketLocker bucketLocker, Retryier lockerRetryier) {
         this.spaceRepository = spaceRepository;
         this.bucketRepository = bucketRepository;
         this.spaceLocker = spaceLocker;
@@ -23,25 +23,25 @@ public class SpaceService {
         this.lockerRetryier = lockerRetryier;
     }
 
-    public void remove(String name) {
-        lockerRetryier.performWithRetries(() -> spaceLocker.lockSpace(name));
+    public void remove(String spaceName) {
+        lockerRetryier.performWithRetries(() -> spaceLocker.lockSpace(spaceName));
         try {
-            Space space = spaceRepository.get(name);
+            Space space = spaceRepository.get(spaceName);
             space.getBuckets().stream()
-                    .map(bucket -> NamesResolver.resolve(name, bucket))
-                    .forEach(bucketName -> removeBucket(name, bucketName));
-            spaceRepository.remove(name);
+                    .map(bucket -> NamesResolver.resolve(spaceName, bucket))
+                    .forEach(bucketName -> removeBucket(spaceName, bucketName));
+            spaceRepository.remove(spaceName);
         } finally {
-            spaceLocker.unlockSpace(name);
+            spaceLocker.unlockSpace(spaceName);
         }
     }
 
-    private void removeBucket(String name, String bucketName) {
-        lockerRetryier.performWithRetries(() -> bucketLocker.lockBucket(name, bucketName));
+    private void removeBucket(String spaceName, String bucketName) {
+        lockerRetryier.performWithRetries(() -> bucketLocker.lockBucket(spaceName, bucketName));
         try {
             bucketRepository.removeBucket(bucketName);
         } finally {
-            bucketLocker.unlockBucket(name, bucketName);
+            bucketLocker.unlockBucket(spaceName, bucketName);
         }
     }
 }

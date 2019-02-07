@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 import org.hibernate.validator.constraints.NotEmpty;
 
-public class ElementFieldApiDto implements Comparable<ElementFieldApiDto> {
+public class ElementFieldDto implements Comparable<ElementFieldDto> {
     @NotEmpty
     private final String name;
 
@@ -14,7 +14,7 @@ public class ElementFieldApiDto implements Comparable<ElementFieldApiDto> {
     private final String value;
 
     @JsonCreator
-    ElementFieldApiDto(
+    ElementFieldDto(
             @JsonProperty("name") String name,
             @JsonProperty("value") String value) {
         this.name = name;
@@ -34,7 +34,7 @@ public class ElementFieldApiDto implements Comparable<ElementFieldApiDto> {
     }
 
     @Override
-    public int compareTo(ElementFieldApiDto o) {
+    public int compareTo(ElementFieldDto o) {
         return name.compareTo(o.name);
     }
 
@@ -47,7 +47,7 @@ public class ElementFieldApiDto implements Comparable<ElementFieldApiDto> {
         } else if (obj.getClass() != this.getClass()) {
             return false;
         } else {
-            ElementFieldApiDto other = (ElementFieldApiDto) obj;
+            ElementFieldDto other = (ElementFieldDto) obj;
             return Objects.equals(other.name, this.name) && Objects.equals(other.value, this.value);
         }
     }

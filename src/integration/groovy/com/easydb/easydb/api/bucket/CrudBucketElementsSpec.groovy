@@ -1,16 +1,18 @@
 package com.easydb.easydb.api.bucket
 
 import com.easydb.easydb.BaseIntegrationSpec
+import com.easydb.easydb.ElementTestBuilder
 import com.easydb.easydb.TestHttpOperations
-import com.easydb.easydb.api.ElementQueryApiDto
-import com.easydb.easydb.api.PaginatedElementsApiDto
+import com.easydb.easydb.api.ElementQueryDto
+import com.easydb.easydb.api.PaginatedElementsDto
 import com.easydb.easydb.domain.bucket.BucketQuery
 import com.easydb.easydb.domain.bucket.BucketService
 import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
 import com.easydb.easydb.domain.bucket.Element
-import com.easydb.easydb.domain.space.SpaceService
+import com.easydb.easydb.domain.space.SpaceRemovalService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpMethod
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.HttpClientErrorException
 
@@ -19,7 +21,7 @@ import java.util.stream.Collectors
 class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOperations {
 
     @Autowired
-    SpaceService spaceService
+    SpaceRemovalService spaceRemovalService
 
     @Autowired
     BucketServiceFactory bucketServiceFactory
@@ -30,26 +32,33 @@ class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOper
     def setup() {
         spaceName = addSampleSpace().body.spaceName
         this.bucketService = bucketServiceFactory.buildBucketService(spaceName)
+        createTestBucket(spaceName)
+        addElement(spaceName,
+                ElementTestBuilder
+                        .builder()
+                        .bucketName(TEST_BUCKET_NAME)
+                        .id("someForSureExistingId")
+                        .build())
     }
 
     def "should add element to bucket"() {
         when:
-        ResponseEntity<ElementQueryApiDto> response = addSampleElement(spaceName)
+        ResponseEntity<ElementQueryDto> response = addSampleElement(spaceName)
 
         then:
         response.statusCodeValue == 201
 
         and:
-        response.body == ElementQueryApiDto.of(bucketService.getElement(TEST_BUCKET_NAME, response.body.getId()))
+        response.body == ElementQueryDto.of(bucketService.getElement(TEST_BUCKET_NAME, response.body.getId()))
     }
 
     def "should remove element from bucket"() {
         given:
-        ResponseEntity<ElementQueryApiDto> addElementResponse = addSampleElement(spaceName)
+        ResponseEntity<ElementQueryDto> addElementResponse = addSampleElement(spaceName)
 
         when:
         ResponseEntity deleteElementResponse = restTemplate.exchange(
-                localUrl('/api/v1/' + spaceName + '/'+ TEST_BUCKET_NAME + '/' + addElementResponse.body.getId()),
+                buildElementUrl(spaceName, TEST_BUCKET_NAME, addElementResponse.body.getId()),
                 HttpMethod.DELETE,
                 null,
                 Void.class)
@@ -63,11 +72,11 @@ class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOper
 
     def "should update element"() {
         given:
-        ResponseEntity<ElementQueryApiDto> addElementResponse = addSampleElement(spaceName)
+        ResponseEntity<ElementQueryDto> addElementResponse = addSampleElement(spaceName)
 
         when:
         ResponseEntity response = restTemplate.exchange(
-                localUrl('/api/v1/' + spaceName + '/'+ TEST_BUCKET_NAME + '/' + addElementResponse.body.getId()),
+                buildElementUrl(spaceName, TEST_BUCKET_NAME, addElementResponse.body.getId()),
                 HttpMethod.PUT,
                 httpJsonEntity(sampleUpdateElementBody()),
                 Void.class)
@@ -86,38 +95,58 @@ class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOper
         addSampleElement(spaceName)
 
         when:
-        ResponseEntity<List<ElementQueryApiDto>> response = restTemplate.exchange(
-                localUrl('/api/v1/' + spaceName + '/'+ TEST_BUCKET_NAME),
+        ResponseEntity<List<ElementQueryDto>> response = restTemplate.exchange(
+                buildElementUrl(spaceName, TEST_BUCKET_NAME),
                 HttpMethod.GET,
                 null,
-                PaginatedElementsApiDto.class)
+                PaginatedElementsDto.class)
 
         then:
         BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, 20, 0)
         response.body.results == bucketService.filterElements(query).stream()
-                .map({it -> ElementQueryApiDto.of(it)})
+                .map({ it -> ElementQueryDto.of(it) })
                 .collect(Collectors.toList())
     }
 
     def "should get element from bucket"() {
         given:
-        ResponseEntity<ElementQueryApiDto> addElementResponse = addSampleElement(spaceName)
+        ResponseEntity<ElementQueryDto> addElementResponse = addSampleElement(spaceName)
 
         when:
-        ResponseEntity<ElementQueryApiDto> getElementResponse = restTemplate.exchange(
-                localUrl('/api/v1/' + spaceName + '/'+ TEST_BUCKET_NAME + '/' + addElementResponse.body.getId()),
+        ResponseEntity<ElementQueryDto> getElementResponse = restTemplate.exchange(
+                buildElementUrl(spaceName, TEST_BUCKET_NAME, addElementResponse.body.getId()),
                 HttpMethod.GET,
                 null,
-                ElementQueryApiDto.class)
+                ElementQueryDto.class)
 
         then:
         addElementResponse.body == getElementResponse.body
     }
 
-    def "should return 404 when trying to update element in nonexistent bucket"() {
+    def "should return 404 when trying to add element to notexistent bucket"() {
+        given:
+        deleteTestBucket(spaceName)
+
         when:
         restTemplate.exchange(
-                localUrl('/api/v1/' + spaceName + '/'+ TEST_BUCKET_NAME + '/' + 'someId'),
+                buildElementUrl(spaceName, TEST_BUCKET_NAME),
+                HttpMethod.POST,
+                httpJsonEntity(sampleUpdateElementBody()),
+                Void.class)
+
+        then:
+        HttpClientErrorException ex = thrown()
+
+        and:
+        ex.statusCode == HttpStatus.NOT_FOUND
+    }
+
+    def "should return 404 when trying to update element in nonexistent bucket"() {
+        deleteTestBucket(spaceName)
+
+        when:
+        restTemplate.exchange(
+                buildElementUrl(spaceName, TEST_BUCKET_NAME, "someForSureExistingId"),
                 HttpMethod.PUT,
                 httpJsonEntity(sampleUpdateElementBody()),
                 Void.class)
@@ -135,7 +164,7 @@ class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOper
 
         when:
         restTemplate.exchange(
-                localUrl('/api/v1/' + spaceName + '/'+ TEST_BUCKET_NAME + '/' + 'nonexistentId'),
+                buildElementUrl(spaceName, TEST_BUCKET_NAME, "notExistingId"),
                 HttpMethod.PUT,
                 httpJsonEntity(sampleUpdateElementBody()),
                 Void.class)
@@ -148,12 +177,15 @@ class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOper
     }
 
     def "should return 404 when trying to get element from nonexistent bucket"() {
+        given:
+        deleteTestBucket(spaceName)
+
         when:
         restTemplate.exchange(
-                localUrl('/api/v1/' + spaceName + '/' + TEST_BUCKET_NAME + '/' + 'someId'),
+                buildElementUrl(spaceName, TEST_BUCKET_NAME, "someForSureExistingId"),
                 HttpMethod.GET,
                 null,
-                ElementQueryApiDto.class)
+                ElementQueryDto.class)
 
         then:
         HttpClientErrorException ex = thrown()
@@ -168,10 +200,10 @@ class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOper
 
         when:
         restTemplate.exchange(
-                localUrl('/api/v1/' + spaceName + '/'+ TEST_BUCKET_NAME + '/' + 'nonexistentId'),
+                buildElementUrl(spaceName, TEST_BUCKET_NAME, "notExistingId"),
                 HttpMethod.GET,
                 null,
-                ElementQueryApiDto.class)
+                ElementQueryDto.class)
 
         then:
         HttpClientErrorException ex = thrown()

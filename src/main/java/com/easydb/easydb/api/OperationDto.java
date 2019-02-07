@@ -31,14 +31,14 @@ public class OperationDto {
     private String elementId;
 
     @Valid
-    private List<ElementFieldApiDto> fields;
+    private List<ElementFieldDto> fields;
 
     @JsonCreator
     public OperationDto(
             @JsonProperty("type") OperationType type,
             @JsonProperty("bucketName") String bucketName,
             @JsonProperty("elementId") String elementId,
-            @JsonProperty("fields") List<ElementFieldApiDto> fields) {
+            @JsonProperty("fields") List<ElementFieldDto> fields) {
         this.type = type;
         this.bucketName = bucketName;
         this.elementId = elementId;
@@ -80,7 +80,7 @@ public class OperationDto {
 
     private List<ElementField> toDomainFields() {
         return fields.stream()
-                .map(ElementFieldApiDto::toDomain)
+                .map(ElementFieldDto::toDomain)
                 .collect(Collectors.toList());
     }
 }

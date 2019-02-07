@@ -8,7 +8,7 @@ import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
 import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.bucket.ElementField
 import com.easydb.easydb.domain.space.SpaceRepository
-import com.easydb.easydb.domain.space.SpaceService
+import com.easydb.easydb.domain.space.SpaceRemovalService
 import com.easydb.easydb.domain.transactions.Operation
 import com.easydb.easydb.domain.transactions.OperationResult
 import com.easydb.easydb.domain.transactions.TransactionAbortedException
@@ -22,7 +22,7 @@ class TransactionsSpec extends IntegrationWithCleanedDatabaseSpec {
     DefaultTransactionManager transactionManager
 
     @Autowired
-    SpaceService spaceService
+    SpaceRemovalService spaceRemovalService
 
     @Autowired
     SpaceRepository spaceRepository
@@ -35,6 +35,7 @@ class TransactionsSpec extends IntegrationWithCleanedDatabaseSpec {
 
     def setup() {
         bucketService = bucketServiceFactory.buildBucketService(TEST_SPACE)
+        bucketService.createBucket(TEST_BUCKET_NAME)
     }
 
     // preventing dirty read prevents one transaction to read uncommitted changes of another transaction

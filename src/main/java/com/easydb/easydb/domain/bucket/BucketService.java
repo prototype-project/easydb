@@ -7,6 +7,8 @@ public interface BucketService {
 
     void removeBucket(String bucketName);
 
+    void createBucket(String bucketName);
+
     void addElement(Element element);
 
     Element getElement(String bucketName, String id);

@@ -7,7 +7,7 @@ import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
 import com.easydb.easydb.domain.space.Space
 import com.easydb.easydb.domain.space.SpaceDoesNotExistException
 import com.easydb.easydb.domain.space.SpaceRepository
-import com.easydb.easydb.domain.space.SpaceService
+import com.easydb.easydb.domain.space.SpaceRemovalService
 import org.springframework.beans.factory.annotation.Autowired
 
 class IntegrationWithCleanedDatabaseSpec extends BaseIntegrationSpec {
@@ -20,7 +20,7 @@ class IntegrationWithCleanedDatabaseSpec extends BaseIntegrationSpec {
     SpaceRepository spaceRepository
 
     @Autowired
-    SpaceService spaceService
+    SpaceRemovalService spaceRemovalService
 
     @Autowired
     BucketRepository bucketRepository
@@ -30,13 +30,13 @@ class IntegrationWithCleanedDatabaseSpec extends BaseIntegrationSpec {
 
     def setup() {
         try {
-            spaceService.remove(TEST_SPACE)
+            spaceRemovalService.remove(TEST_SPACE)
         } catch (SpaceDoesNotExistException | BucketDoesNotExistException ignored ) {}
         spaceRepository.save(Space.of(TEST_SPACE))
         bucketService = bucketServiceFactory.buildBucketService(TEST_SPACE)
     }
 
     def cleanup() {
-        spaceService.remove(TEST_SPACE)
+        spaceRemovalService.remove(TEST_SPACE)
     }
 }

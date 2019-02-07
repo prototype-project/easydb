@@ -45,9 +45,9 @@ public class TransactionConfig {
 
     @Bean
     TransactionEngineFactory transactionEngineFactory(ElementsLockerFactory elementsLockerFactory,
-                                                      SpaceLocker spaceLocker, @Qualifier("lockerRetryier") Retryier lockerRetryier,
+                                                      @Qualifier("lockerRetryier") Retryier lockerRetryier,
                                                       SimpleElementOperationsFactory simpleElementOperationsFactory) {
-        return new TransactionEngineFactory(elementsLockerFactory, spaceLocker, lockerRetryier, simpleElementOperationsFactory);
+        return new TransactionEngineFactory(elementsLockerFactory, lockerRetryier, simpleElementOperationsFactory);
     }
 
     @Bean
