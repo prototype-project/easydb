@@ -5,7 +5,6 @@ import com.easydb.easydb.domain.transactions.TransactionDoesNotExistException;
 import com.easydb.easydb.domain.transactions.TransactionRepository;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
-// TODO hint for optimization - migrate to inmemory cache
 public class MongoTransactionRepository implements TransactionRepository {
 
     private final MongoTemplate mongoTemplate;

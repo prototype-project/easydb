@@ -1,6 +1,6 @@
 package com.easydb.easydb.domain.bucket;
 
-import com.easydb.easydb.domain.bucket.factories.SimpleElementOperationsFactory;
+import com.easydb.easydb.domain.bucket.factories.ElementServiceFactory;
 import com.easydb.easydb.domain.locker.BucketLocker;
 import com.easydb.easydb.domain.locker.SpaceLocker;
 import com.easydb.easydb.domain.space.Space;
@@ -20,7 +20,7 @@ public class TransactionalBucketService implements BucketService {
     private final SpaceRepository spaceRepository;
     private final BucketRepository bucketRepository;
     private final OptimizedTransactionManager optimizedTransactionManager;
-    private final SimpleElementOperations simpleElementOperations;
+    private final ElementService elementService;
     private final BucketLocker bucketLocker;
     private final SpaceLocker spaceLocker;
     private final Retryier transactionRetryier;
@@ -29,7 +29,7 @@ public class TransactionalBucketService implements BucketService {
     public TransactionalBucketService(String spaceName,
                                       SpaceRepository spaceRepository,
                                       BucketRepository bucketRepository,
-                                      SimpleElementOperationsFactory simpleElementOperationsFactory,
+                                      ElementServiceFactory elementServiceFactory,
                                       OptimizedTransactionManager optimizedTransactionManager,
                                       BucketLocker bucketLocker,
                                       SpaceLocker spaceLocker,
@@ -38,7 +38,7 @@ public class TransactionalBucketService implements BucketService {
         this.spaceName = spaceName;
         this.spaceRepository = spaceRepository;
         this.bucketRepository = bucketRepository;
-        this.simpleElementOperations = simpleElementOperationsFactory.buildSimpleElementOperations(spaceName);
+        this.elementService = elementServiceFactory.buildElementService(spaceName);
         this.optimizedTransactionManager = optimizedTransactionManager;
         this.bucketLocker = bucketLocker;
         this.spaceLocker = spaceLocker;
@@ -88,12 +88,12 @@ public class TransactionalBucketService implements BucketService {
 
     @Override
     public void addElement(Element element) {
-        simpleElementOperations.addElement(element);
+        elementService.addElement(element);
     }
 
     @Override
     public Element getElement(String bucketName, String id) {
-        return simpleElementOperations.getElement(bucketName, id).toSimpleElement();
+        return elementService.getElement(bucketName, id).toSimpleElement();
     }
 
     @Override
@@ -106,7 +106,7 @@ public class TransactionalBucketService implements BucketService {
 
     @Override
     public boolean elementExists(String bucketName, String elementId) {
-        return simpleElementOperations.elementExists(bucketName, elementId);
+        return elementService.elementExists(bucketName, elementId);
     }
 
     @Override
@@ -119,14 +119,14 @@ public class TransactionalBucketService implements BucketService {
 
     @Override
     public List<Element> filterElements(BucketQuery query) {
-        return simpleElementOperations.filterElements(query).stream()
+        return elementService.filterElements(query).stream()
                 .map(VersionedElement::toSimpleElement)
                 .collect(Collectors.toList());
     }
 
     @Override
     public long getNumberOfElements(String bucketName) {
-        return simpleElementOperations.getNumberOfElements(bucketName);
+        return elementService.getNumberOfElements(bucketName);
     }
 
     private String getBucketName(String bucketName) {

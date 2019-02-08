@@ -1,14 +1,15 @@
 package com.easydb.easydb.config;
 
-import com.easydb.easydb.domain.bucket.factories.SimpleElementOperationsFactory;
+import com.easydb.easydb.domain.bucket.BucketRepository;
+import com.easydb.easydb.domain.bucket.factories.ElementServiceFactory;
 
-import com.easydb.easydb.domain.locker.SpaceLocker;
 import com.easydb.easydb.domain.locker.factories.ElementsLockerFactory;
 import com.easydb.easydb.domain.space.SpaceRepository;
 import com.easydb.easydb.domain.space.UUIDProvider;
 import com.easydb.easydb.domain.transactions.DefaultTransactionManager;
 import com.easydb.easydb.domain.transactions.OptimizedTransactionManager;
 import com.easydb.easydb.domain.transactions.TransactionAbortedException;
+import com.easydb.easydb.domain.transactions.TransactionConstraintsValidator;
 import com.easydb.easydb.domain.transactions.TransactionEngineFactory;
 import com.easydb.easydb.domain.transactions.TransactionRepository;
 import com.easydb.easydb.domain.transactions.Retryier;
@@ -35,29 +36,29 @@ public class TransactionConfig {
     @Bean
     DefaultTransactionManager defaultTransactionManager(UUIDProvider uuidProvider,
                                                         TransactionRepository transactionRepository,
-                                                        SpaceRepository spaceRepository,
+                                                        TransactionConstraintsValidator transactionConstraintsValidator,
                                                         TransactionEngineFactory transactionEngineFactory,
-                                                        SimpleElementOperationsFactory simpleElementOperationsFactory,
+                                                        ElementServiceFactory elementServiceFactory,
                                                         ApplicationMetrics metrics) {
-        return new DefaultTransactionManager(uuidProvider, transactionRepository, spaceRepository,
-                transactionEngineFactory, simpleElementOperationsFactory, metrics);
+        return new DefaultTransactionManager(uuidProvider, transactionRepository, transactionConstraintsValidator,
+                transactionEngineFactory, elementServiceFactory, metrics);
     }
 
     @Bean
     TransactionEngineFactory transactionEngineFactory(ElementsLockerFactory elementsLockerFactory,
                                                       @Qualifier("lockerRetryier") Retryier lockerRetryier,
-                                                      SimpleElementOperationsFactory simpleElementOperationsFactory) {
-        return new TransactionEngineFactory(elementsLockerFactory, lockerRetryier, simpleElementOperationsFactory);
+                                                      ElementServiceFactory elementServiceFactory) {
+        return new TransactionEngineFactory(elementsLockerFactory, lockerRetryier, elementServiceFactory);
     }
 
     @Bean
     OptimizedTransactionManager optimizedTransactionManager(UUIDProvider uuidProvider,
-                                                            SpaceRepository spaceRepository,
+                                                            TransactionConstraintsValidator transactionConstraintsValidator,
                                                             TransactionEngineFactory transactionEngineFactory,
-                                                            SimpleElementOperationsFactory simpleElementOperationsFactory,
+                                                            ElementServiceFactory elementServiceFactory,
                                                             ApplicationMetrics metrics) {
-        return new OptimizedTransactionManager(uuidProvider, spaceRepository, transactionEngineFactory,
-                simpleElementOperationsFactory, metrics);
+        return new OptimizedTransactionManager(uuidProvider, transactionConstraintsValidator, transactionEngineFactory,
+                elementServiceFactory, metrics);
     }
 
 
@@ -75,4 +76,12 @@ public class TransactionConfig {
         retryTemplate.setBackOffPolicy(backOffPolicy);
         return new Retryier(retryTemplate);
     }
+
+    @Bean
+    TransactionConstraintsValidator transactionConstraintsValidator(SpaceRepository spaceRepository,
+                                                                    BucketRepository bucketRepository,
+                                                                    ElementServiceFactory elementServiceFactory) {
+        return new TransactionConstraintsValidator(spaceRepository, bucketRepository, elementServiceFactory);
+    }
+
 }

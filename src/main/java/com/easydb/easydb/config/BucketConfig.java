@@ -1,7 +1,7 @@
 package com.easydb.easydb.config;
 
 import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory;
-import com.easydb.easydb.domain.bucket.factories.SimpleElementOperationsFactory;
+import com.easydb.easydb.domain.bucket.factories.ElementServiceFactory;
 import com.easydb.easydb.domain.locker.BucketLocker;
 import com.easydb.easydb.domain.locker.SpaceLocker;
 import com.easydb.easydb.domain.space.SpaceRepository;
@@ -13,7 +13,6 @@ import com.easydb.easydb.infrastructure.bucket.MongoBucketRepository;
 import com.easydb.easydb.domain.bucket.factories.TransactionalBucketServiceFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import com.mongodb.MongoClient;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -34,21 +33,21 @@ public class BucketConfig {
     }
 
     @Bean
-    SimpleElementOperationsFactory simpleElementOperationsFactory(BucketRepository bucketRepository) {
-        return new SimpleElementOperationsFactory(bucketRepository);
+    ElementServiceFactory elementServiceFactory(BucketRepository bucketRepository) {
+        return new ElementServiceFactory(bucketRepository);
     }
 
     @Bean
     BucketServiceFactory bucketServiceFactory(
             BucketRepository bucketRepository, SpaceRepository spaceRepository,
-            SimpleElementOperationsFactory simpleElementOperationsFactory,
+            ElementServiceFactory elementServiceFactory,
             OptimizedTransactionManager optimizedTransactionManager,
             BucketLocker bucketLocker,
             SpaceLocker spaceLocker,
             @Qualifier("transactionRetryier")  Retryier transactionRetryier,
             @Qualifier("lockerRetryier") Retryier lockerRetryier) {
         return new TransactionalBucketServiceFactory(spaceRepository, bucketRepository,
-                simpleElementOperationsFactory, optimizedTransactionManager, bucketLocker,
+                elementServiceFactory, optimizedTransactionManager, bucketLocker,
                 spaceLocker, transactionRetryier, lockerRetryier);
     }
 }

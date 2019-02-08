@@ -56,6 +56,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
                 .type(Operation.OperationType.CREATE)
                 .fields([ElementField.of("name", "Daniel")])
                 .elementId(null)
+                .bucketName(TEST_BUCKET_NAME)
                 .build()
 
         when:
@@ -68,6 +69,26 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
         operations[0].type == operation.type
         operations[0].bucketName == operation.bucketName
         operations[0].fields == operation.fields
+    }
+
+    def "should throw 404 when adding create operation in not existing bucket"() {
+        given:
+        def transactionId = beginTransaction(spaceName).body.transactionId
+
+        def operation = OperationTestBuilder
+                .builder()
+                .type(Operation.OperationType.CREATE)
+                .fields([ElementField.of("name", "Daniel")])
+                .elementId(null)
+                .bucketName("notExistingBucket")
+                .build()
+
+        when:
+        addOperation(transactionId, operation)
+
+        then:
+        def ex= thrown(HttpClientErrorException)
+        ex.statusCode == HttpStatus.NOT_FOUND
     }
 
     def "should throw 404 when creating transaction for not existing space"() {
@@ -298,7 +319,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
         def element1Id = addElement(spaceName, element1ToCreate).body.id
         def element2Id = addElement(spaceName, element2ToCreate).body.id
 
-        assert getElements(spaceName).results.size() == 2
+        assert getElementsFromTestBucket(spaceName).results.size() == 2
 
         def operationUpdateElement1 = OperationTestBuilder.builder()
                 .type(Operation.OperationType.UPDATE)
@@ -320,7 +341,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
         commitTransaction(transactionId)
 
         then:
-        getElements(spaceName).results.size() == 1
+        getElementsFromTestBucket(spaceName).results.size() == 1
         getElement(spaceName, TEST_BUCKET_NAME, element1Id).fields.toSet() ==
                 [new ElementFieldDto("name", "Tadzik"), new ElementFieldDto("age", "30")].toSet()
 

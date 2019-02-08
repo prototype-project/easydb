@@ -7,7 +7,7 @@ import com.easydb.easydb.domain.bucket.BucketService
 import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.bucket.TransactionalBucketService
 import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
-import com.easydb.easydb.domain.bucket.factories.SimpleElementOperationsFactory
+import com.easydb.easydb.domain.bucket.factories.ElementServiceFactory
 import com.easydb.easydb.domain.locker.BucketLocker
 import com.easydb.easydb.domain.locker.SpaceLocker
 import com.easydb.easydb.domain.space.SpaceRepository
@@ -49,7 +49,7 @@ class TransactionRetryierSpec extends IntegrationWithCleanedDatabaseSpec {
 
     def setup() {
         mockedBucketService = new TransactionalBucketService("testSpace", Mock(SpaceRepository),
-                Mock(BucketRepository), Mock(SimpleElementOperationsFactory), optimizedTransactionManagerMock,
+                Mock(BucketRepository), Mock(ElementServiceFactory), optimizedTransactionManagerMock,
                 bucketLocker, spaceLocker, transactionRetryier, lockerRetryier)
 
     }

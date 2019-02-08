@@ -9,13 +9,13 @@ class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOp
 //
 //    def setup() {
 //        spaceName = addSampleSpace().body.spaceName
-//        addElement(spaceName, buildElementBody("Daniel", "D"))
-//        addElement(spaceName, buildElementBody("Bartek", "B"))
-//        addElement(spaceName, buildElementBody("Zdzisiek", "Z1"))
-//        addElement(spaceName, buildElementBody("Zdzisiek", "Z2"))
-//        addElement(spaceName, buildElementBody("Zdzisiek", "Z2", '20'))
-//        addElement(spaceName, buildElementBody("Zdzisiek", "Z2", '20'))
-//        addElement(spaceName, buildElementBody("Zdzisiek", "Z2", '21'))
+//        addElementToTestBucket(spaceName, buildElementBody("Daniel", "D"))
+//        addElementToTestBucket(spaceName, buildElementBody("Bartek", "B"))
+//        addElementToTestBucket(spaceName, buildElementBody("Zdzisiek", "Z1"))
+//        addElementToTestBucket(spaceName, buildElementBody("Zdzisiek", "Z2"))
+//        addElementToTestBucket(spaceName, buildElementBody("Zdzisiek", "Z2", '20'))
+//        addElementToTestBucket(spaceName, buildElementBody("Zdzisiek", "Z2", '20'))
+//        addElementToTestBucket(spaceName, buildElementBody("Zdzisiek", "Z2", '21'))
 //    }
 //
 //    def "should filter com.easydb.easydb.element.bucket elements by single field"() {

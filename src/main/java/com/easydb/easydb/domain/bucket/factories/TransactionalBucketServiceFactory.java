@@ -13,7 +13,7 @@ import com.easydb.easydb.domain.transactions.Retryier;
 public class TransactionalBucketServiceFactory implements BucketServiceFactory {
     private final BucketRepository bucketRepository;
     private final SpaceRepository spaceRepository;
-    private final SimpleElementOperationsFactory simpleElementOperationsFactory;
+    private final ElementServiceFactory elementServiceFactory;
     private final OptimizedTransactionManager defaultTransactionManager;
     private final BucketLocker bucketLocker;
     private final SpaceLocker spaceLocker;
@@ -22,7 +22,7 @@ public class TransactionalBucketServiceFactory implements BucketServiceFactory {
 
     public TransactionalBucketServiceFactory(SpaceRepository spaceRepository,
                                              BucketRepository bucketRepository,
-                                             SimpleElementOperationsFactory simpleElementOperationsFactory,
+                                             ElementServiceFactory elementServiceFactory,
                                              OptimizedTransactionManager defaultTransactionManager,
                                              BucketLocker bucketLocker,
                                              SpaceLocker spaceLocker,
@@ -30,7 +30,7 @@ public class TransactionalBucketServiceFactory implements BucketServiceFactory {
                                              Retryier lockerRetryier) {
         this.spaceRepository = spaceRepository;
         this.bucketRepository = bucketRepository;
-        this.simpleElementOperationsFactory = simpleElementOperationsFactory;
+        this.elementServiceFactory = elementServiceFactory;
         this.defaultTransactionManager = defaultTransactionManager;
         this.bucketLocker = bucketLocker;
         this.spaceLocker = spaceLocker;
@@ -43,7 +43,7 @@ public class TransactionalBucketServiceFactory implements BucketServiceFactory {
             throw new SpaceDoesNotExistException(spaceName);
         }
         return new TransactionalBucketService(spaceName, spaceRepository, bucketRepository,
-                simpleElementOperationsFactory, defaultTransactionManager, bucketLocker,
+                elementServiceFactory, defaultTransactionManager, bucketLocker,
                 spaceLocker, transactionRetryier, lockerRetryier);
     }
 }

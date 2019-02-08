@@ -14,7 +14,7 @@ class BucketElementsPaginationSpec extends BaseIntegrationSpec implements TestHt
     def setup() {
         spaceName = addSampleSpace().body.spaceName
         createTestBucket(spaceName)
-        addElement(spaceName, buildElementBody(
+        addElementToTestBucket(spaceName, buildElementBody(
                 ElementTestBuilder
                         .builder()
                         .bucketName(TEST_BUCKET_NAME)
@@ -23,7 +23,7 @@ class BucketElementsPaginationSpec extends BaseIntegrationSpec implements TestHt
                         .addField(ElementField.of("lastName", "Faderski"))
                         .build()))
 
-        addElement(spaceName, buildElementBody(
+        addElementToTestBucket(spaceName, buildElementBody(
                 ElementTestBuilder
                         .builder()
                         .bucketName(TEST_BUCKET_NAME)
@@ -32,7 +32,7 @@ class BucketElementsPaginationSpec extends BaseIntegrationSpec implements TestHt
                         .addField(ElementField.of("lastName", "Faderski"))
                         .build()))
 
-        addElement(spaceName, buildElementBody(
+        addElementToTestBucket(spaceName, buildElementBody(
                 ElementTestBuilder
                         .builder()
                         .bucketName(TEST_BUCKET_NAME)
@@ -44,7 +44,7 @@ class BucketElementsPaginationSpec extends BaseIntegrationSpec implements TestHt
 
     def "should properly paginate results by offset when all elements was fetched"() {
         when:
-        PaginatedElementsDto paginated = getElements(spaceName, 1, 2)
+        PaginatedElementsDto paginated = getElementsFromTestBucket(spaceName, 1, 2)
 
         then:
         paginated.getResults().size() == 2
@@ -53,7 +53,7 @@ class BucketElementsPaginationSpec extends BaseIntegrationSpec implements TestHt
 
     def "should properly paginate results by offset when there are still more elements to fetch"() {
         when:
-        PaginatedElementsDto paginated = getElements(spaceName, 0, 1)
+        PaginatedElementsDto paginated = getElementsFromTestBucket(spaceName, 0, 1)
 
         then:
         paginated.getResults().size() == 1
@@ -76,7 +76,7 @@ class BucketElementsPaginationSpec extends BaseIntegrationSpec implements TestHt
 
     def "should properly paginate results by limit when all elements was fetched"() {
         when:
-        PaginatedElementsDto paginated = getElements(spaceName, 0, 4)
+        PaginatedElementsDto paginated = getElementsFromTestBucket(spaceName, 0, 4)
 
         then:
         paginated.getResults().size() == 3
@@ -85,7 +85,7 @@ class BucketElementsPaginationSpec extends BaseIntegrationSpec implements TestHt
 
     def "should properly paginate results by limit when there are still more elements to fetch"() {
         when:
-        PaginatedElementsDto paginated = getElements(spaceName, 0, 2)
+        PaginatedElementsDto paginated = getElementsFromTestBucket(spaceName, 0, 2)
 
         then:
         paginated.getResults().size() == 2
@@ -101,7 +101,7 @@ class BucketElementsPaginationSpec extends BaseIntegrationSpec implements TestHt
 
     def "should throw error when trying to paginate by limit <= 0"() {
         when:
-        getElements(spaceName, 0, 0)
+        getElementsFromTestBucket(spaceName, 0, 0)
 
         then:
         def response = thrown(HttpClientErrorException)
@@ -110,7 +110,7 @@ class BucketElementsPaginationSpec extends BaseIntegrationSpec implements TestHt
 
     def "should throw error when trying to paginate by offset < 0"() {
         when:
-        getElements(spaceName, -1, 2)
+        getElementsFromTestBucket(spaceName, -1, 2)
 
         then:
         def response = thrown(HttpClientErrorException)

@@ -142,7 +142,7 @@ public class MongoBucketRepository implements BucketRepository {
         }
     }
 
-    // TODO only in sharding mongo mode
+    // TODO only in sharding mongo mode - add config
     private void createShardIfInsertingFirstElement(String bucketName) {
         if (!bucketExists(bucketName)) {
            createShardedCollection(bucketName);

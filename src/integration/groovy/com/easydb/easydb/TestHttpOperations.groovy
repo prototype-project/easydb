@@ -18,7 +18,7 @@ trait TestHttpOperations {
 
     static String TEST_BUCKET_NAME = "bucketPeoples"
 
-    PaginatedElementsDto getElements(String spaceName, int offset = 0, int limit = 10, Map<String, String> filters = [:]) {
+    PaginatedElementsDto getElementsFromTestBucket(String spaceName, int offset = 0, int limit = 10, Map<String, String> filters = [:]) {
         String filtersAsString = ''
         filters.forEach({ key, val -> filtersAsString = filtersAsString + '&' + key + '=' + val })
         getElementsByFullUrl(buildUrl(spaceName, TEST_BUCKET_NAME, limit, offset, filtersAsString))
@@ -35,7 +35,7 @@ trait TestHttpOperations {
                 buildElementUrl(spaceName, bucketName, id), ElementQueryDto).body
     }
 
-    ResponseEntity<ElementQueryDto> addElement(String spaceName, String bucketName, String body) {
+    ResponseEntity<ElementQueryDto> addElementToTestBucket(String spaceName, String bucketName, String body) {
         return restTemplate.exchange(
                 buildElementUrl(spaceName, bucketName),
                 HttpMethod.POST,
@@ -43,12 +43,12 @@ trait TestHttpOperations {
                 ElementQueryDto.class)
     }
 
-    ResponseEntity<ElementQueryDto> addElement(String spaceName, String body) {
-        addElement(spaceName, TEST_BUCKET_NAME, body)
+    ResponseEntity<ElementQueryDto> addElementToTestBucket(String spaceName, String body) {
+        addElementToTestBucket(spaceName, TEST_BUCKET_NAME, body)
     }
 
-    ResponseEntity<ElementQueryDto> addSampleElement(String spaceName) {
-        addElement(spaceName, TEST_BUCKET_NAME, sampleElementBody())
+    ResponseEntity<ElementQueryDto> addSampleElementToTestBucket(String spaceName) {
+        addElementToTestBucket(spaceName, TEST_BUCKET_NAME, sampleElementBody())
     }
 
     ResponseEntity<ElementQueryDto> addElement(String spaceName, Element element) {

@@ -10,7 +10,6 @@ import java.util.Map;
 public class Transaction {
 
     public enum State {
-        // TODO change transactions states, add cleaning background process
         ACTIVE, ABORTED, COMMITED;
     }
 

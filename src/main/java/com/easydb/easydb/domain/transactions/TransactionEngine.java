@@ -1,28 +1,26 @@
 package com.easydb.easydb.domain.transactions;
 
 import com.easydb.easydb.domain.bucket.Element;
-import com.easydb.easydb.domain.bucket.SimpleElementOperations;
+import com.easydb.easydb.domain.bucket.ElementService;
 import com.easydb.easydb.domain.bucket.VersionedElement;
 import com.easydb.easydb.domain.locker.ElementsLocker;
-import com.easydb.easydb.domain.locker.SpaceLocker;
 import com.easydb.easydb.domain.locker.factories.ElementsLockerFactory;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// TODO transaction rollback
 class TransactionEngine {
     private static final Logger logger = LoggerFactory.getLogger(TransactionEngine.class);
 
     private final ElementsLockerFactory lockerFactory;
     private final Retryier lockerRetryier;
-    private final SimpleElementOperations simpleElementOperations;
+    private final ElementService elementService;
 
     TransactionEngine(ElementsLockerFactory lockerFactory, Retryier lockerRetryier,
-                      SimpleElementOperations simpleElementOperations) {
+                      ElementService elementService) {
         this.lockerFactory = lockerFactory;
         this.lockerRetryier = lockerRetryier;
-        this.simpleElementOperations = simpleElementOperations;
+        this.elementService = elementService;
     }
 
     void commit(Transaction transaction) {
@@ -56,13 +54,13 @@ class TransactionEngine {
         Element element = Element.of(o.getElementId(), o.getBucketName(), o.getFields());
         switch (o.getType()) {
             case CREATE:
-                simpleElementOperations.addElement(element);
+                elementService.addElement(element);
                 break;
             case UPDATE:
                 performUpdateOperation(o, t);
                 break;
             case DELETE:
-                simpleElementOperations.removeElement(o.getBucketName(), o.getElementId());
+                elementService.removeElement(o.getBucketName(), o.getElementId());
                 break;
         }
     }
@@ -73,6 +71,6 @@ class TransactionEngine {
                 .map(v -> VersionedElement.of(o.getElementId(), o.getBucketName(), o.getFields(), v))
                 .orElseGet(() -> VersionedElement.of(o.getElementId(), o.getBucketName(), o.getFields()));
 
-        simpleElementOperations.updateElement(versionedElement);
+        elementService.updateElement(versionedElement);
     }
 }

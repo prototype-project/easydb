@@ -3,12 +3,12 @@ package com.easydb.easydb.domain.bucket;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SimpleElementOperations {
+public class ElementService {
 
     private final String spaceName;
     private final BucketRepository bucketRepository;
 
-    public SimpleElementOperations(
+    public ElementService(
             String spaceName,
             BucketRepository bucketRepository) {
         this.spaceName = spaceName;

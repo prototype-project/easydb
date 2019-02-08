@@ -1,9 +1,8 @@
 package com.easydb.easydb.domain.transactions;
 
 import com.easydb.easydb.config.ApplicationMetrics;
-import com.easydb.easydb.domain.bucket.SimpleElementOperations;
-import com.easydb.easydb.domain.bucket.factories.SimpleElementOperationsFactory;
-import com.easydb.easydb.domain.space.SpaceRepository;
+import com.easydb.easydb.domain.bucket.ElementService;
+import com.easydb.easydb.domain.bucket.factories.ElementServiceFactory;
 import com.easydb.easydb.domain.space.UUIDProvider;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -15,27 +14,27 @@ public class DefaultTransactionManager {
 
     private final UUIDProvider uuidProvider;
     private final TransactionRepository transactionRepository;
-    private final SpaceRepository spaceRepository;
+    private final TransactionConstraintsValidator transactionConstraintsValidator;
     private final TransactionEngineFactory transactionEngineFactory;
-    private final SimpleElementOperationsFactory simpleElementOperationsFactory;
+    private final ElementServiceFactory elementServiceFactory;
     private final ApplicationMetrics metrics;
 
     public DefaultTransactionManager(UUIDProvider uuidProvider,
                                      TransactionRepository transactionRepository,
-                                     SpaceRepository spaceRepository,
+                                     TransactionConstraintsValidator transactionConstraintsValidator,
                                      TransactionEngineFactory transactionEngineFactory,
-                                     SimpleElementOperationsFactory simpleElementOperationsFactory,
+                                     ElementServiceFactory elementServiceFactory,
                                      ApplicationMetrics metrics) {
         this.uuidProvider = uuidProvider;
         this.transactionRepository = transactionRepository;
-        this.spaceRepository = spaceRepository;
+        this.transactionConstraintsValidator = transactionConstraintsValidator;
         this.transactionEngineFactory = transactionEngineFactory;
-        this.simpleElementOperationsFactory = simpleElementOperationsFactory;
+        this.elementServiceFactory = elementServiceFactory;
         this.metrics = metrics;
     }
 
     public String beginTransaction(String spaceName) {
-        ensureSpaceExists(spaceName);
+        transactionConstraintsValidator.ensureSpaceExists(spaceName);
 
         String uuid = uuidProvider.generateUUID();
         Transaction transaction = new Transaction(spaceName, uuid);
@@ -46,7 +45,7 @@ public class DefaultTransactionManager {
     public OperationResult addOperation(String transactionId, Operation operation) {
         Transaction transaction = transactionRepository.get(transactionId);
 
-        ensureElementAndBucketExist(transaction.getSpaceName(), operation);
+        transactionConstraintsValidator.ensureOperationConstraints(transaction.getSpaceName(), operation);
 
         OperationResult result = getResultForOperation(transaction, operation);
 
@@ -78,28 +77,16 @@ public class DefaultTransactionManager {
         }
     }
 
-    private void ensureSpaceExists(String spaceName) {
-        spaceRepository.get(spaceName);
-    }
-
-    private void ensureElementAndBucketExist(String spaceName, Operation operation) {
-        if (!operation.getType().equals(Operation.OperationType.CREATE) &&
-                !operation.getType().equals(Operation.OperationType.READ)) {
-            simpleElementOperationsFactory.buildSimpleElementOperations(spaceName)
-                    .getElement(operation.getBucketName(), operation.getElementId());
-        }
-    }
-
     private OperationResult getResultForOperation(Transaction t, Operation o) {
         try {
             if (o.getType().equals(Operation.OperationType.READ)) {
-                SimpleElementOperations simpleElementOperations = simpleElementOperationsFactory
-                        .buildSimpleElementOperations(t.getSpaceName());
+                ElementService elementService = elementServiceFactory
+                        .buildElementService(t.getSpaceName());
 
                 return Optional.ofNullable(t.getReadElements().get(o.getElementId()))
                         .map(version ->
-                                OperationResult.of(simpleElementOperations.getElement(o.getBucketName(), o.getElementId(), version), t.getSpaceName()))
-                        .orElseGet(() -> OperationResult.of(simpleElementOperations.getElement(o.getBucketName(), o.getElementId()), t.getSpaceName()));
+                                OperationResult.of(elementService.getElement(o.getBucketName(), o.getElementId(), version), t.getSpaceName()))
+                        .orElseGet(() -> OperationResult.of(elementService.getElement(o.getBucketName(), o.getElementId()), t.getSpaceName()));
             }
             return OperationResult.emptyResult(t.getSpaceName());
         } catch (ConcurrentTransactionDetectedException e) {
