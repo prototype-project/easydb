@@ -15,20 +15,20 @@ public class DefaultTransactionManager {
     private final UUIDProvider uuidProvider;
     private final TransactionRepository transactionRepository;
     private final TransactionConstraintsValidator transactionConstraintsValidator;
-    private final TransactionEngineFactory transactionEngineFactory;
+    private final TransactionCommitterFactory transactionCommitterFactory;
     private final ElementServiceFactory elementServiceFactory;
     private final ApplicationMetrics metrics;
 
     public DefaultTransactionManager(UUIDProvider uuidProvider,
                                      TransactionRepository transactionRepository,
                                      TransactionConstraintsValidator transactionConstraintsValidator,
-                                     TransactionEngineFactory transactionEngineFactory,
+                                     TransactionCommitterFactory transactionCommitterFactory,
                                      ElementServiceFactory elementServiceFactory,
                                      ApplicationMetrics metrics) {
         this.uuidProvider = uuidProvider;
         this.transactionRepository = transactionRepository;
         this.transactionConstraintsValidator = transactionConstraintsValidator;
-        this.transactionEngineFactory = transactionEngineFactory;
+        this.transactionCommitterFactory = transactionCommitterFactory;
         this.elementServiceFactory = elementServiceFactory;
         this.metrics = metrics;
     }
@@ -65,10 +65,10 @@ public class DefaultTransactionManager {
     }
 
     private void commit(Transaction transaction) {
-        TransactionEngine transactionEngine = transactionEngineFactory.build(transaction.getSpaceName());
+        TransactionCommitter transactionCommitter = transactionCommitterFactory.build(transaction.getSpaceName());
 
         try {
-            transactionEngine.commit(transaction);
+            transactionCommitter.commit(transaction);
         } catch (Exception e) {
             logger.error("Aborting transaction {} ...", transaction.getId(), e);
             metrics.abortedTransactionCounter(transaction.getSpaceName()).increment();

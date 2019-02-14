@@ -1,6 +1,6 @@
 FROM ubuntu:18.04
 
-ENV ZOOKEEPER_VERSION 3.4.12
+ENV ZOOKEEPER_VERSION 3.5.3-beta
 ENV JAVA_HOME "/usr/lib/jvm/java-8-openjdk-amd64"
 
     # install java8
@@ -12,7 +12,7 @@ RUN apt-get -y update && \
 
 # install zookeeper
 RUN apt-get install -y wget && \
-    wget https://www-us.apache.org/dist/zookeeper/stable/zookeeper-${ZOOKEEPER_VERSION}.tar.gz && \
+    wget https://www-eu.apache.org/dist/zookeeper/zookeeper-${ZOOKEEPER_VERSION}/zookeeper-${ZOOKEEPER_VERSION}.tar.gz && \
     tar -xf zookeeper-${ZOOKEEPER_VERSION}.tar.gz -C /opt/ && \
     mv /opt/zookeeper-${ZOOKEEPER_VERSION} /opt/zookeeper && \
     rm zookeeper-${ZOOKEEPER_VERSION}.tar.gz

@@ -65,7 +65,8 @@ services:
     image: easydb/zookeeper
     networks:
       - easydb
-
+    ports:
+      - "2181:2181"
 
 volumes:
   mongo-data-volume:

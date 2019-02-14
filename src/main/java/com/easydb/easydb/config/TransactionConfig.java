@@ -10,7 +10,7 @@ import com.easydb.easydb.domain.transactions.DefaultTransactionManager;
 import com.easydb.easydb.domain.transactions.OptimizedTransactionManager;
 import com.easydb.easydb.domain.transactions.TransactionAbortedException;
 import com.easydb.easydb.domain.transactions.TransactionConstraintsValidator;
-import com.easydb.easydb.domain.transactions.TransactionEngineFactory;
+import com.easydb.easydb.domain.transactions.TransactionCommitterFactory;
 import com.easydb.easydb.domain.transactions.TransactionRepository;
 import com.easydb.easydb.domain.transactions.Retryier;
 import com.easydb.easydb.infrastructure.transactions.MongoTransactionRepository;
@@ -37,28 +37,26 @@ public class TransactionConfig {
     DefaultTransactionManager defaultTransactionManager(UUIDProvider uuidProvider,
                                                         TransactionRepository transactionRepository,
                                                         TransactionConstraintsValidator transactionConstraintsValidator,
-                                                        TransactionEngineFactory transactionEngineFactory,
+                                                        TransactionCommitterFactory transactionCommitterFactory,
                                                         ElementServiceFactory elementServiceFactory,
                                                         ApplicationMetrics metrics) {
         return new DefaultTransactionManager(uuidProvider, transactionRepository, transactionConstraintsValidator,
-                transactionEngineFactory, elementServiceFactory, metrics);
+                transactionCommitterFactory, elementServiceFactory, metrics);
     }
 
     @Bean
-    TransactionEngineFactory transactionEngineFactory(ElementsLockerFactory elementsLockerFactory,
-                                                      @Qualifier("lockerRetryier") Retryier lockerRetryier,
-                                                      ElementServiceFactory elementServiceFactory) {
-        return new TransactionEngineFactory(elementsLockerFactory, lockerRetryier, elementServiceFactory);
+    TransactionCommitterFactory transactionCommitterFactory(ElementsLockerFactory elementsLockerFactory,
+                                                         @Qualifier("lockerRetryier") Retryier lockerRetryier,
+                                                         ElementServiceFactory elementServiceFactory) {
+        return new TransactionCommitterFactory(elementsLockerFactory, lockerRetryier, elementServiceFactory);
     }
 
     @Bean
     OptimizedTransactionManager optimizedTransactionManager(UUIDProvider uuidProvider,
                                                             TransactionConstraintsValidator transactionConstraintsValidator,
-                                                            TransactionEngineFactory transactionEngineFactory,
-                                                            ElementServiceFactory elementServiceFactory,
+                                                            TransactionCommitterFactory transactionCommitterFactory,
                                                             ApplicationMetrics metrics) {
-        return new OptimizedTransactionManager(uuidProvider, transactionConstraintsValidator, transactionEngineFactory,
-                elementServiceFactory, metrics);
+        return new OptimizedTransactionManager(uuidProvider, transactionConstraintsValidator, transactionCommitterFactory, metrics);
     }
 
 

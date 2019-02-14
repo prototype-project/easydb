@@ -1,8 +1,6 @@
 package com.easydb.easydb.domain.transactions;
 
 import com.easydb.easydb.config.ApplicationMetrics;
-import com.easydb.easydb.domain.bucket.factories.ElementServiceFactory;
-import com.easydb.easydb.domain.space.SpaceRepository;
 import com.easydb.easydb.domain.space.UUIDProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,19 +14,16 @@ public class OptimizedTransactionManager {
 
     private final UUIDProvider uuidProvider;
     private final TransactionConstraintsValidator transactionConstraintsValidator;
-    private final TransactionEngineFactory transactionEngineFactory;
-    private final ElementServiceFactory elementServiceFactory;
+    private final TransactionCommitterFactory transactionCommitterFactory;
     private final ApplicationMetrics metrics;
 
     public OptimizedTransactionManager(UUIDProvider uuidProvider,
                                        TransactionConstraintsValidator transactionConstraintsValidator,
-                                       TransactionEngineFactory transactionEngineFactory,
-                                       ElementServiceFactory elementServiceFactory,
+                                       TransactionCommitterFactory transactionCommitterFactory,
                                        ApplicationMetrics metrics) {
         this.uuidProvider = uuidProvider;
         this.transactionConstraintsValidator = transactionConstraintsValidator;
-        this.transactionEngineFactory = transactionEngineFactory;
-        this.elementServiceFactory = elementServiceFactory;
+        this.transactionCommitterFactory = transactionCommitterFactory;
         this.metrics = metrics;
     }
 
@@ -49,9 +44,9 @@ public class OptimizedTransactionManager {
     }
 
     private void commit(Transaction transaction) {
-        TransactionEngine transactionEngine = transactionEngineFactory.build(transaction.getSpaceName());
+        TransactionCommitter transactionCommitter = transactionCommitterFactory.build(transaction.getSpaceName());
         try {
-            transactionEngine.commit(transaction);
+            transactionCommitter.commit(transaction);
         } catch (Exception e) {
             logger.error("Aborting transaction {} ...", transaction.getId(), e);
             metrics.abortedTransactionCounter(transaction.getSpaceName()).increment();

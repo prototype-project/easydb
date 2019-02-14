@@ -9,15 +9,15 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class TransactionEngine {
-    private static final Logger logger = LoggerFactory.getLogger(TransactionEngine.class);
+class TransactionCommitter {
+    private static final Logger logger = LoggerFactory.getLogger(TransactionCommitter.class);
 
     private final ElementsLockerFactory lockerFactory;
     private final Retryier lockerRetryier;
     private final ElementService elementService;
 
-    TransactionEngine(ElementsLockerFactory lockerFactory, Retryier lockerRetryier,
-                      ElementService elementService) {
+    TransactionCommitter(ElementsLockerFactory lockerFactory, Retryier lockerRetryier,
+                         ElementService elementService) {
         this.lockerFactory = lockerFactory;
         this.lockerRetryier = lockerRetryier;
         this.elementService = elementService;
