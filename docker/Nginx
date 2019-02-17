@@ -1,19 +1,28 @@
 FROM ubuntu:16.04
 
 RUN apt-get update -y && \
-    apt-get install wget && \
-    apt-get install libpcre3 libpcre3-dev && \
-    apt-get install libpcre3 libpcre3-dev && \
+    apt-get install -y wget && \
+    apt-get install -y libpcre3 libpcre3-dev && \
+    apt-get install -y libssl-dev && \
+    apt-get install -y make && \
+    apt-get install -y build-essential && \
+    apt-get install -y git && \
     wget https://openresty.org/download/openresty-1.13.6.2.tar.gz && \
     tar -xvf openresty-1.13.6.2.tar.gz && \
+    rm openresty-1.13.6.2.tar.gz && \
     cd openresty-1.13.6.2 && \
-    ./configure -j2 && \
+    git clone git://github.com/yzprofile/ngx_http_dyups_module.git && \
+    ./configure -j2 --add-module=./ngx_http_dyups_module && \
+    make build && \
     make install
 
+ENV PATH=$PATH:/usr/local/openresty/luajit/bin:/usr/local/openresty/nginx/sbin:/usr/local/openresty/bin
 
 
+ADD files/nginx.conf /etc/nginx/nginx.conf
 
-
-ADD files/nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 8080
+EXPOSE 8081
+
+CMD openresty -g "daemon off; error_log  stderr  info;" -c /etc/nginx/nginx.conf

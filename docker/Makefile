@@ -23,12 +23,14 @@ stop:
 	@docker kill `docker ps -f "ancestor=easydb/mongo" -q` 2> /dev/null || true
 	@docker kill `docker ps -f "ancestor=easydb/zookeeper" -q` 2> /dev/null || true
 	@docker kill `docker ps -f "ancestor=easydb/load_balancer" -q` 2> /dev/null || true
+	@docker kill `docker ps -f "ancestor=easydb/discovery_scraper" -q` 2> /dev/null || true
 
 	@echo "Clearing easydb docker processes traces..."
 	@docker rm `docker ps -a -f "ancestor=easydb/app" -q` 2> /dev/null || true
 	@docker rm `docker ps -a -f "ancestor=easydb/monitoring" -q` 2> /dev/null || true
 	@docker rm `docker ps -a -f "ancestor=easydb/mongo" -q` 2> /dev/null || true
 	@docker rm `docker ps -a -f "ancestor=easydb/load_balancer" -q` 2> /dev/null || true
+	@docker rm `docker ps -a -f "ancestor=easydb/discovery_scraper" -q` 2> /dev/null || true
 
 clean:
 	rm -rf ./logs

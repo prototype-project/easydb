@@ -1,0 +1,13 @@
+FROM python:3.7
+
+RUN apt-get -y update && \
+    apt-get install git && \
+    git clone https://github.com/prototype-project/easydb-discovery-scraper.git && \
+    cd easydb-discovery-scraper && \
+    pip install -r requirements.txt
+
+
+ENV ZOOKEEPER_HOSTS 'zookeeper:2181'
+ENV LOAD_BALANCERS 'nginx:8081'
+
+CMD python easydb-discovery-scraper/scraper.py

@@ -1,31 +1,30 @@
 version: "3"
 services:
+  discovery-scraper:
+    build:
+      context: ""
+      dockerfile: DiscoveryScraper
+    image: easydb/discovery_scraper
+    depends_on:
+      - zookeeper
+      - nginx
+    networks:
+      - easydb
+
   nginx:
     build:
       context: ""
       dockerfile: Nginx
     image: easydb/load_balancer
     depends_on:
-      - easydb1
-      - easydb2
+      - easydb
     networks:
       - easydb
     ports:
-      - "8000:8080"
+      - "8000:80"
+      - "8001:8081"
 
-  easydb1:
-    build:
-      context: ""
-      dockerfile: Easydb
-    image: easydb/app
-    depends_on:
-      - monitoring
-      - mongo
-      - zookeeper
-    networks:
-      - easydb
-
-  easydb2:
+  easydb:
     build:
       context: ""
       dockerfile: Easydb
