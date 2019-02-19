@@ -1,5 +1,7 @@
 FROM ubuntu:16.04
 
+ENV OPENRESTY_VERSION 1.13.6.2
+
 RUN apt-get update -y && \
     apt-get install -y wget && \
     apt-get install -y libpcre3 libpcre3-dev && \
@@ -7,10 +9,10 @@ RUN apt-get update -y && \
     apt-get install -y make && \
     apt-get install -y build-essential && \
     apt-get install -y git && \
-    wget https://openresty.org/download/openresty-1.13.6.2.tar.gz && \
-    tar -xvf openresty-1.13.6.2.tar.gz && \
-    rm openresty-1.13.6.2.tar.gz && \
-    cd openresty-1.13.6.2 && \
+    wget https://openresty.org/download/openresty-${OPENRESTY_VERSION}.tar.gz && \
+    tar -xvf openresty-${OPENRESTY_VERSION}.tar.gz && \
+    rm openresty-${OPENRESTY_VERSION}.tar.gz && \
+    cd openresty-${OPENRESTY_VERSION} && \
     git clone git://github.com/yzprofile/ngx_http_dyups_module.git && \
     ./configure -j2 --add-module=./ngx_http_dyups_module && \
     make build && \
