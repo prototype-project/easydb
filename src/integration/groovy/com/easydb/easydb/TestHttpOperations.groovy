@@ -12,22 +12,21 @@ import groovy.json.JsonOutput
 import groovy.transform.SelfType
 import org.springframework.http.HttpMethod
 import org.springframework.http.ResponseEntity
+import org.yaml.snakeyaml.util.UriEncoder
 
 @SelfType(BaseIntegrationSpec)
 trait TestHttpOperations {
 
     static String TEST_BUCKET_NAME = "bucketPeoples"
 
-    PaginatedElementsDto getElementsFromTestBucket(String spaceName, int offset = 0, int limit = 10, Map<String, String> filters = [:]) {
-        String filtersAsString = ''
-        filters.forEach({ key, val -> filtersAsString = filtersAsString + '&' + key + '=' + val })
-        getElementsByFullUrl(buildUrl(spaceName, TEST_BUCKET_NAME, limit, offset, filtersAsString))
+    PaginatedElementsDto getElementsFromTestBucket(String spaceName, int offset = 0, int limit = 10, String query = '') {
+        getElementsByFullUrl(buildUrl(spaceName, TEST_BUCKET_NAME, limit, offset, query))
     }
 
     PaginatedElementsDto getElementsByFullUrl(String fullUrl) {
-        restTemplate.getForEntity(
+        restTemplate.getForObject(
                 fullUrl,
-                PaginatedElementsDto.class).body
+                PaginatedElementsDto.class)
     }
 
     ElementQueryDto getElement(String spaceName, String bucketName, String id) {
@@ -158,7 +157,11 @@ trait TestHttpOperations {
                 ElementTestBuilder.builder().build())
     }
 
-    private String buildUrl(String spaceId, String bucketName, int limit, int offset, String filters = '') {
-        localUrl(String.format("/api/v1/spaces/%s/buckets/%s/elements?limit=%d&offset=%d&%s", spaceId, bucketName, limit, offset, filters))
+    private String buildUrl(String spaceId, String bucketName, int limit, int offset, String query) {
+        String queryString = ''
+        if (query) {
+            queryString = '&query=' + UriEncoder.encode(query)
+        }
+        localUrl(String.format("/api/v1/spaces/%s/buckets/%s/elements?limit=%d&offset=%d%s", spaceId, bucketName, limit, offset, queryString))
     }
 }

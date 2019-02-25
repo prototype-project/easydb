@@ -64,6 +64,7 @@ public class ElementService {
     }
 
     private BucketQuery rebuildToProperSpaceName(BucketQuery query) {
-        return BucketQuery.of(getBucketNameAccordinglyToSpace(query.getBucketName()), query.getLimit(), query.getOffset());
+        return BucketQuery.of(getBucketNameAccordinglyToSpace(query.getBucketName()), query.getLimit(),
+                query.getOffset(), query.getQuery());
     }
 }

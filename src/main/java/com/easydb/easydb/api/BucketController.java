@@ -14,6 +14,7 @@ import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.yaml.snakeyaml.util.UriEncoder;
 
 @RestController
 @RequestMapping(value = "/api/v1/spaces/{spaceName}/buckets")
@@ -99,10 +100,11 @@ class BucketController {
             @PathVariable("bucketName") String bucketName,
             @RequestParam(value = "limit", defaultValue = "20") int limit,
             @RequestParam(value = "offset", defaultValue = "0") int offset,
+            @RequestParam(value = "query", defaultValue = "") String queryAsString,
             HttpServletRequest request) {
         BucketService bucketService = bucketServiceFactory.buildBucketService(spaceName);
 
-        BucketQuery query = BucketQuery.of(bucketName, limit, offset);
+        BucketQuery query = BucketQuery.of(bucketName, limit, offset, UriEncoder.decode(queryAsString));
 
         List<ElementQueryDto> results = bucketService.filterElements(query).stream()
                 .map(ElementQueryDto::of)

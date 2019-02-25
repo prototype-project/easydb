@@ -62,7 +62,9 @@ dependencies {
     compile group: 'net.sf.jopt-simple', name: 'jopt-simple', version: '5.0.4'
     compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.2.RELEASE'
     compile group: 'org.apache.curator', name: 'curator-x-discovery', version: '4.0.1'
-
+    compile group: 'com.graphql-java', name: 'graphql-java', version: '11.0'
+    compile group: 'com.graphql-java-kickstart', name: 'graphql-java-tools', version: '5.5.0'
+    
     testCompile group: 'org.spockframework', name: 'spock-spring', version: '1.1-groovy-2.4'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.23.0'
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: project.springBootVersion

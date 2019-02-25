@@ -1,0 +1,28 @@
+type Field {
+    name: String!
+    value: String!
+}
+
+type Element {
+    id: String!
+    fields: [Field]
+}
+
+type Query {
+    elements(filter: ElementFilter): [Element]
+}
+
+input ElementFilter {
+    fieldsFilters: [FieldFilter]
+    or: [ElementFilter]
+    and: [ElementFilter]
+}
+
+input FieldFilter {
+    name: String!
+    value: String!
+}
+
+schema {
+    query: Query
+}

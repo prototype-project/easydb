@@ -6,8 +6,12 @@ import com.easydb.easydb.domain.bucket.BucketQuery;
 import com.easydb.easydb.domain.bucket.ElementAlreadyExistsException;
 import com.easydb.easydb.domain.transactions.ConcurrentTransactionDetectedException;
 import com.easydb.easydb.domain.bucket.VersionedElement;
+import com.easydb.easydb.infrastructure.bucket.graphql.GraphQlProvider;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
+import graphql.ExecutionResult;
+import graphql.GraphQL;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,14 +34,17 @@ public class MongoBucketRepository implements BucketRepository {
     private final MongoClient mongoClient;
     private final MongoClient mongoAdminClient;
     private final MongoProperties mongoProperties;
+    private final GraphQlProvider graphQlProvider;
 
     public MongoBucketRepository(MongoTemplate mongoTemplate, MongoClient mongoClient,
                                  MongoClient mongoAdminClient,
-                                 MongoProperties mongoProperties) {
+                                 MongoProperties mongoProperties,
+                                 GraphQlProvider graphQlProvider) {
         this.mongoTemplate = mongoTemplate;
         this.mongoClient = mongoClient;
         this.mongoAdminClient = mongoAdminClient;
         this.mongoProperties = mongoProperties;
+        this.graphQlProvider = graphQlProvider;
     }
 
     @Override
@@ -122,6 +129,10 @@ public class MongoBucketRepository implements BucketRepository {
     @Override
     public List<VersionedElement> filterElements(BucketQuery query) {
         ensureBucketExists(query.getBucketName());
+
+        LinkedHashMap map = graphQlProvider.graphQL(query.getBucketName())
+                .execute(query.getQuery())
+                .getData();
 
         Query mongoQuery = fromBucketQuery(query);
         return mongoTemplate.find(mongoQuery, PersistentBucketElement.class, query.getBucketName()).stream()

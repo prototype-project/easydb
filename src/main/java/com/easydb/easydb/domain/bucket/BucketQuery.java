@@ -6,11 +6,13 @@ public class BucketQuery {
     private final String bucketName;
     private final int limit;
     private final int offset;
+    private final String query;
 
-    private BucketQuery(String bucketName, int limit, int offset) {
+    private BucketQuery(String bucketName, int limit, int offset, String query) {
         this.bucketName = bucketName;
         this.limit = limit;
         this.offset = offset;
+        this.query = query;
         validateConstraints();
     }
 
@@ -26,8 +28,12 @@ public class BucketQuery {
         return offset;
     }
 
-    public static BucketQuery of(String name, int limit, int offset) {
-        return new BucketQuery(name, limit, offset);
+    public String getQuery() {
+        return query;
+    }
+
+    public static BucketQuery of(String name, int limit, int offset, String query) {
+        return new BucketQuery(name, limit, offset, query);
     }
 
     private void validateConstraints() {
@@ -35,5 +41,4 @@ public class BucketQuery {
             throw new InvalidPaginationDataException();
         }
     }
-
 }
