@@ -12,6 +12,6 @@ public class Query implements GraphQLQueryResolver {
     }
 
     public List<Element> elements(Optional<ElementFilter> filter) {
-        return mongoRepository.elements();
+        return mongoRepository.elements(filter);
     }
 }

@@ -43,22 +43,24 @@ class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOp
     }
 
     def "should filter elements by field equality"() {
-        given:
+        given: "given query to find all people with lastName 'Faderski' or name 'Jan'"
         String query = """
         {
             elements(filter: {
-                fieldsFilters: [
-                    {
-                        name: "siema"
-                        value: "eniu"
-                    }
-                ]
                 or: [
                         {
                             fieldsFilters: [
                                 {
-                                    name: "inny"
-                                    value: "inny"
+                                    name: "firstName"
+                                    value: "Jan"
+                                }
+                            ]
+                        },
+                        {
+                            fieldsFilters: [
+                                {
+                                    name: "lastName"
+                                    value: "Faderski"
                                 }
                             ]
                         }

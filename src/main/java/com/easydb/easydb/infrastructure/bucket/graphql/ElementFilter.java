@@ -8,7 +8,6 @@ public class ElementFilter {
     private List<ElementFilter> or;
     private List<ElementFilter> and;
 
-
     @JsonProperty("fieldsFilters")
     public List<FieldFilter> getFieldsFilters() {
         return fieldsFilters;
