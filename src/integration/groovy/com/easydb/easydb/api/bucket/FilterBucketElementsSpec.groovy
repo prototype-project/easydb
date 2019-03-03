@@ -11,35 +11,40 @@ class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOp
 
     private String spaceName
 
+    def danielFaderski
+    def janBrzechwa
+    def jurekOgorek
+
     def setup() {
         spaceName = addSampleSpace().body.spaceName
         createTestBucket(spaceName)
-        addElementToTestBucket(spaceName, buildElementBody(
+
+        danielFaderski = addElementToTestBucket(spaceName, buildElementBody(
                 ElementTestBuilder
                         .builder()
                         .bucketName(TEST_BUCKET_NAME)
                         .clearFields()
                         .addField(ElementField.of("firstName", "Daniel"))
                         .addField(ElementField.of("lastName", "Faderski"))
-                        .build()))
+                        .build())).getBody()
 
-        addElementToTestBucket(spaceName, buildElementBody(
+        janBrzechwa = addElementToTestBucket(spaceName, buildElementBody(
                 ElementTestBuilder
                         .builder()
                         .bucketName(TEST_BUCKET_NAME)
                         .clearFields()
                         .addField(ElementField.of("firstName", "Jan"))
                         .addField(ElementField.of("lastName", "Brzechwa"))
-                        .build()))
+                        .build())).getBody()
 
-        addElementToTestBucket(spaceName, buildElementBody(
+        jurekOgorek = addElementToTestBucket(spaceName, buildElementBody(
                 ElementTestBuilder
                         .builder()
                         .bucketName(TEST_BUCKET_NAME)
                         .clearFields()
                         .addField(ElementField.of("firstName", "Jurek"))
                         .addField(ElementField.of("lastName", "Ogórek"))
-                        .build()))
+                        .build())).getBody()
     }
 
     def "should filter elements by field equality"() {
@@ -66,6 +71,7 @@ class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOp
                         }
                     ]
             }) {
+                id
                 fields {
                     name 
                     value
@@ -78,7 +84,8 @@ class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOp
         PaginatedElementsDto elements = getElementsFromTestBucket(spaceName, 0, 20, query)
 
         then:
-        {}
+        elements.results.size() == 2
+        elements.results as Set == [janBrzechwa, danielFaderski] as Set
     }
 
 

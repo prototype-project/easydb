@@ -6,13 +6,11 @@ import com.easydb.easydb.domain.bucket.BucketQuery;
 import com.easydb.easydb.domain.bucket.ElementAlreadyExistsException;
 import com.easydb.easydb.domain.transactions.ConcurrentTransactionDetectedException;
 import com.easydb.easydb.domain.bucket.VersionedElement;
-import com.easydb.easydb.infrastructure.bucket.graphql.GraphQlProvider;
+import com.easydb.easydb.infrastructure.bucket.graphql.GraphQlElementsFetcher;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import com.easydb.easydb.domain.bucket.ElementDoesNotExistException;
 import com.easydb.easydb.domain.bucket.BucketRepository;
@@ -32,17 +30,17 @@ public class MongoBucketRepository implements BucketRepository {
     private final MongoClient mongoClient;
     private final MongoClient mongoAdminClient;
     private final MongoProperties mongoProperties;
-    private final GraphQlProvider graphQlProvider;
+    private final GraphQlElementsFetcher graphQlElementsFetcher;
 
     public MongoBucketRepository(MongoTemplate mongoTemplate, MongoClient mongoClient,
                                  MongoClient mongoAdminClient,
                                  MongoProperties mongoProperties,
-                                 GraphQlProvider graphQlProvider) {
+                                 GraphQlElementsFetcher graphQlElementsFetcher) {
         this.mongoTemplate = mongoTemplate;
         this.mongoClient = mongoClient;
         this.mongoAdminClient = mongoAdminClient;
         this.mongoProperties = mongoProperties;
-        this.graphQlProvider = graphQlProvider;
+        this.graphQlElementsFetcher = graphQlElementsFetcher;
     }
 
     @Override
@@ -125,18 +123,9 @@ public class MongoBucketRepository implements BucketRepository {
     }
 
     @Override
-    public List<VersionedElement> filterElements(BucketQuery query) {
+    public List<Element> filterElements(BucketQuery query) {
         ensureBucketExists(query.getBucketName());
-
-        LinkedHashMap map = graphQlProvider.graphQL(query)
-                .execute(query.getQuery())
-                .getData();
-        // map to versioned elements <-- return
-
-        Query mongoQuery = fromBucketQuery(query);
-        return mongoTemplate.find(mongoQuery, PersistentBucketElement.class, query.getBucketName()).stream()
-                .map(it -> it.toDomainVersionedElement(query.getBucketName()))
-                .collect(Collectors.toList());
+        return graphQlElementsFetcher.elements(query);
     }
 
     @Override
@@ -174,13 +163,6 @@ public class MongoBucketRepository implements BucketRepository {
 
     private PersistentBucketElement getPersistentElement(String bucketName, String id) {
         return mongoTemplate.findById(id, PersistentBucketElement.class, bucketName);
-    }
-
-    private Query fromBucketQuery(BucketQuery bucketQuery) {
-        Query query = new Query();
-        query.limit(bucketQuery.getLimit());
-        query.skip(bucketQuery.getOffset());
-        return query;
     }
 
     private Query buildUpdateQuery(VersionedElement toUpdate) {

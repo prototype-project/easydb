@@ -20,3 +20,6 @@ mongo:
   port: 27017
   username: easydb
   password: 123456789
+
+server:
+  max-http-header-size: 65536

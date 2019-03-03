@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Optional;
 
 public class Query implements GraphQLQueryResolver {
-    private final MongoRepository mongoRepository;
+    private final GraphQlMongoRepository graphQlMongoRepository;
 
-    public Query(MongoRepository mongoRepository) {
-        this.mongoRepository = mongoRepository;
+    public Query(GraphQlMongoRepository graphQlMongoRepository) {
+        this.graphQlMongoRepository = graphQlMongoRepository;
     }
 
-    public List<Element> elements(Optional<ElementFilter> filter) {
-        return mongoRepository.elements(filter);
+    public List<GraphQlElement> elements(Optional<ElementFilter> filter) {
+        return graphQlMongoRepository.elements(filter);
     }
 }

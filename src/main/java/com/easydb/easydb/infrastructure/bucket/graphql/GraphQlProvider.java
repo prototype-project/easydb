@@ -15,16 +15,17 @@ public class GraphQlProvider {
 
     private final String schema;
     private MongoTemplate mongoTemplate;
+    private final ElementFilterToMongoQueryConverter converter;
 
-    public GraphQlProvider(MongoTemplate mongoTemplate) {
+    public GraphQlProvider(MongoTemplate mongoTemplate, ElementFilterToMongoQueryConverter converter) {
+        this.converter = converter;
         this.schema = readSchema();
         this.mongoTemplate = mongoTemplate;
     }
 
-    public GraphQL graphQL(BucketQuery bucketQuery) {
-        ElementFilterToMongoQueryTransformer transformer = new ElementFilterToMongoQueryTransformer(bucketQuery);
+    GraphQL graphQL(BucketQuery bucketQuery) {
         GraphQLSchema graphQLSchema = SchemaParser.newParser().schemaString(schema)
-                .resolvers(new Query(new MongoRepository(transformer, bucketQuery, mongoTemplate)))
+                .resolvers(new Query(new GraphQlMongoRepository(converter, bucketQuery, mongoTemplate)))
                 .build().makeExecutableSchema();
         return GraphQL.newGraphQL(graphQLSchema).build();
     }

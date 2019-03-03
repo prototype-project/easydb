@@ -7,7 +7,7 @@ public class ElementField {
     private final String name;
     private final String value;
 
-    private ElementField(String name, String value) {
+    public ElementField(String name, String value) {
         this.name = name;
         this.value = value;
     }

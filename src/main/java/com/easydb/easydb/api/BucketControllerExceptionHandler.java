@@ -5,6 +5,7 @@ import com.easydb.easydb.domain.bucket.BucketDoesNotExistException;
 import com.easydb.easydb.domain.bucket.ElementAlreadyExistsException;
 import com.easydb.easydb.domain.bucket.ElementDoesNotExistException;
 import com.easydb.easydb.domain.bucket.InvalidPaginationDataException;
+import com.easydb.easydb.infrastructure.bucket.graphql.QueryValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -37,6 +38,11 @@ public class BucketControllerExceptionHandler extends ResponseEntityExceptionHan
     @ExceptionHandler(value = {ElementAlreadyExistsException.class})
     ResponseEntity<ApiError> handleElementExistsException(ElementAlreadyExistsException ex) {
         return mapError(ApiError.of("ELEMENT_ALREADY_EXISTS", HttpStatus.BAD_REQUEST, ex.getMessage()));
+    }
+
+    @ExceptionHandler(value = {QueryValidationException.class})
+    ResponseEntity<ApiError> handleQueryValidationException(QueryValidationException ex) {
+        return mapError(ApiError.of("INVALID_QUERY", HttpStatus.BAD_REQUEST, ex.getMessage()));
     }
 
     private ResponseEntity<ApiError> mapError(ApiError apiError) {

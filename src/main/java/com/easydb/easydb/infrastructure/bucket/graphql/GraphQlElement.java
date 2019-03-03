@@ -2,16 +2,16 @@ package com.easydb.easydb.infrastructure.bucket.graphql;
 
 import java.util.List;
 
-public class Element {
+public class GraphQlElement {
     private final String id;
-    private final List<Field> fields;
+    private final List<GraphQlField> fields;
 
-    public Element(String id, List<Field> fields) {
+    public GraphQlElement(String id, List<GraphQlField> fields) {
         this.id = id;
         this.fields = fields;
     }
 
-    public List<Field> getFields() {
+    public List<GraphQlField> getFields() {
         return fields;
     }
 

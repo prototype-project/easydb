@@ -119,9 +119,7 @@ public class TransactionalBucketService implements BucketService {
 
     @Override
     public List<Element> filterElements(BucketQuery query) {
-        return elementService.filterElements(query).stream()
-                .map(VersionedElement::toSimpleElement)
-                .collect(Collectors.toList());
+        return elementService.filterElements(query);
     }
 
     @Override

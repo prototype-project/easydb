@@ -3,13 +3,13 @@ type Field {
     value: String!
 }
 
-type Element {
+type GraphQlElement {
     id: String!
     fields: [Field]
 }
 
 type Query {
-    elements(filter: ElementFilter): [Element]
+    elements(filter: ElementFilter): [GraphQlElement]
 }
 
 input ElementFilter {

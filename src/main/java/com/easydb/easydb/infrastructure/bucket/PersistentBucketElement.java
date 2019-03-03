@@ -3,12 +3,15 @@ package com.easydb.easydb.infrastructure.bucket;
 import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.bucket.ElementField;
 import com.easydb.easydb.domain.bucket.VersionedElement;
+import com.easydb.easydb.infrastructure.bucket.graphql.GraphQlElement;
+import com.easydb.easydb.infrastructure.bucket.graphql.GraphQlField;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-class PersistentBucketElement {
+public class PersistentBucketElement {
 
     @Id
     private final String id;
@@ -33,6 +36,14 @@ class PersistentBucketElement {
 
     List<ElementField> getFields() {
         return fields;
+    }
+
+    public GraphQlElement toGraphQlElement() {
+        List<GraphQlField> graphQlFields = fields.stream()
+                .map(gf -> new GraphQlField(gf.getName(), gf.getValue()))
+                .collect(Collectors.toList());
+
+        return new GraphQlElement(id, graphQlFields);
     }
 }
 

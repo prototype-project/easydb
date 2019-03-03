@@ -49,9 +49,9 @@ public class ElementService {
         return bucketRepository.getNumberOfElements(getBucketNameAccordinglyToSpace(bucketName));
     }
 
-    List<VersionedElement> filterElements(BucketQuery query) {
+    List<Element> filterElements(BucketQuery query) {
         return bucketRepository.filterElements(rebuildToProperSpaceName(query)).stream()
-                .map(it -> VersionedElement.of(it.getId(), query.getBucketName(), it.getFields()))
+                .map(it -> Element.of(it.getId(), query.getBucketName(), it.getFields()))
                 .collect(Collectors.toList());
     }
 

@@ -1,11 +1,11 @@
 package com.easydb.easydb.infrastructure.bucket.graphql;
 
-public class Field {
+public class GraphQlField {
     private final String name;
     private final String value;
 
 
-    public Field(String name, String value) {
+    public GraphQlField(String name, String value) {
         this.name = name;
         this.value = value;
     }

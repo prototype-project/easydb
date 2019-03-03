@@ -1,10 +1,8 @@
 package com.easydb.easydb
 
-import com.easydb.easydb.config.MongoConfiguration
 import org.apache.curator.test.TestingServer
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.context.annotation.ComponentScan
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
