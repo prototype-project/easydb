@@ -5,13 +5,15 @@ import com.easydb.easydb.IntegrationWithCleanedDatabaseSpec
 import com.easydb.easydb.domain.bucket.*
 import spock.lang.Unroll
 
+import static com.easydb.easydb.infrastructure.bucket.graphql.Query.DEFAULT_GRAPHQL_QUERY
+
 class BucketServicePaginationSpec extends IntegrationWithCleanedDatabaseSpec {
 
     @Unroll
     def "should paginate elements"() {
         given:
         createElements()
-        BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, limit, offset)
+        BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, limit, offset, DEFAULT_GRAPHQL_QUERY)
 
         when:
         List<Element> elements = bucketService.filterElements(query)
@@ -35,7 +37,7 @@ class BucketServicePaginationSpec extends IntegrationWithCleanedDatabaseSpec {
     def "should return empty list when there is no elements"() {
         given:
         bucketService.createBucket(TEST_BUCKET_NAME)
-        BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, 1, 0)
+        BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, 1, 0, DEFAULT_GRAPHQL_QUERY)
 
         when:
         List<Element> elements = bucketService.filterElements(query)
@@ -48,7 +50,7 @@ class BucketServicePaginationSpec extends IntegrationWithCleanedDatabaseSpec {
     def "should throw error when limit is <= 0"() {
         when:
         createElements()
-        BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, limit, 2)
+        BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, limit, 2, DEFAULT_GRAPHQL_QUERY)
 
         and:
         bucketService.filterElements(query)
@@ -63,7 +65,7 @@ class BucketServicePaginationSpec extends IntegrationWithCleanedDatabaseSpec {
     def "should throw error when offset is < 0"() {
         when:
         createElements()
-        BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, 1, -2)
+        BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, 1, -2, DEFAULT_GRAPHQL_QUERY)
 
         and:
         bucketService.filterElements(query)

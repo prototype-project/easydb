@@ -47,7 +47,7 @@ class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOp
                         .build())).getBody()
     }
 
-    def "should filter elements by field equality"() {
+    def "should filter elements with `and` operator"() {
         given: "given query to find all people with lastName 'Faderski' or name 'Jan'"
         String query = """
         {
@@ -88,5 +88,110 @@ class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOp
         elements.results as Set == [janBrzechwa, danielFaderski] as Set
     }
 
+    def "should filter elements with `or` operator"() {
+        given: "given query to find all people with lastName 'Faderski' and name 'Daniel'"
+        String query = """
+        {
+            elements(filter: {
+                and: [
+                        {
+                            fieldsFilters: [
+                                {
+                                    name: "firstName"
+                                    value: "Daniel"
+                                }
+                            ]
+                        },
+                        {
+                            fieldsFilters: [
+                                {
+                                    name: "lastName"
+                                    value: "Faderski"
+                                }
+                            ]
+                        }
+                    ]
+            }) {
+                id
+                fields {
+                    name 
+                    value
+                }
+            }
+        }
+        """
+
+        when:
+        PaginatedElementsDto elements = getElementsFromTestBucket(spaceName, 0, 20, query)
+
+        then:
+        elements.results.size() == 1
+        elements.results == [danielFaderski]
+    }
+
+    def "should filter elements with nested query"() {
+        given:
+        String query = """
+        {
+            elements(filter: {
+                and: [
+                        {
+                            or: [
+                                    {
+                                        fieldsFilters: [
+                                            {
+                                                name: "firstName"
+                                                value: "Jan"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        fieldsFilters: [
+                                            {
+                                                name: "lastName"
+                                                value: "Faderski"
+                                            }
+                                        ]
+                                    }
+                                ]
+                        }
+                        {
+                            or: [
+                                    {
+                                        fieldsFilters: [
+                                            {
+                                                name: "firstName"
+                                                value: "Jurek"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        fieldsFilters: [
+                                            {
+                                                name: "lastName"
+                                                value: "Brzechwa"
+                                            }
+                                        ]
+                                    }
+                                ]
+                        }
+                    ]
+            }) {
+                id
+                fields {
+                    name 
+                    value
+                }
+            }
+        }
+        """
+
+        when:
+        PaginatedElementsDto elements = getElementsFromTestBucket(spaceName, 0, 20, query)
+
+        then:
+        elements.results.size() == 1
+        elements.results == [janBrzechwa]
+    }
 
 }

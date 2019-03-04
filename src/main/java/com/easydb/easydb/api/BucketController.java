@@ -16,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.yaml.snakeyaml.util.UriEncoder;
 
+import static com.easydb.easydb.infrastructure.bucket.graphql.Query.DEFAULT_GRAPHQL_QUERY;
+
 @RestController
 @RequestMapping(value = "/api/v1/spaces/{spaceName}/buckets")
 class BucketController {
@@ -100,7 +102,7 @@ class BucketController {
             @PathVariable("bucketName") String bucketName,
             @RequestParam(value = "limit", defaultValue = "20") int limit,
             @RequestParam(value = "offset", defaultValue = "0") int offset,
-            @RequestParam(value = "query", defaultValue = "") String queryAsString,
+            @RequestParam(value = "query", defaultValue = DEFAULT_GRAPHQL_QUERY) String queryAsString,
             HttpServletRequest request) {
         BucketService bucketService = bucketServiceFactory.buildBucketService(spaceName);
 

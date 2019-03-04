@@ -18,6 +18,8 @@ import org.springframework.web.client.HttpClientErrorException
 
 import java.util.stream.Collectors
 
+import static com.easydb.easydb.infrastructure.bucket.graphql.Query.DEFAULT_GRAPHQL_QUERY
+
 class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOperations {
 
     @Autowired
@@ -102,7 +104,7 @@ class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOper
                 PaginatedElementsDto.class)
 
         then:
-        BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, 20, 0)
+        BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, 20, 0, DEFAULT_GRAPHQL_QUERY)
         response.body.results == bucketService.filterElements(query).stream()
                 .map({ it -> ElementQueryDto.of(it) })
                 .collect(Collectors.toList())
