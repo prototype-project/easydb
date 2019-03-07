@@ -6,7 +6,7 @@ import com.easydb.easydb.domain.bucket.factories.ElementServiceFactory;
 import com.easydb.easydb.domain.locker.factories.ElementsLockerFactory;
 import com.easydb.easydb.domain.space.SpaceRepository;
 import com.easydb.easydb.domain.space.UUIDProvider;
-import com.easydb.easydb.domain.transactions.DefaultTransactionManager;
+import com.easydb.easydb.domain.transactions.PersistentTransactionManager;
 import com.easydb.easydb.domain.transactions.OptimizedTransactionManager;
 import com.easydb.easydb.domain.transactions.TransactionAbortedException;
 import com.easydb.easydb.domain.transactions.TransactionConstraintsValidator;
@@ -34,13 +34,13 @@ public class TransactionConfig {
     }
 
     @Bean
-    DefaultTransactionManager defaultTransactionManager(UUIDProvider uuidProvider,
-                                                        TransactionRepository transactionRepository,
-                                                        TransactionConstraintsValidator transactionConstraintsValidator,
-                                                        TransactionCommitterFactory transactionCommitterFactory,
-                                                        ElementServiceFactory elementServiceFactory,
-                                                        ApplicationMetrics metrics) {
-        return new DefaultTransactionManager(uuidProvider, transactionRepository, transactionConstraintsValidator,
+    PersistentTransactionManager defaultTransactionManager(UUIDProvider uuidProvider,
+                                                           TransactionRepository transactionRepository,
+                                                           TransactionConstraintsValidator transactionConstraintsValidator,
+                                                           TransactionCommitterFactory transactionCommitterFactory,
+                                                           ElementServiceFactory elementServiceFactory,
+                                                           ApplicationMetrics metrics) {
+        return new PersistentTransactionManager(uuidProvider, transactionRepository, transactionConstraintsValidator,
                 transactionCommitterFactory, elementServiceFactory, metrics);
     }
 

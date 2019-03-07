@@ -9,8 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class DefaultTransactionManager {
-    private static final Logger logger = LoggerFactory.getLogger(DefaultTransactionManager.class);
+public class PersistentTransactionManager {
+    private static final Logger logger = LoggerFactory.getLogger(PersistentTransactionManager.class);
 
     private final UUIDProvider uuidProvider;
     private final TransactionRepository transactionRepository;
@@ -19,12 +19,12 @@ public class DefaultTransactionManager {
     private final ElementServiceFactory elementServiceFactory;
     private final ApplicationMetrics metrics;
 
-    public DefaultTransactionManager(UUIDProvider uuidProvider,
-                                     TransactionRepository transactionRepository,
-                                     TransactionConstraintsValidator transactionConstraintsValidator,
-                                     TransactionCommitterFactory transactionCommitterFactory,
-                                     ElementServiceFactory elementServiceFactory,
-                                     ApplicationMetrics metrics) {
+    public PersistentTransactionManager(UUIDProvider uuidProvider,
+                                        TransactionRepository transactionRepository,
+                                        TransactionConstraintsValidator transactionConstraintsValidator,
+                                        TransactionCommitterFactory transactionCommitterFactory,
+                                        ElementServiceFactory elementServiceFactory,
+                                        ApplicationMetrics metrics) {
         this.uuidProvider = uuidProvider;
         this.transactionRepository = transactionRepository;
         this.transactionConstraintsValidator = transactionConstraintsValidator;

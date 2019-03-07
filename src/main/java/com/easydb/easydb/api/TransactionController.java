@@ -3,7 +3,7 @@ package com.easydb.easydb.api;
 import com.easydb.easydb.config.ApplicationMetrics;
 import com.easydb.easydb.domain.space.UUIDProvider;
 import com.easydb.easydb.domain.transactions.OperationResult;
-import com.easydb.easydb.domain.transactions.DefaultTransactionManager;
+import com.easydb.easydb.domain.transactions.PersistentTransactionManager;
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,13 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/api/v1/transactions")
 class TransactionController {
 
-    private final DefaultTransactionManager defaultTransactionManager;
+    private final PersistentTransactionManager persistentTransactionManager;
     private final UUIDProvider uuidProvider;
     private final ApplicationMetrics metrics;
 
-    TransactionController(DefaultTransactionManager defaultTransactionManager, UUIDProvider uuidProvider,
+    TransactionController(PersistentTransactionManager persistentTransactionManager, UUIDProvider uuidProvider,
                           ApplicationMetrics metrics) {
-        this.defaultTransactionManager = defaultTransactionManager;
+        this.persistentTransactionManager = persistentTransactionManager;
         this.uuidProvider = uuidProvider;
         this.metrics = metrics;
     }
@@ -31,7 +31,7 @@ class TransactionController {
     @PostMapping("/{spaceName}")
     @ResponseStatus(value = HttpStatus.CREATED)
     TransactionDto beginTransaction(@PathVariable("spaceName") String spaceName) {
-        String transactionId = defaultTransactionManager.beginTransaction(spaceName);
+        String transactionId = persistentTransactionManager.beginTransaction(spaceName);
         metrics.beginTransactionRequestsCounter(spaceName).increment();
         return new TransactionDto(transactionId);
     }
@@ -40,7 +40,7 @@ class TransactionController {
     @ResponseStatus(value = HttpStatus.CREATED)
     OperationResultDto addOperation(@PathVariable String transactionId,
                                     @RequestBody @Valid OperationDto dto) {
-        OperationResult operationResult = defaultTransactionManager.addOperation(transactionId, dto.toDomain(uuidProvider));
+        OperationResult operationResult = persistentTransactionManager.addOperation(transactionId, dto.toDomain(uuidProvider));
         metrics.addOperationToTransactionRequestCounter(operationResult.getSpaceName(), dto.getBucketName(),
                 dto.getType().toString()).increment();
         return OperationResultDto.of(operationResult);
@@ -49,7 +49,7 @@ class TransactionController {
     @PostMapping("/{transactionId}/commit")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
     void commitTransaction(@PathVariable String transactionId) {
-        String spaceName = defaultTransactionManager.commitTransaction(transactionId).getSpaceName();
+        String spaceName = persistentTransactionManager.commitTransaction(transactionId).getSpaceName();
         metrics.commitTransactionRequestCounter(spaceName).increment();
     }
 }
