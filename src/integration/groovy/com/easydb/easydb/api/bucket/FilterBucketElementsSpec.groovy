@@ -5,6 +5,8 @@ import com.easydb.easydb.ElementTestBuilder
 import com.easydb.easydb.TestHttpOperations
 import com.easydb.easydb.api.PaginatedElementsDto
 import com.easydb.easydb.domain.bucket.ElementField
+import org.springframework.http.HttpStatus
+import org.springframework.web.client.HttpClientErrorException
 
 
 class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOperations {
@@ -179,7 +181,7 @@ class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOp
             }) {
                 id
                 fields {
-                    name 
+                    name
                     value
                 }
             }
@@ -192,6 +194,97 @@ class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOp
         then:
         elements.results.size() == 1
         elements.results == [janBrzechwa]
+    }
+
+    def "should throw validation error in case of empty filter query"() {
+        given:
+        String query = """
+        {
+            elements(unknown: {
+            }) {
+                id
+                fields {
+                    name
+                    value
+                }
+            }
+        }
+        """
+
+        when:
+        getElementsFromTestBucket(spaceName, 0, 20, query)
+
+        then:
+        def ex = thrown(HttpClientErrorException)
+        ex.statusCode == HttpStatus.BAD_REQUEST
+    }
+
+    def "should throw validation error in case of two operators at the same time"() {
+        given:
+        String query = """
+        {
+            elements(filter: {
+                               fieldsFilters: [
+                                   {
+                                       name: "firstName"
+                                       value: "Jan"
+                                   }
+                               ],
+                               or: [ 
+                                       {
+                                           fieldsFilters: [
+                                               {
+                                                   name: "firstName"
+                                                   value: "Jan"
+                                               }
+                                           ]
+                                       }
+                               ]
+            }) {
+                id
+                fields {
+                    name
+                    value
+                }
+            }
+        }
+        """
+
+        when:
+        getElementsFromTestBucket(spaceName, 0, 20, query)
+
+        then:
+        def ex = thrown(HttpClientErrorException)
+        ex.statusCode == HttpStatus.BAD_REQUEST
+    }
+
+    def "should throw validation error in case of syntax error"() {
+        given:
+        String query = """
+        {
+            elements(filter: {
+                               fieldsFilters: [
+                                   {
+                                       name: "firstName"
+                                       value: "Jan"
+                                   
+                               ]
+            }) {
+                id
+                fields {
+                    name
+                    value
+                }
+            }
+        }
+        """
+
+        when:
+        getElementsFromTestBucket(spaceName, 0, 20, query)
+
+        then:
+        def ex = thrown(HttpClientErrorException)
+        ex.statusCode == HttpStatus.BAD_REQUEST
     }
 
 }

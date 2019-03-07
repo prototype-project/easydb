@@ -1,5 +1,10 @@
-package com.easydb.easydb.domain.bucket;
+package com.easydb.easydb.domain.bucket.transactions;
 
+import com.easydb.easydb.domain.bucket.BucketAlreadyExistsException;
+import com.easydb.easydb.domain.bucket.BucketQuery;
+import com.easydb.easydb.domain.bucket.BucketService;
+import com.easydb.easydb.domain.bucket.Element;
+import com.easydb.easydb.domain.bucket.NamesResolver;
 import com.easydb.easydb.domain.bucket.factories.ElementServiceFactory;
 import com.easydb.easydb.domain.locker.BucketLocker;
 import com.easydb.easydb.domain.locker.SpaceLocker;
@@ -12,7 +17,6 @@ import com.easydb.easydb.domain.transactions.Transaction;
 import com.easydb.easydb.domain.transactions.Retryier;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class TransactionalBucketService implements BucketService {
 
@@ -20,7 +24,7 @@ public class TransactionalBucketService implements BucketService {
     private final SpaceRepository spaceRepository;
     private final BucketRepository bucketRepository;
     private final OptimizedTransactionManager optimizedTransactionManager;
-    private final ElementService elementService;
+    private final TransactionalElementService elementService;
     private final BucketLocker bucketLocker;
     private final SpaceLocker spaceLocker;
     private final Retryier transactionRetryier;

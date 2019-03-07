@@ -1,7 +1,7 @@
 package com.easydb.easydb.domain.bucket.factories;
 
-import com.easydb.easydb.domain.bucket.BucketRepository;
-import com.easydb.easydb.domain.bucket.ElementService;
+import com.easydb.easydb.domain.bucket.transactions.BucketRepository;
+import com.easydb.easydb.domain.bucket.transactions.TransactionalElementService;
 
 public class ElementServiceFactory {
     private final BucketRepository bucketRepository;
@@ -10,7 +10,7 @@ public class ElementServiceFactory {
         this.bucketRepository = bucketRepository;
     }
 
-    public ElementService buildElementService(String spaceName) {
-        return new ElementService(spaceName, bucketRepository);
+    public TransactionalElementService buildElementService(String spaceName) {
+        return new TransactionalElementService(spaceName, bucketRepository);
     }
 }

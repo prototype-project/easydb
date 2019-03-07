@@ -1,5 +1,10 @@
-package com.easydb.easydb.domain.bucket;
+package com.easydb.easydb.domain.bucket.transactions;
 
+import com.easydb.easydb.domain.bucket.BucketDoesNotExistException;
+import com.easydb.easydb.domain.bucket.BucketQuery;
+import com.easydb.easydb.domain.bucket.Element;
+import com.easydb.easydb.domain.bucket.ElementAlreadyExistsException;
+import com.easydb.easydb.domain.bucket.ElementDoesNotExistException;
 import com.easydb.easydb.domain.transactions.ConcurrentTransactionDetectedException;
 import java.util.List;
 
@@ -23,7 +28,8 @@ public interface BucketRepository {
 
     boolean elementExists(String bucketName, String elementId) throws BucketDoesNotExistException;
 
-    void updateElement(VersionedElement toUpdate) throws BucketDoesNotExistException, ElementDoesNotExistException;
+    void updateElement(VersionedElement toUpdate) throws BucketDoesNotExistException, ElementDoesNotExistException,
+            ConcurrentTransactionDetectedException;
 
     List<Element> filterElements(BucketQuery query);
 

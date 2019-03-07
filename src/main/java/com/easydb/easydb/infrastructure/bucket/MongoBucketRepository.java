@@ -5,7 +5,7 @@ import com.easydb.easydb.domain.bucket.BucketDoesNotExistException;
 import com.easydb.easydb.domain.bucket.BucketQuery;
 import com.easydb.easydb.domain.bucket.ElementAlreadyExistsException;
 import com.easydb.easydb.domain.transactions.ConcurrentTransactionDetectedException;
-import com.easydb.easydb.domain.bucket.VersionedElement;
+import com.easydb.easydb.domain.bucket.transactions.VersionedElement;
 import com.easydb.easydb.infrastructure.bucket.graphql.GraphQlElementsFetcher;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.easydb.easydb.domain.bucket.ElementDoesNotExistException;
-import com.easydb.easydb.domain.bucket.BucketRepository;
+import com.easydb.easydb.domain.bucket.transactions.BucketRepository;
 import com.easydb.easydb.domain.bucket.Element;
 import com.mongodb.WriteResult;
 import org.springframework.dao.DuplicateKeyException;

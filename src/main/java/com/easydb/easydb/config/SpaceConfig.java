@@ -1,6 +1,6 @@
 package com.easydb.easydb.config;
 
-import com.easydb.easydb.domain.bucket.BucketRepository;
+import com.easydb.easydb.domain.bucket.transactions.BucketRepository;
 import com.easydb.easydb.domain.locker.BucketLocker;
 import com.easydb.easydb.domain.locker.SpaceLocker;
 import com.easydb.easydb.domain.space.SpaceRepository;

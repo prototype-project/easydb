@@ -1,7 +1,7 @@
 package com.easydb.easydb.domain.transactions;
 
 import com.easydb.easydb.domain.bucket.BucketDoesNotExistException;
-import com.easydb.easydb.domain.bucket.BucketRepository;
+import com.easydb.easydb.domain.bucket.transactions.BucketRepository;
 import com.easydb.easydb.domain.bucket.NamesResolver;
 import com.easydb.easydb.domain.bucket.factories.ElementServiceFactory;
 import com.easydb.easydb.domain.space.SpaceRepository;

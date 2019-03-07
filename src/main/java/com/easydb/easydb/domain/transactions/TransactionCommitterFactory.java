@@ -1,6 +1,6 @@
 package com.easydb.easydb.domain.transactions;
 
-import com.easydb.easydb.domain.bucket.ElementService;
+import com.easydb.easydb.domain.bucket.transactions.TransactionalElementService;
 import com.easydb.easydb.domain.bucket.factories.ElementServiceFactory;
 import com.easydb.easydb.domain.locker.factories.ElementsLockerFactory;
 
@@ -18,7 +18,7 @@ public class TransactionCommitterFactory {
     }
 
     TransactionCommitter build(String spaceName) {
-        ElementService elementService =
+        TransactionalElementService elementService =
                 elementServiceFactory.buildElementService(spaceName);
         return new TransactionCommitter(elementsLockerFactory, lockerRetryier, elementService);
 

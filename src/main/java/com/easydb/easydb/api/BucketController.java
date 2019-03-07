@@ -8,6 +8,7 @@ import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.space.UUIDProvider;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -15,8 +16,6 @@ import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.yaml.snakeyaml.util.UriEncoder;
-
-import static com.easydb.easydb.infrastructure.bucket.graphql.Query.DEFAULT_GRAPHQL_QUERY;
 
 @RestController
 @RequestMapping(value = "/api/v1/spaces/{spaceName}/buckets")
@@ -102,13 +101,14 @@ class BucketController {
             @PathVariable("bucketName") String bucketName,
             @RequestParam(value = "limit", defaultValue = "20") int limit,
             @RequestParam(value = "offset", defaultValue = "0") int offset,
-            @RequestParam(value = "query", defaultValue = DEFAULT_GRAPHQL_QUERY) String queryAsString,
+            @RequestParam(value = "query") Optional<String> query,
             HttpServletRequest request) {
         BucketService bucketService = bucketServiceFactory.buildBucketService(spaceName);
 
-        BucketQuery query = BucketQuery.of(bucketName, limit, offset, UriEncoder.decode(queryAsString));
+        Optional<String> uriDecodedQuery = query.map(UriEncoder::decode);
+        BucketQuery bucketQuery = BucketQuery.of(bucketName, limit, offset, uriDecodedQuery);
 
-        List<ElementQueryDto> results = bucketService.filterElements(query).stream()
+        List<ElementQueryDto> results = bucketService.filterElements(bucketQuery).stream()
                 .map(ElementQueryDto::of)
                 .collect(Collectors.toList());
 

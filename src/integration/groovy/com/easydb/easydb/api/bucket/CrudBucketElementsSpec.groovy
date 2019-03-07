@@ -88,8 +88,8 @@ class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOper
 
         and:
         Element updatedElement = bucketService.getElement(TEST_BUCKET_NAME, addElementResponse.body.getId())
-        updatedElement.getFieldValue('firstName') == 'john'
-        updatedElement.getFieldValue('lastName') == 'snow'
+        getFieldValue(updatedElement, 'firstName') == 'john'
+        getFieldValue(updatedElement, 'lastName') == 'snow'
     }
 
     def "should get all elements from bucket"() {
@@ -104,7 +104,7 @@ class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOper
                 PaginatedElementsDto.class)
 
         then:
-        BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, 20, 0, DEFAULT_GRAPHQL_QUERY)
+        BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, 20, 0)
         response.body.results == bucketService.filterElements(query).stream()
                 .map({ it -> ElementQueryDto.of(it) })
                 .collect(Collectors.toList())
@@ -209,5 +209,11 @@ class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOper
 
         and:
         ex.rawStatusCode == 404
+    }
+
+    static getFieldValue(Element element, String fieldName) {
+        return element.fields.stream()
+                .filter({f -> f.getName() == fieldName})
+                .map({it.value}).findFirst().get()
     }
 }

@@ -2,7 +2,7 @@ package com.easydb.easydb.infrastructure.bucket;
 
 import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.bucket.ElementField;
-import com.easydb.easydb.domain.bucket.VersionedElement;
+import com.easydb.easydb.domain.bucket.transactions.VersionedElement;
 import com.easydb.easydb.infrastructure.bucket.graphql.GraphQlElement;
 import com.easydb.easydb.infrastructure.bucket.graphql.GraphQlField;
 import java.util.List;

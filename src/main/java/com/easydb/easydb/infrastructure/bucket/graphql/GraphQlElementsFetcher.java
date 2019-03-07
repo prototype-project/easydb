@@ -3,6 +3,7 @@ package com.easydb.easydb.infrastructure.bucket.graphql;
 import com.easydb.easydb.domain.bucket.BucketQuery;
 import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.bucket.ElementField;
+import graphql.ExecutionResult;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,11 +16,14 @@ public class GraphQlElementsFetcher {
     }
 
     public List<Element> elements(BucketQuery query) {
-        LinkedHashMap<String, Element> result = graphQlProvider.graphQL(query)
-                .execute(query.getQuery())
-                .getData();
+        ExecutionResult executionResult = graphQlProvider.graphQL(query)
+                .execute(query.getQuery().orElse(Query.DEFAULT_GRAPHQL_QUERY));
 
-        return convertToDomainElement(result, query);
+        if (executionResult.getErrors().size() > 0) {
+            throw new QueryValidationException(String.format("Query validation error: `%s`", executionResult.getErrors().get(0).getMessage()));
+        }
+        return convertToDomainElement(executionResult.getData(), query);
+
     }
 
     private List<Element> convertToDomainElement(LinkedHashMap result, BucketQuery query) {
@@ -47,7 +51,7 @@ public class GraphQlElementsFetcher {
     }
 
     private ElementField convertToField(LinkedHashMap field) {
-        return new ElementField((String)field.get("name"), (String)field.get("value"));
+        return new ElementField((String) field.get("name"), (String) field.get("value"));
     }
 
 }

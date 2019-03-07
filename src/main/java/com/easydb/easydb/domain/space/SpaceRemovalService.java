@@ -1,7 +1,7 @@
 package com.easydb.easydb.domain.space;
 
 import com.easydb.easydb.domain.bucket.NamesResolver;
-import com.easydb.easydb.domain.bucket.BucketRepository;
+import com.easydb.easydb.domain.bucket.transactions.BucketRepository;
 import com.easydb.easydb.domain.locker.BucketLocker;
 import com.easydb.easydb.domain.locker.SpaceLocker;
 import com.easydb.easydb.domain.transactions.Retryier;

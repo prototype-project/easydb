@@ -3,11 +3,11 @@ package com.easydb.easydb.infrastructure.bucket
 import com.easydb.easydb.IntegrationWithCleanedDatabaseSpec
 import com.easydb.easydb.domain.bucket.*
 import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
+import com.easydb.easydb.domain.bucket.transactions.BucketRepository
 import com.easydb.easydb.domain.space.SpaceRepository
 import org.springframework.beans.factory.annotation.Autowired
 
 import static com.easydb.easydb.ElementTestBuilder.builder
-import static com.easydb.easydb.infrastructure.bucket.graphql.Query.DEFAULT_GRAPHQL_QUERY
 
 class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec {
 
@@ -128,7 +128,7 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec {
         bucketService.updateElement(toUpdate)
 
         then:
-        bucketService.getElement(TEST_BUCKET_NAME, toCreate.id).getFieldValue("lastName") == "Snow"
+        getFieldValue(bucketService.getElement(TEST_BUCKET_NAME, toCreate.id), 'lastName') == "Snow"
         bucketService.getElement(TEST_BUCKET_NAME, toCreate.id).id == toCreate.id
     }
 
@@ -217,7 +217,7 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec {
 
     def "should throw exception when trying to get elements from nonexistent bucket"() {
         when:
-        bucketService.filterElements(BucketQuery.of("nonExistentBucket", 20, 0, DEFAULT_GRAPHQL_QUERY))
+        bucketService.filterElements(BucketQuery.of("nonExistentBucket", 20, 0))
 
         then:
         thrown(BucketDoesNotExistException)
@@ -249,6 +249,12 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec {
     }
 
     static BucketQuery getDefaultBucketQuery() {
-        return BucketQuery.of(TEST_BUCKET_NAME, 20, 0, DEFAULT_GRAPHQL_QUERY);
+        return BucketQuery.of(TEST_BUCKET_NAME, 20, 0);
+    }
+
+    static getFieldValue(Element element, String fieldName) {
+        return element.fields.stream()
+                .filter({f -> f.getName() == fieldName})
+                .map({it.value}).findFirst().get()
     }
 }

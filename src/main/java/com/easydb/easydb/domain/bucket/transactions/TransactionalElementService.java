@@ -1,14 +1,17 @@
-package com.easydb.easydb.domain.bucket;
+package com.easydb.easydb.domain.bucket.transactions;
 
+import com.easydb.easydb.domain.bucket.BucketQuery;
+import com.easydb.easydb.domain.bucket.Element;
+import com.easydb.easydb.domain.bucket.NamesResolver;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ElementService {
+public class TransactionalElementService {
 
     private final String spaceName;
     private final BucketRepository bucketRepository;
 
-    public ElementService(
+    public TransactionalElementService(
             String spaceName,
             BucketRepository bucketRepository) {
         this.spaceName = spaceName;

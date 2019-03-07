@@ -2,10 +2,10 @@ package com.easydb.easydb.api.transactions
 
 import com.easydb.easydb.ElementTestBuilder
 import com.easydb.easydb.IntegrationWithCleanedDatabaseSpec
-import com.easydb.easydb.domain.bucket.BucketRepository
+import com.easydb.easydb.domain.bucket.transactions.BucketRepository
 import com.easydb.easydb.domain.bucket.BucketService
 import com.easydb.easydb.domain.bucket.Element
-import com.easydb.easydb.domain.bucket.TransactionalBucketService
+import com.easydb.easydb.domain.bucket.transactions.TransactionalBucketService
 import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
 import com.easydb.easydb.domain.bucket.factories.ElementServiceFactory
 import com.easydb.easydb.domain.locker.BucketLocker

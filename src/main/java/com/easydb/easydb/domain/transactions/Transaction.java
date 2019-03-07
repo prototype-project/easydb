@@ -1,6 +1,6 @@
 package com.easydb.easydb.domain.transactions;
 
-import com.easydb.easydb.domain.bucket.VersionedElement;
+import com.easydb.easydb.domain.bucket.transactions.VersionedElement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

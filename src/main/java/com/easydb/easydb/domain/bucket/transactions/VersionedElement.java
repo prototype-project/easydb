@@ -1,5 +1,7 @@
-package com.easydb.easydb.domain.bucket;
+package com.easydb.easydb.domain.bucket.transactions;
 
+import com.easydb.easydb.domain.bucket.Element;
+import com.easydb.easydb.domain.bucket.ElementField;
 import java.util.List;
 import java.util.Optional;
 

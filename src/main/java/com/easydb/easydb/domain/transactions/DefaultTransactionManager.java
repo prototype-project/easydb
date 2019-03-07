@@ -1,7 +1,7 @@
 package com.easydb.easydb.domain.transactions;
 
 import com.easydb.easydb.config.ApplicationMetrics;
-import com.easydb.easydb.domain.bucket.ElementService;
+import com.easydb.easydb.domain.bucket.transactions.TransactionalElementService;
 import com.easydb.easydb.domain.bucket.factories.ElementServiceFactory;
 import com.easydb.easydb.domain.space.UUIDProvider;
 import java.util.Optional;
@@ -80,8 +80,7 @@ public class DefaultTransactionManager {
     private OperationResult getResultForOperation(Transaction t, Operation o) {
         try {
             if (o.getType().equals(Operation.OperationType.READ)) {
-                ElementService elementService = elementServiceFactory
-                        .buildElementService(t.getSpaceName());
+                TransactionalElementService elementService = elementServiceFactory.buildElementService(t.getSpaceName());
 
                 return Optional.ofNullable(t.getReadElements().get(o.getElementId()))
                         .map(version ->

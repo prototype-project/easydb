@@ -50,9 +50,13 @@ public class ElementFilterToMongoQueryConverter {
     }
 
     private void validate(ElementFilter rootFilter) {
-        if (Stream.of(rootFilter.getAnd() != null, rootFilter.getOr() != null, rootFilter.getFieldsFilters() != null)
+        long operatorCount = Stream.of(rootFilter.getAnd() != null, rootFilter.getOr() != null, rootFilter.getFieldsFilters() != null)
                 .filter(b -> b)
-                .count() > 2) {
+                .count();
+        if (operatorCount < 1) {
+            throw new QueryValidationException("Empty query or subquery");
+        }
+        if (operatorCount > 1) {
             throw new QueryValidationException("Query or subquery can only contain one of [`and`, `or`, `fieldsFilters`] operator. You cannot use them together");
         }
     }

@@ -1,8 +1,8 @@
 package com.easydb.easydb.domain.transactions;
 
 import com.easydb.easydb.domain.bucket.Element;
-import com.easydb.easydb.domain.bucket.ElementService;
-import com.easydb.easydb.domain.bucket.VersionedElement;
+import com.easydb.easydb.domain.bucket.transactions.TransactionalElementService;
+import com.easydb.easydb.domain.bucket.transactions.VersionedElement;
 import com.easydb.easydb.domain.locker.ElementsLocker;
 import com.easydb.easydb.domain.locker.factories.ElementsLockerFactory;
 import java.util.Optional;
@@ -14,10 +14,10 @@ class TransactionCommitter {
 
     private final ElementsLockerFactory lockerFactory;
     private final Retryier lockerRetryier;
-    private final ElementService elementService;
+    private final TransactionalElementService elementService;
 
     TransactionCommitter(ElementsLockerFactory lockerFactory, Retryier lockerRetryier,
-                         ElementService elementService) {
+                         TransactionalElementService elementService) {
         this.lockerFactory = lockerFactory;
         this.lockerRetryier = lockerRetryier;
         this.elementService = elementService;
