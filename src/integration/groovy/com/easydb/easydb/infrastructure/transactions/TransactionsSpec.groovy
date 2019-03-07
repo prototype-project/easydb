@@ -1,6 +1,7 @@
 package com.easydb.easydb.infrastructure.transactions
 
 import com.easydb.easydb.ElementTestBuilder
+import com.easydb.easydb.ElementUtils
 import com.easydb.easydb.IntegrationWithCleanedDatabaseSpec
 import com.easydb.easydb.OperationTestBuilder
 import com.easydb.easydb.domain.bucket.BucketService
@@ -13,13 +14,18 @@ import com.easydb.easydb.domain.transactions.Operation
 import com.easydb.easydb.domain.transactions.OperationResult
 import com.easydb.easydb.domain.transactions.TransactionAbortedException
 import com.easydb.easydb.domain.transactions.PersistentTransactionManager
+import com.easydb.easydb.domain.transactions.TransactionDoesNotExistException
+import com.easydb.easydb.domain.transactions.TransactionRepository
 import org.springframework.beans.factory.annotation.Autowired
 
 
-class TransactionsSpec extends IntegrationWithCleanedDatabaseSpec {
+class TransactionsSpec extends IntegrationWithCleanedDatabaseSpec implements ElementUtils {
 
     @Autowired
     PersistentTransactionManager transactionManager
+
+    @Autowired
+    TransactionRepository transactionRepository
 
     @Autowired
     SpaceRemovalService spaceRemovalService
@@ -82,11 +88,11 @@ class TransactionsSpec extends IntegrationWithCleanedDatabaseSpec {
                 .type(Operation.OperationType.READ)
                 .elementId(element.id)
                 .build()
-        OperationResult resultRead = transactionManager.addOperation(transactionId, readOperation)
+        OperationResult readResult = transactionManager.addOperation(transactionId, readOperation)
 
         then:
-        resultRead.element.isPresent()
-        resultRead.element.get().fields[0].value == '0'
+        readResult.element.isPresent()
+        readResult.element.get().fields[0].value == '0'
 
         and: "meantime element is updated by another transaction"
         bucketService.updateElement(ElementTestBuilder.builder()
@@ -102,8 +108,8 @@ class TransactionsSpec extends IntegrationWithCleanedDatabaseSpec {
         thrown(TransactionAbortedException)
     }
 
-    def "should prevent dirty writes"() {
-        given: "saved counter element with value 0"
+    def "should prevent dirty writes with concurrent removal"() {
+        given: "saved element"
         Element element = ElementTestBuilder.builder()
                 .bucketName(TEST_BUCKET_NAME)
                 .fields([ElementField.of("counter", "0")])
@@ -117,10 +123,10 @@ class TransactionsSpec extends IntegrationWithCleanedDatabaseSpec {
                 .type(Operation.OperationType.UPDATE)
                 .elementId(element.id)
                 .build()
-        OperationResult resultRead = transactionManager.addOperation(transactionId, updateOperation)
+        OperationResult updateResult = transactionManager.addOperation(transactionId, updateOperation)
 
         then:
-        !resultRead.element.isPresent()
+        !updateResult.element.isPresent()
 
         and: "meantime element is deleted by another transaction"
         bucketService.removeElement(TEST_BUCKET_NAME, element.id)
@@ -130,5 +136,62 @@ class TransactionsSpec extends IntegrationWithCleanedDatabaseSpec {
 
         then:
         thrown(TransactionAbortedException)
+    }
+
+    def "should prevent dirty writes with concurrent update"() {
+        given: "saved element"
+        Element element = ElementTestBuilder.builder()
+                .bucketName(TEST_BUCKET_NAME)
+                .fields([ElementField.of("counter", "0")])
+                .build()
+        bucketService.addElement(element)
+
+        when: "one transaction read element"
+        String transactionId = transactionManager.beginTransaction(TEST_SPACE)
+        Operation readOperation = OperationTestBuilder.builder()
+                .bucketName(TEST_BUCKET_NAME)
+                .type(Operation.OperationType.READ)
+                .elementId(element.id)
+                .build()
+        OperationResult readResult = transactionManager.addOperation(transactionId, readOperation)
+
+        then:
+        readResult.element.isPresent()
+
+        and: "meantime element is updated by another transaction"
+        bucketService.updateElement(ElementTestBuilder.builder()
+                .bucketName(TEST_BUCKET_NAME)
+                .id(element.id)
+                .fields([ElementField.of("counter", "1")])
+                .build())
+
+        and: "the first transaction wants to update element based on previously retrieved value"
+        Operation updateOperation = OperationTestBuilder.builder()
+                .bucketName(TEST_BUCKET_NAME)
+                .type(Operation.OperationType.UPDATE)
+                .elementId(element.id)
+                .build()
+        OperationResult updateResult = transactionManager.addOperation(transactionId, updateOperation)
+
+        then:
+        !updateResult.element.isPresent()
+
+        when: "when first transaction commits it should prevent dirty write and abort"
+        transactionManager.commitTransaction(transactionId)
+
+        then:
+        thrown(TransactionAbortedException)
+    }
+
+    def "should remove transaction after commit"() {
+        given:
+        def transactionId = transactionManager.beginTransaction(TEST_SPACE)
+        transactionManager.commitTransaction(transactionId)
+
+        when:
+        transactionRepository.get(transactionId)
+
+        then:
+        thrown(TransactionDoesNotExistException)
     }
 }

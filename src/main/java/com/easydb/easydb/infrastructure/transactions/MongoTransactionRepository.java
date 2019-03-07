@@ -33,6 +33,12 @@ public class MongoTransactionRepository implements TransactionRepository {
         mongoTemplate.save(fromDomain(t));
     }
 
+    @Override
+    public void delete(Transaction t) throws TransactionDoesNotExistException {
+        ensureTransactionExists(t.getId());
+        mongoTemplate.remove(fromDomain(t));
+    }
+
     private PersistentTransaction getPersistentTransaction(String id) {
         return mongoTemplate.findById(id, PersistentTransaction.class);
     }
@@ -44,6 +50,6 @@ public class MongoTransactionRepository implements TransactionRepository {
     }
 
     private PersistentTransaction fromDomain(Transaction t) {
-        return new PersistentTransaction(t.getSpaceName(), t.getId(), t.getOperations(), t.getReadElements(), t.getState());
+        return new PersistentTransaction(t.getSpaceName(), t.getId(), t.getOperations(), t.getReadElements());
     }
 }

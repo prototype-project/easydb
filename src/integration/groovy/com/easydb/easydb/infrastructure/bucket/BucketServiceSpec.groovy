@@ -1,5 +1,6 @@
 package com.easydb.easydb.infrastructure.bucket
 
+import com.easydb.easydb.ElementUtils
 import com.easydb.easydb.IntegrationWithCleanedDatabaseSpec
 import com.easydb.easydb.domain.bucket.*
 import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
@@ -9,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 
 import static com.easydb.easydb.ElementTestBuilder.builder
 
-class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec {
+class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec implements ElementUtils {
 
     BucketService bucketService
 
@@ -250,11 +251,5 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec {
 
     static BucketQuery getDefaultBucketQuery() {
         return BucketQuery.of(TEST_BUCKET_NAME, 20, 0);
-    }
-
-    static getFieldValue(Element element, String fieldName) {
-        return element.fields.stream()
-                .filter({f -> f.getName() == fieldName})
-                .map({it.value}).findFirst().get()
     }
 }

@@ -5,7 +5,7 @@ import org.apache.curator.framework.CuratorFramework
 import org.apache.curator.x.discovery.ServiceDiscoveryBuilder
 import org.springframework.beans.factory.annotation.Autowired;
 
-class BucketServiceSpec extends BaseIntegrationSpec {
+class DiscoveryServiceSpec extends BaseIntegrationSpec {
 
     @Autowired
     CuratorFramework curatorFramework

@@ -344,7 +344,6 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
         getElementsFromTestBucket(spaceName).results.size() == 1
         getElement(spaceName, TEST_BUCKET_NAME, element1Id).fields.toSet() ==
                 [new ElementFieldDto("name", "Tadzik"), new ElementFieldDto("age", "30")].toSet()
-
     }
 
     def "should return operation read result"() {

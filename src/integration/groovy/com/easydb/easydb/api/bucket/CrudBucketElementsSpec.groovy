@@ -2,6 +2,7 @@ package com.easydb.easydb.api.bucket
 
 import com.easydb.easydb.BaseIntegrationSpec
 import com.easydb.easydb.ElementTestBuilder
+import com.easydb.easydb.ElementUtils
 import com.easydb.easydb.TestHttpOperations
 import com.easydb.easydb.api.ElementQueryDto
 import com.easydb.easydb.api.PaginatedElementsDto
@@ -18,9 +19,7 @@ import org.springframework.web.client.HttpClientErrorException
 
 import java.util.stream.Collectors
 
-import static com.easydb.easydb.infrastructure.bucket.graphql.Query.DEFAULT_GRAPHQL_QUERY
-
-class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOperations {
+class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOperations, ElementUtils {
 
     @Autowired
     SpaceRemovalService spaceRemovalService
@@ -209,11 +208,5 @@ class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOper
 
         and:
         ex.rawStatusCode == 404
-    }
-
-    static getFieldValue(Element element, String fieldName) {
-        return element.fields.stream()
-                .filter({f -> f.getName() == fieldName})
-                .map({it.value}).findFirst().get()
     }
 }

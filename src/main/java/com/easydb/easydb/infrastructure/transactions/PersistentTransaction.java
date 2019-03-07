@@ -19,21 +19,18 @@ class PersistentTransaction {
 
     private final Map<String, Long> readElements;
 
-    private final Transaction.State state;
 
     PersistentTransaction(String spaceName, String id,
                           List<Operation> operations,
-                          Map<String, Long> readElements,
-                          Transaction.State state) {
+                          Map<String, Long> readElements) {
         this.spaceName = spaceName;
         this.id = id;
         this.operations = operations;
         this.readElements = readElements;
-        this.state = state;
     }
 
     Transaction toDomain() {
-        return new Transaction(spaceName, id, operations, readElements, state);
+        return new Transaction(spaceName, id, operations, readElements);
     }
 
 }

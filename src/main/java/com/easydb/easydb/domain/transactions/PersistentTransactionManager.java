@@ -74,6 +74,8 @@ public class PersistentTransactionManager {
             metrics.abortedTransactionCounter(transaction.getSpaceName()).increment();
             throw new TransactionAbortedException(
                     "Transaction " + transaction.getId() + " was aborted", e);
+        } finally {
+            transactionRepository.delete(transaction);
         }
     }
 

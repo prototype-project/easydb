@@ -9,29 +9,22 @@ import java.util.Map;
 
 public class Transaction {
 
-    public enum State {
-        ACTIVE, ABORTED, COMMITED;
-    }
-
     private final String id;
     private String spaceName;
     private final List<Operation> operations;
     private final Map<String, Long> readElements;
-    private State state;
 
     public Transaction(String spaceName, String id,
                         List<Operation> operations,
-                        Map<String, Long> readElements,
-                        State state) {
+                        Map<String, Long> readElements) {
         this.spaceName = spaceName;
         this.operations = operations;
         this.readElements = readElements;
         this.id = id;
-        this.state = state;
     }
 
     Transaction(String spaceName, String id) {
-        this(spaceName, id, new ArrayList<>(), new HashMap<>(), State.ACTIVE);
+        this(spaceName, id, new ArrayList<>(), new HashMap<>());
     }
 
     public String getId() {
@@ -40,10 +33,6 @@ public class Transaction {
 
     public List<Operation> getOperations() {
         return operations;
-    }
-
-    public State getState() {
-        return state;
     }
 
     public String getSpaceName() {

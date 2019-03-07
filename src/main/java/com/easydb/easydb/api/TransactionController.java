@@ -47,7 +47,7 @@ class TransactionController {
     }
 
     @PostMapping("/{transactionId}/commit")
-    @ResponseStatus(value = HttpStatus.ACCEPTED)
+    @ResponseStatus(value = HttpStatus.OK)
     void commitTransaction(@PathVariable String transactionId) {
         String spaceName = persistentTransactionManager.commitTransaction(transactionId).getSpaceName();
         metrics.commitTransactionRequestCounter(spaceName).increment();
