@@ -1,5 +1,6 @@
 build_images: prepare_easydb_executable
 	docker-compose build
+	docker-compose -f docker-mongo-compose.yml build
 
 prepare_easydb_executable:
 	rm -rf ./build
@@ -13,24 +14,32 @@ prepare_easydb_executable:
 	rm -rf ./build/easydb-0.0.1-SNAPSHOT
 	rsync -av --exclude "application*.yml" ../src/main/resources ./build/
 
-run:
-	docker-compose up
+run-app:
+	docker-compose -f docker-compose.yml up
 
-stop:
+run-mongo:
+	docker-compose -f docker-mongo-compose.yml up
+
+init-mongo:
+	docker exec -it mongo-replicaset-node1 bash -c "mongo localhost:27017 < /tmp/initShardedReplica.js"
+	docker exec -it mongo-configserver-node1 bash -c "mongo localhost:27017 < /tmp/initConfigServers.js"
+	docker exec -it mongo-router1 bash -c "mongo localhost:27017 < /tmp/initRouters.js"
+	docker exec -it mongo-router1 bash -c "mongo localhost:27017 < /tmp/mongoCreateAdminUser.js"
+	docker exec -it mongo-router1 bash -c "mongo localhost:27017 < /tmp/mongoCreateUser.js"
+
+stop-app:
 	@echo "Killing running easydb docker processes..."
-	@docker kill `docker ps -f "ancestor=easydb/app" -q` 2> /dev/null || true
-	@docker kill `docker ps -f "ancestor=easydb/monitoring" -q` 2> /dev/null || true
-	@docker kill `docker ps -f "ancestor=easydb/mongo" -q` 2> /dev/null || true
-	@docker kill `docker ps -f "ancestor=easydb/zookeeper" -q` 2> /dev/null || true
-	@docker kill `docker ps -f "ancestor=easydb/load_balancer" -q` 2> /dev/null || true
-	@docker kill `docker ps -f "ancestor=easydb/discovery_scraper" -q` 2> /dev/null || true
+	@docker kill `docker ps --filter "label=type=Easydb Cluster" -q` 2> /dev/null || true
 
 	@echo "Clearing easydb docker processes traces..."
-	@docker rm `docker ps -a -f "ancestor=easydb/app" -q` 2> /dev/null || true
-	@docker rm `docker ps -a -f "ancestor=easydb/monitoring" -q` 2> /dev/null || true
-	@docker rm `docker ps -a -f "ancestor=easydb/mongo" -q` 2> /dev/null || true
-	@docker rm `docker ps -a -f "ancestor=easydb/load_balancer" -q` 2> /dev/null || true
-	@docker rm `docker ps -a -f "ancestor=easydb/discovery_scraper" -q` 2> /dev/null || true
+	@docker rm `docker ps -a --filter "label=type=Easydb Cluster"  -q` -f 2> /dev/null || true
+
+stop-mongo:
+	@echo "Killing running easydb docker processes..."
+	@docker kill `docker ps --filter "label=type=Mongo Cluster" -q` 2> /dev/null || true
+
+	@echo "Clearing easydb docker processes traces..."
+	@docker rm `docker ps -a --filter "label=type=Easydb Cluster"  -q` -f 2> /dev/null || true
 
 clean:
 	rm -rf ./logs

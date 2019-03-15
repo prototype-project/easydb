@@ -4,14 +4,14 @@ import com.coxautodev.graphql.tools.SchemaParser;
 import com.easydb.easydb.domain.bucket.BucketQuery;
 import graphql.GraphQL;
 import graphql.schema.GraphQLSchema;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import org.springframework.core.io.ClassPathResource;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.stream.Collectors;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 public class GraphQlProvider {
-    private static String SCHEMA_FILE_NAME = "schema.graphql";
+    private static String SCHEMA_FILE_NAME = "/schema.graphql";
 
     private final String schema;
     private MongoTemplate mongoTemplate;
@@ -32,9 +32,10 @@ public class GraphQlProvider {
 
     private String readSchema() {
         try {
-            File file = new ClassPathResource(SCHEMA_FILE_NAME).getFile();
-            return new String(Files.readAllBytes(file.toPath()));
-        } catch (IOException ex) {
+            InputStream in = getClass().getResourceAsStream(SCHEMA_FILE_NAME);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+            return reader.lines().collect(Collectors.joining());
+        } catch (Exception ex) {
             throw new RuntimeException("Error during reading schema", ex);
         }
     }

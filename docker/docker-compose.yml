@@ -1,9 +1,11 @@
-version: "3"
+version: "3.3"
 services:
   discovery-scraper:
     build:
       context: ""
       dockerfile: DiscoveryScraper
+      labels:
+        - "type=Easydb Cluster"
     image: easydb/discovery_scraper
     depends_on:
       - zookeeper
@@ -15,6 +17,8 @@ services:
     build:
       context: ""
       dockerfile: Nginx
+      labels:
+        - "type=Easydb Cluster"
     image: easydb/load_balancer
     depends_on:
       - easydb
@@ -28,10 +32,11 @@ services:
     build:
       context: ""
       dockerfile: Easydb
+      labels:
+        - "type=Easydb Cluster"
     image: easydb/app
     depends_on:
       - monitoring
-      - mongo
       - zookeeper
     networks:
       - easydb
@@ -40,6 +45,8 @@ services:
     build:
       context: ""
       dockerfile: Monitoring
+      labels:
+        - "type=Easydb Cluster"
     image: easydb/monitoring
     networks:
       - easydb
@@ -47,28 +54,17 @@ services:
       - "9090:9090"
       - "9095:9095"
 
-  mongo:
-    build:
-      context: ""
-      dockerfile: Mongo
-    image: easydb/mongo
-    volumes:
-      - mongo-data-volume:/data/easydb/mongodb
-    networks:
-      - easydb
-
   zookeeper:
     build:
       context: ""
       dockerfile: Zookeeper
+      labels:
+        - "type=Easydb Cluster"
     image: easydb/zookeeper
     networks:
       - easydb
     ports:
       - "2181:2181"
-
-volumes:
-  mongo-data-volume:
 
 networks:
   easydb:

@@ -2,6 +2,8 @@ FROM ubuntu:18.04
 
 ENV JAVA_HOME "/usr/lib/jvm/java-8-openjdk-amd64"
 ENV SPRING_CONFIG_LOCATION "/opt/easydb/resources/application.yml"
+ENV JAVA_OPTS "-Xmx500m -XX:+UseG1GC"
+
 
     # install java8
 RUN apt-get -y update && \

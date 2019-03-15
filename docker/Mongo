@@ -11,20 +11,8 @@ RUN apt-get -y update && \
     apt-get -y update && \
     apt-get -y install mongodb-org=${MONGO_VERSION} mongodb-org-server=${MONGO_VERSION} mongodb-org-shell=${MONGO_VERSION} mongodb-org-mongos=${MONGO_VERSION} mongodb-org-tools=${MONGO_VERSION}
 
-    # prepare mongodb command
-RUN mkdir -p /data/easydb/mongodb/ && \
-    mkdir -p /var/log/easydb/ && \
-    touch /var/log/easydb/mongodb.log && \
-    mkdir -p /etc/mongodb/
-
-ADD files/mongodb.conf /etc/mongodb/mongodb.conf
-ADD files/mongoCreateUser.js /tmp/mongoCreateUser.js
-ADD files/mongoCreateAdminUser.js /tmp/mongoCreateAdminUser.js
-ADD files/mongoCreateUser.sh /tmp/mongoCreateUser.sh
-
-    # cerate mongodb user
-RUN sh /tmp/mongoCreateUser.sh
-
-EXPOSE 27017
-
-CMD /usr/bin/mongod --config /etc/mongodb/mongodb.conf
+ADD files/mongo/mongoCreateUser.js /tmp/mongoCreateUser.js
+ADD files/mongo/mongoCreateAdminUser.js /tmp/mongoCreateAdminUser.js
+ADD files/mongo/initConfigServers.js /tmp/initConfigServers.js
+ADD files/mongo/initRouters.js /tmp/initRouters.js
+ADD files/mongo/initShardedReplica.js /tmp/initShardedReplica.js

@@ -5,8 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "mongo")
 public class MongoProperties {
     private String databaseName;
-    private String host;
-    private int port;
+    private String hosts;
     private String username;
     private String password;
     private String adminDatabaseName;
@@ -19,14 +18,6 @@ public class MongoProperties {
 
     public void setDatabaseName(String databaseName) {
         this.databaseName = databaseName;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
     }
 
     public String getUsername() {
@@ -45,12 +36,12 @@ public class MongoProperties {
         this.password = password;
     }
 
-    public String getHost() {
-        return host;
+    public String getHosts() {
+        return hosts;
     }
 
-    public void setHost(String host) {
-        this.host = host;
+    public void setHosts(String hosts) {
+        this.hosts = hosts;
     }
 
     public String getAdminDatabaseName() {

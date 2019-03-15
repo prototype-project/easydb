@@ -5,24 +5,24 @@
         </encoder>
     </appender>
 
-    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>/var/log/easydb/easydb.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- daily rollover -->
-            <fileNamePattern>/var/log/easydb/easydb.%d{dd-MM-yyyy}.gz</fileNamePattern>
+    <!--<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+        <!--<file>/var/log/easydb/easydb.log</file>-->
+        <!--<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
+            <!--&lt;!&ndash; daily rollover &ndash;&gt;-->
+            <!--<fileNamePattern>/var/log/easydb/easydb.%d{dd-MM-yyyy}.gz</fileNamePattern>-->
 
-            <!-- keep 1 days worth of history capped at 1GB total size -->
-            <maxHistory>30</maxHistory>
-            <totalSizeCap>1GB</totalSizeCap>
-        </rollingPolicy>
-        <encoder>
-            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
-    </appender>
+            <!--&lt;!&ndash; keep 1 days worth of history capped at 1GB total size &ndash;&gt;-->
+            <!--<maxHistory>30</maxHistory>-->
+            <!--<totalSizeCap>1GB</totalSizeCap>-->
+        <!--</rollingPolicy>-->
+        <!--<encoder>-->
+            <!--<pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>-->
+        <!--</encoder>-->
+    <!--</appender>-->
 
-    <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
-        <appender-ref ref="FILE" />
-    </appender>
+    <!--<appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">-->
+        <!--<appender-ref ref="FILE" />-->
+    <!--</appender>-->
 
     <root level="info">
         <!--<appender-ref ref="ASYNC" />-->

@@ -16,10 +16,11 @@ management:
 
 mongo:
   databaseName: easydb
-  host: localhost
-  port: 27017
+  hosts: "localhost:27017"
   username: easydb
-  password: 123456789
-
+  password: 123456
+  adminDatabaseName: admin
+  adminUsername: admin
+  adminPassword: 123456
 server:
   max-http-header-size: 65536

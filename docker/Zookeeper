@@ -1,6 +1,6 @@
 FROM ubuntu:18.04
 
-ENV ZOOKEEPER_VERSION 3.5.3-beta
+ENV ZOOKEEPER_VERSION 3.5.4-beta
 ENV JAVA_HOME "/usr/lib/jvm/java-8-openjdk-amd64"
 
     # install java8
