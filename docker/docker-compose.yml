@@ -12,6 +12,8 @@ services:
       - nginx
     networks:
       - easydb
+    volumes:
+      - "targets:/etc/prometheus/targets"
 
   nginx:
     build:
@@ -53,6 +55,8 @@ services:
     ports:
       - "9090:9090"
       - "9095:9095"
+    volumes:
+      - "targets:/etc/prometheus/targets"
 
   zookeeper:
     build:
@@ -68,3 +72,6 @@ services:
 
 networks:
   easydb:
+
+volumes:
+  targets:

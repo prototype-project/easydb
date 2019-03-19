@@ -1,6 +1,7 @@
 FROM ubuntu:16.04
 
 ENV PUPPET_VERSION "5.5.3"
+ENV PROMETHEUS_VERSION "2.0.0"
 
 # install puppet
 RUN apt-get -y update && \
@@ -24,23 +25,35 @@ RUN echo 'deb https://packages.grafana.com/oss/deb stable main' > /etc/apt/sourc
     apt-get install -y grafana
 
 # install prometheus
-RUN puppet module install puppet-prometheus --version 6.2.0 && \
-    puppet module install puppetlabs-apt && \
+RUN mkdir -p /etc/prometheus && \
+    mkdir -p /var/lib/prometheus && \
+    curl -LO https://github.com/prometheus/prometheus/releases/download/v${PROMETHEUS_VERSION}/prometheus-${PROMETHEUS_VERSION}.linux-amd64.tar.gz && \
+    tar xvf prometheus-${PROMETHEUS_VERSION}.linux-amd64.tar.gz && \
+    cp prometheus-${PROMETHEUS_VERSION}.linux-amd64/prometheus /usr/local/bin/ && \
+    cp prometheus-${PROMETHEUS_VERSION}.linux-amd64/promtool /usr/local/bin/ && \
+    cp -r prometheus-${PROMETHEUS_VERSION}.linux-amd64/consoles /etc/prometheus && \
+    cp -r prometheus-${PROMETHEUS_VERSION}.linux-amd64/console_libraries /etc/prometheus && \
+    rm -rf prometheus-${PROMETHEUS_VERSION}.linux-amd64.tar.gz prometheus-${PROMETHEUS_VERSION}.linux-amd64
+
+RUN puppet module install puppetlabs-apt && \
     puppet module install puppet-grafana --version 5.0.0 && \
     puppet module install puppet-healthcheck --version 0.4.1
 
-ADD files/prometheus.pp /tmp/prometheus.pp
 ADD files/grafana.pp /tmp/grafana.pp
 ADD files/grafana_dashboard.json /tmp/grafana_dashboard.json
 ADD files/grafana.ini /etc/grafana/grafana.ini
+ADD files/prometheus.yml /etc/prometheus/prometheus.yml
+ADD files/targets.json /etc/prometheus/targets/targets.json
 
 RUN service grafana-server start && \
-    puppet apply /tmp/prometheus.pp && \
     puppet apply /tmp/grafana.pp
 
 EXPOSE 9090
 EXPOSE 9095
 
-CMD puppet apply /tmp/prometheus.pp && \
-    service grafana-server start && \
-    tail -f /dev/null
+CMD service grafana-server start && \
+    /usr/local/bin/prometheus \
+        --config.file /etc/prometheus/prometheus.yml \
+        --storage.tsdb.path /var/lib/prometheus/ \
+        --web.console.templates=/etc/prometheus/consoles \
+        --web.console.libraries=/etc/prometheus/console_libraries

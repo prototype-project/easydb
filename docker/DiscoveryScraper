@@ -6,7 +6,6 @@ RUN apt-get -y update && \
     cd easydb-discovery-scraper && \
     pip install -r requirements.txt
 
-
 ENV ZOOKEEPER_HOSTS 'zookeeper:2181'
 ENV LOAD_BALANCERS 'nginx:8081'
 

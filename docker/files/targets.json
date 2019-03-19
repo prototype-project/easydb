@@ -1,0 +1,10 @@
+[
+  {
+    "labels": {
+      "alias": "Easydb"
+    },
+    "targets": [
+      "easydb:9000"
+    ]
+  }
+]
