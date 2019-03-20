@@ -11,7 +11,6 @@ import com.easydb.easydb.domain.bucket.BucketService
 import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
 import com.easydb.easydb.domain.bucket.ElementField
 import com.easydb.easydb.domain.transactions.Operation
-import com.easydb.easydb.domain.transactions.Transaction
 import com.easydb.easydb.domain.transactions.TransactionRepository
 import groovy.json.JsonOutput
 import org.springframework.beans.factory.annotation.Autowired
