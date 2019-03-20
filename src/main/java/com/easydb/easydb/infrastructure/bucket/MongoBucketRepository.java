@@ -50,6 +50,7 @@ public class MongoBucketRepository implements BucketRepository {
 
     @Override
     public void createBucket(String name) {
+        createShardedCollection(name);
         mongoTemplate.createCollection(name);
     }
 
@@ -64,7 +65,6 @@ public class MongoBucketRepository implements BucketRepository {
         ensureBucketExists(element.getBucketName());
 
         try {
-//            createShardIfInsertingFirstElement(element.getName());
             mongoTemplate.insert(PersistentBucketElement.of(element), element.getBucketName());
         } catch (DuplicateKeyException e) {
             throw new ElementAlreadyExistsException(
@@ -138,13 +138,6 @@ public class MongoBucketRepository implements BucketRepository {
     private void ensureBucketExists(String bucketName) {
         if (!bucketExists(bucketName)) {
             throw new BucketDoesNotExistException(bucketName);
-        }
-    }
-
-    // TODO only in sharding mongo mode - add config
-    private void createShardIfInsertingFirstElement(String bucketName) {
-        if (!bucketExists(bucketName)) {
-           createShardedCollection(bucketName);
         }
     }
 
