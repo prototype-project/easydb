@@ -8,7 +8,7 @@ import com.easydb.easydb.domain.space.SpaceRepository;
 import com.easydb.easydb.domain.space.UUIDProvider;
 import com.easydb.easydb.domain.bucket.transactions.BucketRepository;
 import com.easydb.easydb.domain.transactions.OptimizedTransactionManager;
-import com.easydb.easydb.domain.transactions.Retryier;
+import com.easydb.easydb.domain.transactions.Retryer;
 import com.easydb.easydb.infrastructure.bucket.MongoBucketRepository;
 import com.easydb.easydb.domain.bucket.factories.TransactionalBucketServiceFactory;
 import com.easydb.easydb.infrastructure.bucket.graphql.GraphQlElementsFetcher;
@@ -45,10 +45,10 @@ public class BucketConfig {
             OptimizedTransactionManager optimizedTransactionManager,
             BucketLocker bucketLocker,
             SpaceLocker spaceLocker,
-            @Qualifier("transactionRetryier")  Retryier transactionRetryier,
-            @Qualifier("lockerRetryier") Retryier lockerRetryier) {
+            @Qualifier("transactionRetryer") Retryer transactionRetryer,
+            @Qualifier("lockerRetryer") Retryer lockerRetryer) {
         return new TransactionalBucketServiceFactory(spaceRepository, bucketRepository,
                 elementServiceFactory, optimizedTransactionManager, bucketLocker,
-                spaceLocker, transactionRetryier, lockerRetryier);
+                spaceLocker, transactionRetryer, lockerRetryer);
     }
 }

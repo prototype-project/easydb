@@ -13,13 +13,13 @@ class TransactionCommitter {
     private static final Logger logger = LoggerFactory.getLogger(TransactionCommitter.class);
 
     private final ElementsLockerFactory lockerFactory;
-    private final Retryier lockerRetryier;
+    private final Retryer lockerRetryer;
     private final TransactionalElementService elementService;
 
-    TransactionCommitter(ElementsLockerFactory lockerFactory, Retryier lockerRetryier,
+    TransactionCommitter(ElementsLockerFactory lockerFactory, Retryer lockerRetryer,
                          TransactionalElementService elementService) {
         this.lockerFactory = lockerFactory;
-        this.lockerRetryier = lockerRetryier;
+        this.lockerRetryer = lockerRetryer;
         this.elementService = elementService;
     }
 
@@ -29,12 +29,12 @@ class TransactionCommitter {
         try {
             transaction.getOperations().forEach(o -> {
                 if (operationRequiresElementLock(o)) {
-                    lockerRetryier.performWithRetries(() -> locker.lockElement(o.getBucketName(), o.getElementId()));
+                    lockerRetryer.performWithRetries(() -> locker.lockElement(o.getBucketName(), o.getElementId()));
                 }
             });
             transaction.getOperations().forEach(o -> performOperation(o, transaction));
         } catch (Exception e) {
-            logger.error("Error during committing transaction {}. Making rollback...", transaction.getId(), e);
+            logger.info("Error during committing transaction {}. Making rollback...", transaction.getId(), e);
             throw e;
         } finally {
             // TODO think about corner cases (e.g. unlocking not already locked element)

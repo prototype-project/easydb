@@ -7,20 +7,20 @@ import com.easydb.easydb.domain.locker.factories.ElementsLockerFactory;
 public class TransactionCommitterFactory {
 
     private final ElementsLockerFactory elementsLockerFactory;
-    private final Retryier lockerRetryier;
+    private final Retryer lockerRetryer;
     private final ElementServiceFactory elementServiceFactory;
 
-    public TransactionCommitterFactory(ElementsLockerFactory elementsLockerFactory, Retryier lockerRetryier,
+    public TransactionCommitterFactory(ElementsLockerFactory elementsLockerFactory, Retryer lockerRetryer,
                                        ElementServiceFactory elementServiceFactory) {
         this.elementsLockerFactory = elementsLockerFactory;
-        this.lockerRetryier = lockerRetryier;
+        this.lockerRetryer = lockerRetryer;
         this.elementServiceFactory = elementServiceFactory;
     }
 
     TransactionCommitter build(String spaceName) {
         TransactionalElementService elementService =
                 elementServiceFactory.buildElementService(spaceName);
-        return new TransactionCommitter(elementsLockerFactory, lockerRetryier, elementService);
+        return new TransactionCommitter(elementsLockerFactory, lockerRetryer, elementService);
 
     }
 }

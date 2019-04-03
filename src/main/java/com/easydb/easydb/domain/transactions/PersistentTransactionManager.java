@@ -70,7 +70,7 @@ public class PersistentTransactionManager {
         try {
             transactionCommitter.commit(transaction);
         } catch (Exception e) {
-            logger.error("Aborting transaction {} ...", transaction.getId(), e);
+            logger.info("Aborting transaction {} ...", transaction.getId(), e);
             metrics.abortedTransactionCounter(transaction.getSpaceName()).increment();
             throw new TransactionAbortedException(
                     "Transaction " + transaction.getId() + " was aborted", e);
@@ -91,7 +91,7 @@ public class PersistentTransactionManager {
             }
             return OperationResult.emptyResult(t.getSpaceName());
         } catch (ConcurrentTransactionDetectedException e) {
-            logger.error("Aborting transaction {} ...", t.getId(), e);
+            logger.info("Aborting transaction {} ...", t.getId(), e);
             metrics.abortedTransactionCounter(t.getSpaceName()).increment();
             throw new TransactionAbortedException(
                     "Transaction " + t.getId() + " was aborted", e);

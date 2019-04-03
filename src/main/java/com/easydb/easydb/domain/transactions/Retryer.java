@@ -3,10 +3,10 @@ package com.easydb.easydb.domain.transactions;
 import org.springframework.retry.RetryContext;
 import org.springframework.retry.support.RetryTemplate;
 
-public class Retryier {
+public class Retryer {
     private final RetryTemplate retryTemplate;
 
-    public Retryier(RetryTemplate retryTemplate) {
+    public Retryer(RetryTemplate retryTemplate) {
         this.retryTemplate = retryTemplate;
     }
 

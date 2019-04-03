@@ -45,7 +45,7 @@ class BucketController {
     @ResponseStatus(value = HttpStatus.CREATED)
     void createBucket(@PathVariable("spaceName") String spaceName, @RequestBody @Valid BucketDefinitionDto toCreate) {
         bucketServiceFactory.buildBucketService(spaceName).createBucket(toCreate.getName());
-        metrics.createBucketRequestsCounter(spaceName);
+        metrics.createBucketRequestsCounter(spaceName).increment();
     }
 
     @PostMapping(path = "/{bucketName}/elements")

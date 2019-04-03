@@ -8,11 +8,11 @@ import com.easydb.easydb.domain.space.SpaceRepository;
 import com.easydb.easydb.domain.space.UUIDProvider;
 import com.easydb.easydb.domain.transactions.PersistentTransactionManager;
 import com.easydb.easydb.domain.transactions.OptimizedTransactionManager;
+import com.easydb.easydb.domain.transactions.Retryer;
 import com.easydb.easydb.domain.transactions.TransactionAbortedException;
 import com.easydb.easydb.domain.transactions.TransactionConstraintsValidator;
 import com.easydb.easydb.domain.transactions.TransactionCommitterFactory;
 import com.easydb.easydb.domain.transactions.TransactionRepository;
-import com.easydb.easydb.domain.transactions.Retryier;
 import com.easydb.easydb.infrastructure.transactions.MongoTransactionRepository;
 import java.util.Collections;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -46,9 +46,9 @@ public class TransactionConfig {
 
     @Bean
     TransactionCommitterFactory transactionCommitterFactory(ElementsLockerFactory elementsLockerFactory,
-                                                         @Qualifier("lockerRetryier") Retryier lockerRetryier,
+                                                         @Qualifier("lockerRetryer") Retryer lockerRetryer,
                                                          ElementServiceFactory elementServiceFactory) {
-        return new TransactionCommitterFactory(elementsLockerFactory, lockerRetryier, elementServiceFactory);
+        return new TransactionCommitterFactory(elementsLockerFactory, lockerRetryer, elementServiceFactory);
     }
 
     @Bean
@@ -61,7 +61,7 @@ public class TransactionConfig {
 
 
     @Bean
-    Retryier transactionRetryier(TransactionsProperties properties) {
+    Retryer transactionRetryer(TransactionsProperties properties) {
         RetryTemplate retryTemplate = new RetryTemplate();
 
         SimpleRetryPolicy boundedRetriesPolicy = new SimpleRetryPolicy(
@@ -72,7 +72,7 @@ public class TransactionConfig {
 
         retryTemplate.setRetryPolicy(boundedRetriesPolicy);
         retryTemplate.setBackOffPolicy(backOffPolicy);
-        return new Retryier(retryTemplate);
+        return new Retryer(retryTemplate);
     }
 
     @Bean

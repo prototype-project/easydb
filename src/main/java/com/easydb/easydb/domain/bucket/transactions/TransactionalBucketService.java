@@ -13,8 +13,8 @@ import com.easydb.easydb.domain.space.SpaceRepository;
 import com.easydb.easydb.domain.transactions.Operation;
 import com.easydb.easydb.domain.transactions.Operation.OperationType;
 import com.easydb.easydb.domain.transactions.OptimizedTransactionManager;
+import com.easydb.easydb.domain.transactions.Retryer;
 import com.easydb.easydb.domain.transactions.Transaction;
-import com.easydb.easydb.domain.transactions.Retryier;
 
 import java.util.List;
 
@@ -27,8 +27,8 @@ public class TransactionalBucketService implements BucketService {
     private final TransactionalElementService elementService;
     private final BucketLocker bucketLocker;
     private final SpaceLocker spaceLocker;
-    private final Retryier transactionRetryier;
-    private final Retryier lockerRetryier;
+    private final Retryer transactionRetryer;
+    private final Retryer lockerRetryer;
 
     public TransactionalBucketService(String spaceName,
                                       SpaceRepository spaceRepository,
@@ -37,8 +37,8 @@ public class TransactionalBucketService implements BucketService {
                                       OptimizedTransactionManager optimizedTransactionManager,
                                       BucketLocker bucketLocker,
                                       SpaceLocker spaceLocker,
-                                      Retryier transactionRetryier,
-                                      Retryier lockerRetryier) {
+                                      Retryer transactionRetryer,
+                                      Retryer lockerRetryer) {
         this.spaceName = spaceName;
         this.spaceRepository = spaceRepository;
         this.bucketRepository = bucketRepository;
@@ -46,8 +46,8 @@ public class TransactionalBucketService implements BucketService {
         this.optimizedTransactionManager = optimizedTransactionManager;
         this.bucketLocker = bucketLocker;
         this.spaceLocker = spaceLocker;
-        this.transactionRetryier = transactionRetryier;
-        this.lockerRetryier = lockerRetryier;
+        this.transactionRetryer = transactionRetryer;
+        this.lockerRetryer = lockerRetryer;
     }
 
     @Override
@@ -60,8 +60,8 @@ public class TransactionalBucketService implements BucketService {
         Space space = spaceRepository.get(spaceName);
         space.getBuckets().remove(bucketName);
 
-        lockerRetryier.performWithRetries(() -> spaceLocker.lockSpace(spaceName));
-        lockerRetryier.performWithRetries(() -> bucketLocker.lockBucket(spaceName, bucketName));
+        lockerRetryer.performWithRetries(() -> spaceLocker.lockSpace(spaceName));
+        lockerRetryer.performWithRetries(() -> bucketLocker.lockBucket(spaceName, bucketName));
 
         try {
             spaceRepository.update(space);
@@ -81,7 +81,7 @@ public class TransactionalBucketService implements BucketService {
         Space space = spaceRepository.get(spaceName);
         space.getBuckets().add(bucketName);
 
-        lockerRetryier.performWithRetries(() -> spaceLocker.lockSpace(spaceName));
+        lockerRetryer.performWithRetries(() -> spaceLocker.lockSpace(spaceName));
         try {
             spaceRepository.update(space);
             bucketRepository.createBucket(getBucketName(bucketName));
@@ -105,7 +105,7 @@ public class TransactionalBucketService implements BucketService {
         Transaction transaction = optimizedTransactionManager.beginTransaction(spaceName);
         Operation operation = Operation.of(OperationType.DELETE, bucketName, elementId);
         optimizedTransactionManager.addOperation(transaction, operation);
-        transactionRetryier.performWithRetries(() -> optimizedTransactionManager.commitTransaction(transaction));
+        transactionRetryer.performWithRetries(() -> optimizedTransactionManager.commitTransaction(transaction));
     }
 
     @Override
@@ -118,7 +118,7 @@ public class TransactionalBucketService implements BucketService {
         Transaction transaction = optimizedTransactionManager.beginTransaction(spaceName);
         Operation operation = Operation.of(OperationType.UPDATE, toUpdate);
         optimizedTransactionManager.addOperation(transaction, operation);
-        transactionRetryier.performWithRetries(() -> optimizedTransactionManager.commitTransaction(transaction));
+        transactionRetryer.performWithRetries(() -> optimizedTransactionManager.commitTransaction(transaction));
     }
 
     @Override

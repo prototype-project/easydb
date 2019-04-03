@@ -4,7 +4,7 @@ import com.easydb.easydb.domain.locker.BucketLocker;
 import com.easydb.easydb.domain.locker.LockTimeoutException;
 import com.easydb.easydb.domain.locker.SpaceLocker;
 import com.easydb.easydb.domain.locker.factories.ElementsLockerFactory;
-import com.easydb.easydb.domain.transactions.Retryier;
+import com.easydb.easydb.domain.transactions.Retryer;
 import com.easydb.easydb.infrastructure.locker.ZookeeperBucketLocker;
 import com.easydb.easydb.infrastructure.locker.ZookeeperSpaceLocker;
 import com.easydb.easydb.infrastructure.locker.factories.ZookeeperElementsLockerFactory;
@@ -58,7 +58,7 @@ public class LockingConfiguration {
     }
 
     @Bean
-    Retryier lockerRetryier(LockingProperties properties) {
+    Retryer lockerRetryer(LockingProperties properties) {
         RetryTemplate retryTemplate = new RetryTemplate();
 
         SimpleRetryPolicy boundedRetriesPolicy = new SimpleRetryPolicy(
@@ -69,6 +69,6 @@ public class LockingConfiguration {
 
         retryTemplate.setRetryPolicy(boundedRetriesPolicy);
         retryTemplate.setBackOffPolicy(backOffPolicy);
-        return new Retryier(retryTemplate);
+        return new Retryer(retryTemplate);
     }
 }

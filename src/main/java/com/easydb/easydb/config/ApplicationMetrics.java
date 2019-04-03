@@ -114,6 +114,22 @@ public class ApplicationMetrics {
         return buildSpaceCounter("abortedTransactions", spaceName);
     }
 
+    Counter applicationAllRequests() {
+        return buildCounter("api.v1.requests.all");
+    }
+
+    Counter application2xxRequests() {
+        return buildCounter("api.v1.requests.2xx");
+    }
+
+    Counter application4xxRequests() {
+        return buildCounter("api.v1.requests.4xx");
+    }
+
+    Counter application5xxRequests() {
+        return buildCounter("api.v1.requests.5xx");
+    }
+
     public Timer compoundTransactionTimer(String spaceName) {
         return buildSpaceTimer("compoundTransactionTime", spaceName);
     }

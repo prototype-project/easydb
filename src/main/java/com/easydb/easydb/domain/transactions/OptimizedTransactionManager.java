@@ -48,7 +48,7 @@ public class OptimizedTransactionManager {
         try {
             transactionCommitter.commit(transaction);
         } catch (Exception e) {
-            logger.error("Aborting transaction {} ...", transaction.getId(), e);
+            logger.info("Aborting transaction {} ...", transaction.getId(), e);
             metrics.abortedTransactionCounter(transaction.getSpaceName()).increment();
             throw new TransactionAbortedException(
                     "Transaction " + transaction.getId() + " was aborted", e);

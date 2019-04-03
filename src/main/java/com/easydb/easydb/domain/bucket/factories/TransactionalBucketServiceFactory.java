@@ -8,7 +8,7 @@ import com.easydb.easydb.domain.locker.SpaceLocker;
 import com.easydb.easydb.domain.space.SpaceDoesNotExistException;
 import com.easydb.easydb.domain.space.SpaceRepository;
 import com.easydb.easydb.domain.transactions.OptimizedTransactionManager;
-import com.easydb.easydb.domain.transactions.Retryier;
+import com.easydb.easydb.domain.transactions.Retryer;
 
 public class TransactionalBucketServiceFactory implements BucketServiceFactory {
     private final BucketRepository bucketRepository;
@@ -17,8 +17,8 @@ public class TransactionalBucketServiceFactory implements BucketServiceFactory {
     private final OptimizedTransactionManager defaultTransactionManager;
     private final BucketLocker bucketLocker;
     private final SpaceLocker spaceLocker;
-    private final Retryier transactionRetryier;
-    private final Retryier lockerRetryier;
+    private final Retryer transactionRetryer;
+    private final Retryer lockerRetryer;
 
     public TransactionalBucketServiceFactory(SpaceRepository spaceRepository,
                                              BucketRepository bucketRepository,
@@ -26,16 +26,16 @@ public class TransactionalBucketServiceFactory implements BucketServiceFactory {
                                              OptimizedTransactionManager defaultTransactionManager,
                                              BucketLocker bucketLocker,
                                              SpaceLocker spaceLocker,
-                                             Retryier transactionRetryier,
-                                             Retryier lockerRetryier) {
+                                             Retryer transactionRetryer,
+                                             Retryer lockerRetryer) {
         this.spaceRepository = spaceRepository;
         this.bucketRepository = bucketRepository;
         this.elementServiceFactory = elementServiceFactory;
         this.defaultTransactionManager = defaultTransactionManager;
         this.bucketLocker = bucketLocker;
         this.spaceLocker = spaceLocker;
-        this.transactionRetryier = transactionRetryier;
-        this.lockerRetryier = lockerRetryier;
+        this.transactionRetryer = transactionRetryer;
+        this.lockerRetryer = lockerRetryer;
     }
 
     public BucketService buildBucketService(String spaceName) {
@@ -44,6 +44,6 @@ public class TransactionalBucketServiceFactory implements BucketServiceFactory {
         }
         return new TransactionalBucketService(spaceName, spaceRepository, bucketRepository,
                 elementServiceFactory, defaultTransactionManager, bucketLocker,
-                spaceLocker, transactionRetryier, lockerRetryier);
+                spaceLocker, transactionRetryer, lockerRetryer);
     }
 }
