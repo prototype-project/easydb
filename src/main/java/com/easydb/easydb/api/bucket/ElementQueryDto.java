@@ -1,4 +1,4 @@
-package com.easydb.easydb.api;
+package com.easydb.easydb.api.bucket;
 
 import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.bucket.ElementField;

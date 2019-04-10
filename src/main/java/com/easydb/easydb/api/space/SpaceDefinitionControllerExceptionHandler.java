@@ -1,5 +1,7 @@
-package com.easydb.easydb.api;
+package com.easydb.easydb.api.space;
 
+import com.easydb.easydb.api.ApiError;
+import com.easydb.easydb.api.ApiErrorMapper;
 import com.easydb.easydb.domain.space.SpaceDoesNotExistException;
 import com.easydb.easydb.domain.space.SpaceNameNotUniqueException;
 import org.springframework.http.HttpStatus;

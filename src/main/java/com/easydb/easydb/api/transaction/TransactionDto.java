@@ -1,4 +1,4 @@
-package com.easydb.easydb.api;
+package com.easydb.easydb.api.transaction;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -53,7 +53,7 @@ public class TransactionalElementService {
     }
 
     List<Element> filterElements(BucketQuery query) {
-        return bucketRepository.filterElements(rebuildToProperSpaceName(query)).stream()
+        return bucketRepository.filterElements(rebuildForProperSpace(query)).stream()
                 .map(it -> Element.of(it.getId(), query.getBucketName(), it.getFields()))
                 .collect(Collectors.toList());
     }
@@ -66,7 +66,7 @@ public class TransactionalElementService {
         return NamesResolver.resolve(spaceName, bucketName);
     }
 
-    private BucketQuery rebuildToProperSpaceName(BucketQuery query) {
+    private BucketQuery rebuildForProperSpace(BucketQuery query) {
         return BucketQuery.of(getBucketNameAccordinglyToSpace(query.getBucketName()), query.getLimit(),
                 query.getOffset(), query.getQuery());
     }

@@ -1,10 +1,10 @@
 package com.easydb.easydb
 
-import com.easydb.easydb.api.ElementQueryDto
-import com.easydb.easydb.api.OperationResultDto
-import com.easydb.easydb.api.PaginatedElementsDto
-import com.easydb.easydb.api.SpaceDefinitionDto
-import com.easydb.easydb.api.TransactionDto
+import com.easydb.easydb.api.bucket.ElementQueryDto
+import com.easydb.easydb.api.transaction.OperationResultDto
+import com.easydb.easydb.api.bucket.PaginatedElementsDto
+import com.easydb.easydb.api.space.SpaceDefinitionDto
+import com.easydb.easydb.api.transaction.TransactionDto
 import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.bucket.ElementField
 import com.easydb.easydb.domain.transactions.Operation

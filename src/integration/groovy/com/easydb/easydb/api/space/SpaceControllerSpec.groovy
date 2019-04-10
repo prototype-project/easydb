@@ -1,7 +1,6 @@
 package com.easydb.easydb.api.space
 
-import com.easydb.easydb.BaseIntegrationSpec;
-import com.easydb.easydb.api.SpaceDefinitionDto
+import com.easydb.easydb.BaseIntegrationSpec
 import com.easydb.easydb.TestHttpOperations
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity

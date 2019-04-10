@@ -1,5 +1,6 @@
 package com.easydb.easydb.config;
 
+import com.easydb.easydb.domain.bucket.BucketObserversContainer;
 import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory;
 import com.easydb.easydb.domain.bucket.factories.ElementServiceFactory;
 import com.easydb.easydb.domain.locker.BucketLocker;
@@ -14,11 +15,13 @@ import com.easydb.easydb.domain.bucket.factories.TransactionalBucketServiceFacto
 import com.easydb.easydb.infrastructure.bucket.graphql.GraphQlElementsFetcher;
 import org.springframework.beans.factory.annotation.Qualifier;
 import com.mongodb.MongoClient;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 @Configuration
+@EnableConfigurationProperties(SubscribingProperties.class)
 public class BucketConfig {
 
     @Bean
@@ -50,5 +53,11 @@ public class BucketConfig {
         return new TransactionalBucketServiceFactory(spaceRepository, bucketRepository,
                 elementServiceFactory, optimizedTransactionManager, bucketLocker,
                 spaceLocker, transactionRetryer, lockerRetryer);
+    }
+
+    @Bean
+    BucketObserversContainer bucketObserversContainer(SubscribingProperties properties) {
+        return new BucketObserversContainer(properties.getEventsObserverQueueCapacity(),
+                properties.getEventsObserversThreadPoolSize());
     }
 }

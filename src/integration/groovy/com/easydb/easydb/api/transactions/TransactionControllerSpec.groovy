@@ -4,9 +4,9 @@ import com.easydb.easydb.BaseIntegrationSpec
 import com.easydb.easydb.ElementTestBuilder
 import com.easydb.easydb.OperationTestBuilder
 import com.easydb.easydb.TestHttpOperations
-import com.easydb.easydb.api.ElementFieldDto
-import com.easydb.easydb.api.OperationResultDto
-import com.easydb.easydb.api.TransactionDto
+import com.easydb.easydb.api.bucket.ElementFieldDto
+import com.easydb.easydb.api.transaction.OperationResultDto
+import com.easydb.easydb.api.transaction.TransactionDto
 import com.easydb.easydb.domain.bucket.BucketService
 import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
 import com.easydb.easydb.domain.bucket.ElementField

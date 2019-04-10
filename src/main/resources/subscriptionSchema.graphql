@@ -1,0 +1,39 @@
+type Field {
+    name: String!
+    value: String!
+}
+
+type GraphQlElement {
+    id: String!
+    fields: [Field]
+}
+
+enum GraphQlElementEventType {
+    CREATE,
+    UPDATE,
+    DELETE
+}
+
+type GraphQlElementEvent {
+    type: EventType!
+    element: GraphQlElement
+}
+
+input ElementFilter {
+    fieldsFilters: [FieldFilter]
+    or: [ElementFilter]
+    and: [ElementFilter]
+}
+
+input FieldFilter {
+    name: String!
+    value: String!
+}
+
+type Subscription {
+    elementEvents(filter: ElementFilter): GraphQlElementEvent
+}
+
+schema {
+    subscription: Subscription
+}

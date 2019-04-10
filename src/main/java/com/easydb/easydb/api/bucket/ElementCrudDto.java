@@ -1,4 +1,4 @@
-package com.easydb.easydb.api;
+package com.easydb.easydb.api.bucket;
 
 import com.easydb.easydb.domain.bucket.Element;
 
@@ -25,7 +25,7 @@ public class ElementCrudDto {
         return fields;
     }
 
-    Element toDomain(String id, String bucketName) {
+    public Element toDomain(String id, String bucketName) {
         return Element.of(id, bucketName, fields.stream()
                 .map(ElementFieldDto::toDomain)
                 .collect(Collectors.toList()));

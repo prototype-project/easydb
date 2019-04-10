@@ -1,4 +1,4 @@
-package com.easydb.easydb.api;
+package com.easydb.easydb.api.bucket;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -24,7 +24,7 @@ public class PaginatedElementsDto {
         return results;
     }
 
-    static PaginatedElementsDto of(String nextPageLink, List<ElementQueryDto> results) {
+    public static PaginatedElementsDto of(String nextPageLink, List<ElementQueryDto> results) {
         return new PaginatedElementsDto(nextPageLink, results);
     }
 }

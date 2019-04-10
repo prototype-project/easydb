@@ -8,10 +8,6 @@ type GraphQlElement {
     fields: [Field]
 }
 
-type Query {
-    elements(filter: ElementFilter): [GraphQlElement]
-}
-
 input ElementFilter {
     fieldsFilters: [FieldFilter]
     or: [ElementFilter]
@@ -21,6 +17,10 @@ input ElementFilter {
 input FieldFilter {
     name: String!
     value: String!
+}
+
+type Query {
+    elements(filter: ElementFilter): [GraphQlElement]
 }
 
 schema {

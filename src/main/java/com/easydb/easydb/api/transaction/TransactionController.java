@@ -1,4 +1,4 @@
-package com.easydb.easydb.api;
+package com.easydb.easydb.api.transaction;
 
 import com.easydb.easydb.config.ApplicationMetrics;
 import com.easydb.easydb.domain.space.UUIDProvider;

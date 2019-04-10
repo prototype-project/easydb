@@ -64,7 +64,8 @@ dependencies {
     compile group: 'org.apache.curator', name: 'curator-x-discovery', version: '4.0.1'
     compile group: 'com.graphql-java', name: 'graphql-java', version: '11.0'
     compile group: 'com.graphql-java-kickstart', name: 'graphql-java-tools', version: '5.5.0'
-    
+    compile group: 'io.projectreactor', name: 'reactor-core', version: '3.2.8.RELEASE'
+
     testCompile group: 'org.spockframework', name: 'spock-spring', version: '1.1-groovy-2.4'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.23.0'
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: project.springBootVersion
@@ -84,14 +85,6 @@ task integrationTest(type: Test) {
 check.dependsOn integrationTest
 
 mainClassName = "com.easydb.easydb.EasydbApplication"
-
-//task run {
-//    doFirst {
-//        String env = project.hasProperty('environment') ? project.property('environment') : 'local'
-//        String port = project.hasProperty('port') ? project.property('port') : '8080'
-//        bootRun.args = ["--environment=" + env, "--port=" + port]
-//    }
-//}
 
 bootRun {
     dependsOn run

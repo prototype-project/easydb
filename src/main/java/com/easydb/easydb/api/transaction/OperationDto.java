@@ -1,5 +1,9 @@
-package com.easydb.easydb.api;
+package com.easydb.easydb.api.transaction;
 
+import com.easydb.easydb.api.bucket.ElementFieldDto;
+import com.easydb.easydb.api.bucket.ElementFieldsMustNotBeNullException;
+import com.easydb.easydb.api.bucket.ElementIdMustBeEmptyException;
+import com.easydb.easydb.api.bucket.ElementIdMustNotBeEmptyException;
 import com.easydb.easydb.domain.bucket.ElementField;
 import com.easydb.easydb.domain.space.UUIDProvider;
 import com.easydb.easydb.domain.transactions.Operation;
@@ -47,18 +51,18 @@ public class OperationDto {
         validate();
     }
 
-    Operation toDomain(UUIDProvider uuidProvider) {
+    public Operation toDomain(UUIDProvider uuidProvider) {
         if (type.equals(CREATE)) {
             return Operation.of(type, bucketName, uuidProvider.generateUUID(), toDomainFields());
         }
         return Operation.of(type, bucketName, elementId, toDomainFields());
     }
 
-    OperationType getType() {
+    public OperationType getType() {
         return type;
     }
 
-    String getBucketName() {
+    public String getBucketName() {
         return bucketName;
     }
 
@@ -70,7 +74,7 @@ public class OperationDto {
             throw new ElementIdMustBeEmptyException();
         }
         if ((type.equals(UPDATE) || type.equals(CREATE)) && CollectionUtils.isEmpty(fields)) {
-            throw new ElementFieldsMustNotBeNull();
+            throw new ElementFieldsMustNotBeNullException();
         }
     }
 

@@ -1,5 +1,7 @@
-package com.easydb.easydb.api;
+package com.easydb.easydb.api.bucket;
 
+import com.easydb.easydb.api.ApiError;
+import com.easydb.easydb.api.ApiErrorMapper;
 import com.easydb.easydb.domain.bucket.BucketAlreadyExistsException;
 import com.easydb.easydb.domain.bucket.BucketDoesNotExistException;
 import com.easydb.easydb.domain.bucket.ElementAlreadyExistsException;
