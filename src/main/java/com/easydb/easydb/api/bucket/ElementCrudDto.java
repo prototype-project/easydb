@@ -1,5 +1,6 @@
 package com.easydb.easydb.api.bucket;
 
+import com.easydb.easydb.domain.BucketName;
 import com.easydb.easydb.domain.bucket.Element;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -25,7 +26,7 @@ public class ElementCrudDto {
         return fields;
     }
 
-    public Element toDomain(String id, String bucketName) {
+    public Element toDomain(String id, BucketName bucketName) {
         return Element.of(id, bucketName, fields.stream()
                 .map(ElementFieldDto::toDomain)
                 .collect(Collectors.toList()));

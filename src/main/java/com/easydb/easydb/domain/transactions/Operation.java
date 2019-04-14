@@ -53,7 +53,7 @@ public class Operation {
     }
 
     public static Operation of(OperationType type, Element element) {
-        return of(type, element.getBucketName(), element.getId(), element.getFields());
+        return of(type, element.getBucketName().getName(), element.getId(), element.getFields());
     }
 
     @Override

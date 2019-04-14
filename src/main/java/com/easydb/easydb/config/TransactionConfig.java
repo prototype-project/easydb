@@ -1,17 +1,17 @@
 package com.easydb.easydb.config;
 
+import com.easydb.easydb.domain.bucket.ElementService;
 import com.easydb.easydb.domain.bucket.transactions.BucketRepository;
-import com.easydb.easydb.domain.bucket.factories.ElementServiceFactory;
 
-import com.easydb.easydb.domain.locker.factories.ElementsLockerFactory;
+import com.easydb.easydb.domain.locker.ElementsLocker;
 import com.easydb.easydb.domain.space.SpaceRepository;
 import com.easydb.easydb.domain.space.UUIDProvider;
 import com.easydb.easydb.domain.transactions.PersistentTransactionManager;
 import com.easydb.easydb.domain.transactions.OptimizedTransactionManager;
 import com.easydb.easydb.domain.transactions.Retryer;
 import com.easydb.easydb.domain.transactions.TransactionAbortedException;
+import com.easydb.easydb.domain.transactions.TransactionCommitter;
 import com.easydb.easydb.domain.transactions.TransactionConstraintsValidator;
-import com.easydb.easydb.domain.transactions.TransactionCommitterFactory;
 import com.easydb.easydb.domain.transactions.TransactionRepository;
 import com.easydb.easydb.infrastructure.transactions.MongoTransactionRepository;
 import java.util.Collections;
@@ -33,30 +33,31 @@ public class TransactionConfig {
         return new MongoTransactionRepository(template);
     }
 
+
     @Bean
     PersistentTransactionManager defaultTransactionManager(UUIDProvider uuidProvider,
                                                            TransactionRepository transactionRepository,
                                                            TransactionConstraintsValidator transactionConstraintsValidator,
-                                                           TransactionCommitterFactory transactionCommitterFactory,
-                                                           ElementServiceFactory elementServiceFactory,
+                                                           TransactionCommitter transactionCommitter,
+                                                           ElementService elementService,
                                                            ApplicationMetrics metrics) {
         return new PersistentTransactionManager(uuidProvider, transactionRepository, transactionConstraintsValidator,
-                transactionCommitterFactory, elementServiceFactory, metrics);
+                transactionCommitter, elementService, metrics);
     }
 
     @Bean
-    TransactionCommitterFactory transactionCommitterFactory(ElementsLockerFactory elementsLockerFactory,
-                                                         @Qualifier("lockerRetryer") Retryer lockerRetryer,
-                                                         ElementServiceFactory elementServiceFactory) {
-        return new TransactionCommitterFactory(elementsLockerFactory, lockerRetryer, elementServiceFactory);
+    TransactionCommitter transactionCommitter(ElementsLocker elementsLocker,
+                                              @Qualifier("lockerRetryer") Retryer lockerRetryer,
+                                              ElementService elementService) {
+        return new TransactionCommitter(elementsLocker, lockerRetryer, elementService);
     }
 
     @Bean
     OptimizedTransactionManager optimizedTransactionManager(UUIDProvider uuidProvider,
                                                             TransactionConstraintsValidator transactionConstraintsValidator,
-                                                            TransactionCommitterFactory transactionCommitterFactory,
+                                                            TransactionCommitter transactionCommitter,
                                                             ApplicationMetrics metrics) {
-        return new OptimizedTransactionManager(uuidProvider, transactionConstraintsValidator, transactionCommitterFactory, metrics);
+        return new OptimizedTransactionManager(uuidProvider, transactionConstraintsValidator, transactionCommitter, metrics);
     }
 
 
@@ -78,8 +79,8 @@ public class TransactionConfig {
     @Bean
     TransactionConstraintsValidator transactionConstraintsValidator(SpaceRepository spaceRepository,
                                                                     BucketRepository bucketRepository,
-                                                                    ElementServiceFactory elementServiceFactory) {
-        return new TransactionConstraintsValidator(spaceRepository, bucketRepository, elementServiceFactory);
+                                                                    ElementService elementService) {
+        return new TransactionConstraintsValidator(spaceRepository, bucketRepository, elementService);
     }
 
 }

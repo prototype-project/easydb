@@ -1,5 +1,6 @@
 package com.easydb.easydb.domain.bucket.transactions;
 
+import com.easydb.easydb.domain.BucketName;
 import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.bucket.ElementField;
 import java.util.List;
@@ -10,16 +11,16 @@ public class VersionedElement {
     private final Optional<Long> version;
     private final Element element;
 
-    private VersionedElement(String id, String bucketName, List<ElementField> fields, Optional<Long> version) {
+    private VersionedElement(String id, BucketName bucketName, List<ElementField> fields, Optional<Long> version) {
         this.element = Element.of(id, bucketName, fields);
         this.version = version;
     }
 
-    public static VersionedElement of(String id, String bucketName, List<ElementField> fields) {
+    public static VersionedElement of(String id, BucketName bucketName, List<ElementField> fields) {
         return new VersionedElement(id, bucketName, fields, Optional.empty());
     }
 
-    public static VersionedElement of(String id, String bucketName, List<ElementField> fields, long version) {
+    public static VersionedElement of(String id, BucketName bucketName, List<ElementField> fields, long version) {
         return new VersionedElement(id, bucketName, fields, Optional.of(version));
     }
 
@@ -31,7 +32,7 @@ public class VersionedElement {
         return version;
     }
 
-    public String getBucketName() {
+    public BucketName getBucketName() {
         return element.getBucketName();
     }
 

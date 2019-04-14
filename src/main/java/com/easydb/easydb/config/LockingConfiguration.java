@@ -1,13 +1,13 @@
 package com.easydb.easydb.config;
 
 import com.easydb.easydb.domain.locker.BucketLocker;
+import com.easydb.easydb.domain.locker.ElementsLocker;
 import com.easydb.easydb.domain.locker.LockTimeoutException;
 import com.easydb.easydb.domain.locker.SpaceLocker;
-import com.easydb.easydb.domain.locker.factories.ElementsLockerFactory;
 import com.easydb.easydb.domain.transactions.Retryer;
 import com.easydb.easydb.infrastructure.locker.ZookeeperBucketLocker;
+import com.easydb.easydb.infrastructure.locker.ZookeeperElementsLocker;
 import com.easydb.easydb.infrastructure.locker.ZookeeperSpaceLocker;
-import com.easydb.easydb.infrastructure.locker.factories.ZookeeperElementsLockerFactory;
 import java.util.Collections;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
@@ -41,9 +41,9 @@ public class LockingConfiguration {
     }
 
     @Bean
-    ElementsLockerFactory elementsLockerFactory(CuratorFramework client, ZookeeperProperties properties,
-                                                ApplicationMetrics metrics) {
-        return new ZookeeperElementsLockerFactory(client, properties, metrics);
+    ElementsLocker elementsLockerFactory(CuratorFramework client, ZookeeperProperties properties,
+                                         ApplicationMetrics metrics) {
+        return new ZookeeperElementsLocker(properties, client, metrics);
     }
 
     @Bean

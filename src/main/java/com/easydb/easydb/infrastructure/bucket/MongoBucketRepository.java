@@ -1,9 +1,11 @@
 package com.easydb.easydb.infrastructure.bucket;
 
 import com.easydb.easydb.config.MongoProperties;
+import com.easydb.easydb.domain.BucketName;
 import com.easydb.easydb.domain.bucket.BucketDoesNotExistException;
 import com.easydb.easydb.domain.bucket.BucketQuery;
 import com.easydb.easydb.domain.bucket.ElementAlreadyExistsException;
+import com.easydb.easydb.domain.bucket.NamesResolver;
 import com.easydb.easydb.domain.transactions.ConcurrentTransactionDetectedException;
 import com.easydb.easydb.domain.bucket.transactions.VersionedElement;
 import com.easydb.easydb.infrastructure.bucket.graphql.GraphQlElementsFetcher;
@@ -44,20 +46,20 @@ public class MongoBucketRepository implements BucketRepository {
     }
 
     @Override
-    public boolean bucketExists(String name) {
-        return mongoTemplate.collectionExists(name);
+    public boolean bucketExists(BucketName name) {
+        return mongoTemplate.collectionExists(NamesResolver.resolve(name));
     }
 
     @Override
-    public void createBucket(String name) {
+    public void createBucket(BucketName name) {
         createShardedCollection(name);
-        mongoTemplate.createCollection(name);
+        mongoTemplate.createCollection(NamesResolver.resolve(name));
     }
 
     @Override
-    public void removeBucket(String bucketName) {
+    public void removeBucket(BucketName bucketName) {
         ensureBucketExists(bucketName);
-        mongoTemplate.dropCollection(bucketName);
+        mongoTemplate.dropCollection(NamesResolver.resolve(bucketName));
     }
 
     @Override
@@ -65,7 +67,7 @@ public class MongoBucketRepository implements BucketRepository {
         ensureBucketExists(element.getBucketName());
 
         try {
-            mongoTemplate.insert(PersistentBucketElement.of(element), element.getBucketName());
+            mongoTemplate.insert(PersistentBucketElement.of(element), NamesResolver.resolve(element.getBucketName()));
         } catch (DuplicateKeyException e) {
             throw new ElementAlreadyExistsException(
                     "Element " + element + " already exists");
@@ -73,17 +75,17 @@ public class MongoBucketRepository implements BucketRepository {
     }
 
     @Override
-    public VersionedElement getElement(String bucketName, String id) {
+    public VersionedElement getElement(BucketName bucketName, String id) {
         ensureBucketExists(bucketName);
 
         PersistentBucketElement elementFromDb = getPersistentElement(bucketName, id);
         return Optional.ofNullable(elementFromDb)
                 .map(it -> it.toDomainVersionedElement(bucketName))
-                .orElseThrow(() -> new ElementDoesNotExistException(bucketName, id));
+                .orElseThrow(() -> new ElementDoesNotExistException(NamesResolver.resolve(bucketName), id));
     }
 
     @Override
-    public VersionedElement getElement(String bucketName, String id, long requiredVersion) {
+    public VersionedElement getElement(BucketName bucketName, String id, long requiredVersion) {
         VersionedElement versionedElement = getElement(bucketName, id);
         if (versionedElement.getVersionOrThrowErrorIfEmpty() != requiredVersion) {
             throw new ConcurrentTransactionDetectedException(
@@ -93,14 +95,14 @@ public class MongoBucketRepository implements BucketRepository {
     }
 
     @Override
-    public void removeElement(String bucketName, String id) {
+    public void removeElement(BucketName bucketName, String id) {
         ensureElementExists(bucketName, id);
 
-        mongoTemplate.remove(getPersistentElement(bucketName, id), bucketName);
+        mongoTemplate.remove(getPersistentElement(bucketName, id), NamesResolver.resolve(bucketName));
     }
 
     @Override
-    public boolean elementExists(String bucketName, String elementId) {
+    public boolean elementExists(BucketName bucketName, String elementId) {
         try {
             getElement(bucketName, elementId);
             return true;
@@ -118,7 +120,7 @@ public class MongoBucketRepository implements BucketRepository {
         update.set("version", element.getVersionOrThrowErrorIfEmpty() + 1);
         update.set("fields", toUpdate.getFields());
 
-        WriteResult updateResult = mongoTemplate.updateFirst(query, update, toUpdate.getBucketName());
+        WriteResult updateResult = mongoTemplate.updateFirst(query, update, NamesResolver.resolve(toUpdate.getBucketName()));
         validateUpdateResultAgainstConcurrency(updateResult, toUpdate);
     }
 
@@ -129,20 +131,20 @@ public class MongoBucketRepository implements BucketRepository {
     }
 
     @Override
-    public long getNumberOfElements(String bucketName) {
+    public long getNumberOfElements(BucketName bucketName) {
         ensureBucketExists(bucketName);
 
-        return mongoTemplate.count(new Query(), PersistentBucketElement.class, bucketName);
+        return mongoTemplate.count(new Query(), PersistentBucketElement.class, NamesResolver.resolve(bucketName));
     }
 
-    private void ensureBucketExists(String bucketName) {
+    private void ensureBucketExists(BucketName bucketName) {
         if (!bucketExists(bucketName)) {
-            throw new BucketDoesNotExistException(bucketName);
+            throw new BucketDoesNotExistException(NamesResolver.resolve(bucketName));
         }
     }
 
-    private void createShardedCollection(String bucketName) {
-        mongoClient.getDatabase(mongoProperties.getDatabaseName()).createCollection(bucketName);
+    private void createShardedCollection(BucketName bucketName) {
+        mongoClient.getDatabase(mongoProperties.getDatabaseName()).createCollection(NamesResolver.resolve(bucketName));
         BasicDBObject shardKey = new BasicDBObject("_id", "hashed");
         BasicDBObject shardCollection = new BasicDBObject("shardCollection", mongoProperties.getDatabaseName() + "." + bucketName);
         shardCollection.put("key", shardKey);
@@ -150,12 +152,12 @@ public class MongoBucketRepository implements BucketRepository {
                 .runCommand(shardCollection);
     }
 
-    private void ensureElementExists(String bucketName, String id) {
+    private void ensureElementExists(BucketName bucketName, String id) {
         getElement(bucketName, id);
     }
 
-    private PersistentBucketElement getPersistentElement(String bucketName, String id) {
-        return mongoTemplate.findById(id, PersistentBucketElement.class, bucketName);
+    private PersistentBucketElement getPersistentElement(BucketName bucketName, String id) {
+        return mongoTemplate.findById(id, PersistentBucketElement.class, NamesResolver.resolve(bucketName));
     }
 
     private Query buildUpdateQuery(VersionedElement toUpdate) {
@@ -173,6 +175,5 @@ public class MongoBucketRepository implements BucketRepository {
             throw new ConcurrentTransactionDetectedException(
                     String.format("%s was updated by concurrent transaction", toUpdate));
         }
-
     }
 }

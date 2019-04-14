@@ -7,8 +7,8 @@ import com.easydb.easydb.TestHttpOperations
 import com.easydb.easydb.api.bucket.ElementFieldDto
 import com.easydb.easydb.api.transaction.OperationResultDto
 import com.easydb.easydb.api.transaction.TransactionDto
+import com.easydb.easydb.domain.BucketName
 import com.easydb.easydb.domain.bucket.BucketService
-import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
 import com.easydb.easydb.domain.bucket.ElementField
 import com.easydb.easydb.domain.transactions.Operation
 import com.easydb.easydb.domain.transactions.TransactionRepository
@@ -23,17 +23,15 @@ import org.springframework.web.client.HttpClientErrorException
 class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpOperations {
 
     @Autowired
-    BucketServiceFactory bucketServiceFactory
+    BucketService bucketService
 
     @Autowired
     TransactionRepository repository
 
     String spaceName
-    BucketService bucketService
 
     def setup() {
         spaceName = addSampleSpace().body.spaceName
-        this.bucketService = bucketServiceFactory.buildBucketService(spaceName)
         createTestBucket(spaceName)
     }
 
@@ -59,7 +57,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
                 .build()
 
         when:
-        ResponseEntity<OperationResultDto> response = addOperation(transactionId, operation)
+        ResponseEntity<OperationResultDto> response = addOperation(spaceName, transactionId, operation)
 
         then:
         response.statusCode == HttpStatus.CREATED
@@ -83,7 +81,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
                 .build()
 
         when:
-        addOperation(transactionId, operation)
+        addOperation(spaceName, transactionId, operation)
 
         then:
         def ex= thrown(HttpClientErrorException)
@@ -103,7 +101,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
         given:
         // create bucket and element to be sure that 404 it thrown due to missing transaction
         def element = ElementTestBuilder.builder()
-                .bucketName(TEST_BUCKET_NAME)
+                .bucketName(new BucketName(spaceName, TEST_BUCKET_NAME))
                 .build()
 
         String elementId = addElement(spaceName, element).body.id
@@ -134,7 +132,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
                 .build()
 
         when:
-        addOperation(transactionId, operation)
+        addOperation(spaceName, transactionId, operation)
 
         then:
         def response = thrown(HttpClientErrorException)
@@ -151,7 +149,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
                 .build()
 
         when:
-        addOperation(transactionId, operation)
+        addOperation(spaceName, transactionId, operation)
 
         then:
         def response = thrown(HttpClientErrorException)
@@ -170,7 +168,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
 
         when:
         restTemplate.exchange(
-                localUrl("/api/v1/transactions/${transactionId}/add-operation"),
+                localUrl("/api/v1/spaces/${spaceName}/transactions/${transactionId}/add-operation"),
                 HttpMethod.POST,
                 httpJsonEntity(body),
                 Void.class)
@@ -184,7 +182,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
         given:
         def element = ElementTestBuilder
                 .builder()
-                .bucketName(TEST_BUCKET_NAME)
+                .bucketName(new BucketName(spaceName, TEST_BUCKET_NAME))
                 .id(null)
                 .build()
 
@@ -200,7 +198,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
                 .build()
 
         when:
-        addOperation(transactionId, operation)
+        addOperation(spaceName, transactionId, operation)
 
         then:
         def response = thrown(HttpClientErrorException)
@@ -219,7 +217,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
                 .build()
 
         when:
-        addOperation(transactionId, operation)
+        addOperation(spaceName, transactionId, operation)
 
         then:
         def response = thrown(HttpClientErrorException)
@@ -245,14 +243,14 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
                 .build()
 
         when:
-        addOperation(transactionId, operationWithoutFieldName)
+        addOperation(spaceName, transactionId, operationWithoutFieldName)
 
         then:
         def responseOperationWithoutFieldName = thrown(HttpClientErrorException)
         responseOperationWithoutFieldName.statusCode == HttpStatus.BAD_REQUEST
 
         when:
-        addOperation(transactionId, operationWithoutFieldValue)
+        addOperation(spaceName, transactionId, operationWithoutFieldValue)
 
         then:
         def responseOperationWithoutFieldValue = thrown(HttpClientErrorException)
@@ -264,7 +262,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
         def transactionId = beginTransaction(spaceName).body.transactionId
 
         def element = ElementTestBuilder.builder()
-                .bucketName(TEST_BUCKET_NAME)
+                .bucketName(new BucketName(spaceName, TEST_BUCKET_NAME))
                 .id(null)
                 .build()
 
@@ -277,7 +275,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
                 .build()
 
         when:
-        addOperation(transactionId, operation)
+        addOperation(spaceName, transactionId, operation)
 
         then:
         def response = thrown(HttpClientErrorException)
@@ -294,7 +292,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
                 .build()
 
         when:
-        addOperation(transactionId, operation)
+        addOperation(spaceName, transactionId, operation)
 
         then:
         def response = thrown(HttpClientErrorException)
@@ -306,12 +304,12 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
         def transactionId = beginTransaction(spaceName).body.transactionId
         def element1ToCreate = ElementTestBuilder.builder()
                 .fields([ElementField.of("name", "Antek")])
-                .bucketName(TEST_BUCKET_NAME)
+                .bucketName(new BucketName(spaceName, TEST_BUCKET_NAME))
                 .id(null)
                 .build()
         def element2ToCreate = ElementTestBuilder.builder()
                 .fields([ElementField.of("name", "Grażynka")])
-                .bucketName(TEST_BUCKET_NAME)
+                .bucketName(new BucketName(spaceName, TEST_BUCKET_NAME))
                 .id(null)
                 .build()
 
@@ -333,11 +331,11 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
                 .elementId(element2Id)
                 .build()
 
-        addOperation(transactionId, operationUpdateElement1)
-        addOperation(transactionId, operationDeleteElement2)
+        addOperation(spaceName, transactionId, operationUpdateElement1)
+        addOperation(spaceName, transactionId, operationDeleteElement2)
 
         when:
-        commitTransaction(transactionId)
+        commitTransaction(spaceName, transactionId)
 
         then:
         getElementsFromTestBucket(spaceName).results.size() == 1
@@ -348,7 +346,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
     def "should return operation read result"() {
         given:
         def element = ElementTestBuilder.builder()
-                .bucketName(TEST_BUCKET_NAME)
+                .bucketName(new BucketName(spaceName, TEST_BUCKET_NAME))
                 .id(null)
                 .build()
 
@@ -362,7 +360,7 @@ class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpO
                 .elementId(elementDto.id)
                 .build()
         when:
-        OperationResultDto result = addOperation(transactionId, operation).body
+        OperationResultDto result = addOperation(spaceName, transactionId, operation).body
 
         then:
         result.element.isPresent()

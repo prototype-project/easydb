@@ -5,7 +5,6 @@ import com.easydb.easydb.ElementUtils
 import com.easydb.easydb.IntegrationWithCleanedDatabaseSpec
 import com.easydb.easydb.OperationTestBuilder
 import com.easydb.easydb.domain.bucket.BucketService
-import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
 import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.bucket.ElementField
 import com.easydb.easydb.domain.space.SpaceRepository
@@ -34,13 +33,9 @@ class TransactionsSpec extends IntegrationWithCleanedDatabaseSpec implements Ele
     SpaceRepository spaceRepository
 
     @Autowired
-    BucketServiceFactory bucketServiceFactory
-
     BucketService bucketService
 
-
     def setup() {
-        bucketService = bucketServiceFactory.buildBucketService(TEST_SPACE)
         bucketService.createBucket(TEST_BUCKET_NAME)
     }
 
@@ -54,9 +49,9 @@ class TransactionsSpec extends IntegrationWithCleanedDatabaseSpec implements Ele
         bucketService.addElement(element)
 
         when: "one transaction modifies element"
-        String transactionId = transactionManager.beginTransaction(TEST_SPACE)
+        String transactionId = transactionManager.beginTransaction(TEST_BUCKET_NAME.spaceName)
         Operation modifyOperation = OperationTestBuilder.builder()
-                .bucketName(TEST_BUCKET_NAME)
+                .bucketName(TEST_BUCKET_NAME.name)
                 .type(Operation.OperationType.UPDATE)
                 .fields([ElementField.of("counter", "1")])
                 .elementId(element.id)
@@ -82,9 +77,9 @@ class TransactionsSpec extends IntegrationWithCleanedDatabaseSpec implements Ele
         bucketService.addElement(element)
 
         when: "one transaction read element"
-        String transactionId = transactionManager.beginTransaction(TEST_SPACE)
+        String transactionId = transactionManager.beginTransaction(TEST_BUCKET_NAME.spaceName)
         Operation readOperation = OperationTestBuilder.builder()
-                .bucketName(TEST_BUCKET_NAME)
+                .bucketName(TEST_BUCKET_NAME.name)
                 .type(Operation.OperationType.READ)
                 .elementId(element.id)
                 .build()
@@ -117,9 +112,9 @@ class TransactionsSpec extends IntegrationWithCleanedDatabaseSpec implements Ele
         bucketService.addElement(element)
 
         when: "one transaction wants to update element"
-        String transactionId = transactionManager.beginTransaction(TEST_SPACE)
+        String transactionId = transactionManager.beginTransaction(TEST_BUCKET_NAME.spaceName)
         Operation updateOperation = OperationTestBuilder.builder()
-                .bucketName(TEST_BUCKET_NAME)
+                .bucketName(TEST_BUCKET_NAME.name)
                 .type(Operation.OperationType.UPDATE)
                 .elementId(element.id)
                 .build()
@@ -147,9 +142,9 @@ class TransactionsSpec extends IntegrationWithCleanedDatabaseSpec implements Ele
         bucketService.addElement(element)
 
         when: "one transaction read element"
-        String transactionId = transactionManager.beginTransaction(TEST_SPACE)
+        String transactionId = transactionManager.beginTransaction(TEST_BUCKET_NAME.spaceName)
         Operation readOperation = OperationTestBuilder.builder()
-                .bucketName(TEST_BUCKET_NAME)
+                .bucketName(TEST_BUCKET_NAME.name)
                 .type(Operation.OperationType.READ)
                 .elementId(element.id)
                 .build()
@@ -167,7 +162,7 @@ class TransactionsSpec extends IntegrationWithCleanedDatabaseSpec implements Ele
 
         and: "the first transaction wants to update element based on previously retrieved value"
         Operation updateOperation = OperationTestBuilder.builder()
-                .bucketName(TEST_BUCKET_NAME)
+                .bucketName(TEST_BUCKET_NAME.name)
                 .type(Operation.OperationType.UPDATE)
                 .elementId(element.id)
                 .build()
@@ -185,7 +180,7 @@ class TransactionsSpec extends IntegrationWithCleanedDatabaseSpec implements Ele
 
     def "should remove transaction after commit"() {
         given:
-        def transactionId = transactionManager.beginTransaction(TEST_SPACE)
+        def transactionId = transactionManager.beginTransaction(TEST_BUCKET_NAME.spaceName)
         transactionManager.commitTransaction(transactionId)
 
         when:

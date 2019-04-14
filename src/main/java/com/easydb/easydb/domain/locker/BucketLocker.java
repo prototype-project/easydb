@@ -1,9 +1,10 @@
 package com.easydb.easydb.domain.locker;
 
+import com.easydb.easydb.domain.BucketName;
 import java.time.Duration;
 
 public interface BucketLocker {
-    void lockBucket(String spaceName, String bucketName);
-    void lockBucket(String spaceName, String bucketName, Duration timeout);
-    void unlockBucket(String spaceName, String bucketName);
+    void lockBucket(BucketName bucketName);
+    void lockBucket(BucketName bucketName, Duration timeout);
+    void unlockBucket(BucketName bucketName);
 }

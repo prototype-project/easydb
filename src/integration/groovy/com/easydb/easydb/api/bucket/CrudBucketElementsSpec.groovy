@@ -4,9 +4,9 @@ import com.easydb.easydb.BaseIntegrationSpec
 import com.easydb.easydb.ElementTestBuilder
 import com.easydb.easydb.ElementUtils
 import com.easydb.easydb.TestHttpOperations
+import com.easydb.easydb.domain.BucketName
 import com.easydb.easydb.domain.bucket.BucketQuery
 import com.easydb.easydb.domain.bucket.BucketService
-import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
 import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.space.SpaceRemovalService
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,20 +23,18 @@ class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOper
     SpaceRemovalService spaceRemovalService
 
     @Autowired
-    BucketServiceFactory bucketServiceFactory
+    BucketService bucketService
 
     String spaceName
-    BucketService bucketService
     String someForSureExistingElementId
 
     def setup() {
         spaceName = addSampleSpace().body.spaceName
-        this.bucketService = bucketServiceFactory.buildBucketService(spaceName)
         createTestBucket(spaceName)
         someForSureExistingElementId = addElement(spaceName,
                 ElementTestBuilder
                         .builder()
-                        .bucketName(TEST_BUCKET_NAME)
+                        .bucketName(new BucketName(spaceName, TEST_BUCKET_NAME))
                         .build()).body.id
     }
 
@@ -48,7 +46,7 @@ class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOper
         response.statusCode == HttpStatus.CREATED
 
         and:
-        response.body == ElementQueryDto.of(bucketService.getElement(TEST_BUCKET_NAME, response.body.getId()))
+        response.body == ElementQueryDto.of(bucketService.getElement(new BucketName(spaceName, TEST_BUCKET_NAME), response.body.getId()))
     }
 
     def "should remove element from bucket"() {
@@ -66,7 +64,7 @@ class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOper
         deleteElementResponse.statusCode == HttpStatus.OK
 
         and:
-        !bucketService.elementExists(TEST_BUCKET_NAME, addElementResponse.body.getId())
+        !bucketService.elementExists(new BucketName(spaceName, TEST_BUCKET_NAME), addElementResponse.body.getId())
     }
 
     def "should update element"() {
@@ -84,7 +82,7 @@ class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOper
         response.statusCode == HttpStatus.OK
 
         and:
-        Element updatedElement = bucketService.getElement(TEST_BUCKET_NAME, addElementResponse.body.getId())
+        Element updatedElement = bucketService.getElement(new BucketName(spaceName, TEST_BUCKET_NAME), addElementResponse.body.getId())
         getFieldValue(updatedElement, 'firstName') == 'john'
         getFieldValue(updatedElement, 'lastName') == 'snow'
     }
@@ -101,7 +99,7 @@ class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOper
                 PaginatedElementsDto.class)
 
         then:
-        BucketQuery query = BucketQuery.of(TEST_BUCKET_NAME, 20, 0)
+        BucketQuery query = BucketQuery.of(new BucketName(spaceName, TEST_BUCKET_NAME), 20, 0)
         response.body.results == bucketService.filterElements(query).stream()
                 .map({ it -> ElementQueryDto.of(it) })
                 .collect(Collectors.toList())

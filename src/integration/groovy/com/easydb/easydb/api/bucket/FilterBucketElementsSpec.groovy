@@ -3,6 +3,7 @@ package com.easydb.easydb.api.bucket
 import com.easydb.easydb.BaseIntegrationSpec
 import com.easydb.easydb.ElementTestBuilder
 import com.easydb.easydb.TestHttpOperations
+import com.easydb.easydb.domain.BucketName
 import com.easydb.easydb.domain.bucket.ElementField
 import org.springframework.http.HttpStatus
 import org.springframework.web.client.HttpClientErrorException
@@ -20,10 +21,11 @@ class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOp
         spaceName = addSampleSpace().body.spaceName
         createTestBucket(spaceName)
 
+        def testBucketName = new BucketName(spaceName, TEST_BUCKET_NAME)
         danielFaderski = addElementToTestBucket(spaceName, buildElementBody(
                 ElementTestBuilder
                         .builder()
-                        .bucketName(TEST_BUCKET_NAME)
+                        .bucketName(testBucketName)
                         .clearFields()
                         .addField(ElementField.of("firstName", "Daniel"))
                         .addField(ElementField.of("lastName", "Faderski"))
@@ -32,7 +34,7 @@ class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOp
         janBrzechwa = addElementToTestBucket(spaceName, buildElementBody(
                 ElementTestBuilder
                         .builder()
-                        .bucketName(TEST_BUCKET_NAME)
+                        .bucketName(testBucketName)
                         .clearFields()
                         .addField(ElementField.of("firstName", "Jan"))
                         .addField(ElementField.of("lastName", "Brzechwa"))
@@ -41,7 +43,7 @@ class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOp
         jurekOgorek = addElementToTestBucket(spaceName, buildElementBody(
                 ElementTestBuilder
                         .builder()
-                        .bucketName(TEST_BUCKET_NAME)
+                        .bucketName(testBucketName)
                         .clearFields()
                         .addField(ElementField.of("firstName", "Jurek"))
                         .addField(ElementField.of("lastName", "Ogórek"))

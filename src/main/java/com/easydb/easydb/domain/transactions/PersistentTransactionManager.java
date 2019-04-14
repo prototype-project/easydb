@@ -1,8 +1,8 @@
 package com.easydb.easydb.domain.transactions;
 
 import com.easydb.easydb.config.ApplicationMetrics;
-import com.easydb.easydb.domain.bucket.transactions.TransactionalElementService;
-import com.easydb.easydb.domain.bucket.factories.ElementServiceFactory;
+import com.easydb.easydb.domain.BucketName;
+import com.easydb.easydb.domain.bucket.ElementService;
 import com.easydb.easydb.domain.space.UUIDProvider;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -15,21 +15,19 @@ public class PersistentTransactionManager {
     private final UUIDProvider uuidProvider;
     private final TransactionRepository transactionRepository;
     private final TransactionConstraintsValidator transactionConstraintsValidator;
-    private final TransactionCommitterFactory transactionCommitterFactory;
-    private final ElementServiceFactory elementServiceFactory;
+    private final TransactionCommitter transactionCommitter;
+    private final ElementService elementService;
     private final ApplicationMetrics metrics;
 
     public PersistentTransactionManager(UUIDProvider uuidProvider,
                                         TransactionRepository transactionRepository,
                                         TransactionConstraintsValidator transactionConstraintsValidator,
-                                        TransactionCommitterFactory transactionCommitterFactory,
-                                        ElementServiceFactory elementServiceFactory,
-                                        ApplicationMetrics metrics) {
+                                        TransactionCommitter transactionCommitter, ElementService elementService, ApplicationMetrics metrics) {
         this.uuidProvider = uuidProvider;
         this.transactionRepository = transactionRepository;
         this.transactionConstraintsValidator = transactionConstraintsValidator;
-        this.transactionCommitterFactory = transactionCommitterFactory;
-        this.elementServiceFactory = elementServiceFactory;
+        this.transactionCommitter = transactionCommitter;
+        this.elementService = elementService;
         this.metrics = metrics;
     }
 
@@ -65,7 +63,6 @@ public class PersistentTransactionManager {
     }
 
     private void commit(Transaction transaction) {
-        TransactionCommitter transactionCommitter = transactionCommitterFactory.build(transaction.getSpaceName());
 
         try {
             transactionCommitter.commit(transaction);
@@ -80,14 +77,13 @@ public class PersistentTransactionManager {
     }
 
     private OperationResult getResultForOperation(Transaction t, Operation o) {
+        BucketName bucketName = new BucketName(t.getSpaceName(), o.getBucketName());
         try {
             if (o.getType().equals(Operation.OperationType.READ)) {
-                TransactionalElementService elementService = elementServiceFactory.buildElementService(t.getSpaceName());
-
                 return Optional.ofNullable(t.getReadElements().get(o.getElementId()))
                         .map(version ->
-                                OperationResult.of(elementService.getElement(o.getBucketName(), o.getElementId(), version), t.getSpaceName()))
-                        .orElseGet(() -> OperationResult.of(elementService.getElement(o.getBucketName(), o.getElementId()), t.getSpaceName()));
+                                OperationResult.of(elementService.getElement(bucketName, o.getElementId(), version), t.getSpaceName()))
+                        .orElseGet(() -> OperationResult.of(elementService.getElement(bucketName, o.getElementId()), t.getSpaceName()));
             }
             return OperationResult.emptyResult(t.getSpaceName());
         } catch (ConcurrentTransactionDetectedException e) {

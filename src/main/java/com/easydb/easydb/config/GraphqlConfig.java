@@ -1,13 +1,13 @@
 package com.easydb.easydb.config;
 
-import com.easydb.easydb.domain.bucket.BucketEventsPublisher;
+import com.easydb.easydb.domain.bucket.BucketObserversContainer;
 import com.easydb.easydb.infrastructure.bucket.graphql.ElementFilterToMongoQueryConverter;
 import com.easydb.easydb.infrastructure.bucket.graphql.GraphQlElementsFetcher;
 import com.easydb.easydb.infrastructure.bucket.graphql.GraphQlEventsPublisher;
 import com.easydb.easydb.infrastructure.bucket.graphql.GraphQlProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.core.MongoTemplate;
+    import org.springframework.data.mongodb.core.MongoTemplate;
 
 @Configuration
 public class GraphqlConfig {
@@ -30,7 +30,7 @@ public class GraphqlConfig {
     @Bean
     public GraphQlProvider graphQlProvider(MongoTemplate mongoTemplate,
                                            ElementFilterToMongoQueryConverter elementFilterToMongoQueryConverter,
-                                           BucketEventsPublisher bucketEventsPublisher) {
-        return new GraphQlProvider(mongoTemplate, elementFilterToMongoQueryConverter, bucketEventsPublisher);
+                                           BucketObserversContainer observersContainer) {
+        return new GraphQlProvider(mongoTemplate, elementFilterToMongoQueryConverter, observersContainer);
     }
 }

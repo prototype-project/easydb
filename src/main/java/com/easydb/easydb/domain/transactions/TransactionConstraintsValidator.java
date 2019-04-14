@@ -1,22 +1,22 @@
 package com.easydb.easydb.domain.transactions;
 
+import com.easydb.easydb.domain.BucketName;
 import com.easydb.easydb.domain.bucket.BucketDoesNotExistException;
+import com.easydb.easydb.domain.bucket.ElementService;
 import com.easydb.easydb.domain.bucket.transactions.BucketRepository;
-import com.easydb.easydb.domain.bucket.NamesResolver;
-import com.easydb.easydb.domain.bucket.factories.ElementServiceFactory;
 import com.easydb.easydb.domain.space.SpaceRepository;
 
 public class TransactionConstraintsValidator {
     private SpaceRepository spaceRepository;
     private BucketRepository bucketRepository;
-    private ElementServiceFactory elementServiceFactory;
+    private ElementService elementService;
 
     public TransactionConstraintsValidator(SpaceRepository spaceRepository,
                                            BucketRepository bucketRepository,
-                                           ElementServiceFactory elementServiceFactory) {
+                                           ElementService elementService) {
         this.bucketRepository = bucketRepository;
         this.spaceRepository = spaceRepository;
-        this.elementServiceFactory = elementServiceFactory;
+        this.elementService = elementService;
     }
 
     void ensureSpaceExists(String spaceName) {
@@ -24,13 +24,13 @@ public class TransactionConstraintsValidator {
     }
 
     void ensureOperationConstraints(String spaceName, Operation operation) {
+        BucketName bucketName = new BucketName(spaceName, operation.getBucketName());
+
         if (!operation.getType().equals(Operation.OperationType.CREATE)) {
-            elementServiceFactory.buildElementService(spaceName)
-                    .getElement(operation.getBucketName(), operation.getElementId());
+            elementService.getElement(bucketName, operation.getElementId());
         } else {
-            String resolvedName = NamesResolver.resolve(spaceName, operation.getBucketName());
-            if (!bucketRepository.bucketExists(resolvedName)) {
-                throw new BucketDoesNotExistException(resolvedName);
+            if (!bucketRepository.bucketExists(bucketName)) {
+                throw new BucketDoesNotExistException(bucketName.getName());
             }
         }
     }

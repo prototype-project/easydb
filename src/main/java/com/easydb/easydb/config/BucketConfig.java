@@ -1,8 +1,10 @@
 package com.easydb.easydb.config;
 
 import com.easydb.easydb.domain.bucket.BucketObserversContainer;
-import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory;
-import com.easydb.easydb.domain.bucket.factories.ElementServiceFactory;
+import com.easydb.easydb.domain.bucket.BucketService;
+import com.easydb.easydb.domain.bucket.ElementService;
+import com.easydb.easydb.domain.bucket.transactions.TransactionalBucketService;
+import com.easydb.easydb.domain.bucket.transactions.TransactionalElementService;
 import com.easydb.easydb.domain.locker.BucketLocker;
 import com.easydb.easydb.domain.locker.SpaceLocker;
 import com.easydb.easydb.domain.space.SpaceRepository;
@@ -11,7 +13,6 @@ import com.easydb.easydb.domain.bucket.transactions.BucketRepository;
 import com.easydb.easydb.domain.transactions.OptimizedTransactionManager;
 import com.easydb.easydb.domain.transactions.Retryer;
 import com.easydb.easydb.infrastructure.bucket.MongoBucketRepository;
-import com.easydb.easydb.domain.bucket.factories.TransactionalBucketServiceFactory;
 import com.easydb.easydb.infrastructure.bucket.graphql.GraphQlElementsFetcher;
 import org.springframework.beans.factory.annotation.Qualifier;
 import com.mongodb.MongoClient;
@@ -37,27 +38,28 @@ public class BucketConfig {
     }
 
     @Bean
-    ElementServiceFactory elementServiceFactory(BucketRepository bucketRepository) {
-        return new ElementServiceFactory(bucketRepository);
+    ElementService elementServiceFactory(BucketRepository bucketRepository) {
+        return new TransactionalElementService(bucketRepository);
     }
 
     @Bean
-    BucketServiceFactory bucketServiceFactory(
+    BucketService bucketServiceFactory(
             BucketRepository bucketRepository, SpaceRepository spaceRepository,
-            ElementServiceFactory elementServiceFactory,
+            ElementService elementService,
             OptimizedTransactionManager optimizedTransactionManager,
             BucketLocker bucketLocker,
             SpaceLocker spaceLocker,
             @Qualifier("transactionRetryer") Retryer transactionRetryer,
             @Qualifier("lockerRetryer") Retryer lockerRetryer) {
-        return new TransactionalBucketServiceFactory(spaceRepository, bucketRepository,
-                elementServiceFactory, optimizedTransactionManager, bucketLocker,
+        return new TransactionalBucketService(spaceRepository, bucketRepository,
+                elementService, optimizedTransactionManager, bucketLocker,
                 spaceLocker, transactionRetryer, lockerRetryer);
     }
 
     @Bean
     BucketObserversContainer bucketObserversContainer(SubscribingProperties properties) {
         return new BucketObserversContainer(properties.getEventsObserverQueueCapacity(),
+                properties.getEventsObserverThreadPoolQueueCapacity(),
                 properties.getEventsObserversThreadPoolSize());
     }
 }

@@ -2,6 +2,7 @@ package com.easydb.easydb.infrastructure.locker;
 
 import com.easydb.easydb.config.ApplicationMetrics;
 import com.easydb.easydb.config.ZookeeperProperties;
+import com.easydb.easydb.domain.BucketName;
 import com.easydb.easydb.domain.locker.ElementsLocker;
 import com.easydb.easydb.domain.locker.LockNotHoldException;
 import com.easydb.easydb.domain.locker.LockTimeoutException;
@@ -16,15 +17,15 @@ import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 public class ZookeeperElementsLocker implements ElementsLocker {
 
     static class ElementKey {
-        private final String bucketName;
+        private final BucketName bucketName;
         private final String elementId;
 
-        private ElementKey(String bucketName, String elementId) {
+        private ElementKey(BucketName bucketName, String elementId) {
             this.bucketName = bucketName;
             this.elementId = elementId;
         }
 
-        public static ElementKey of(String bucketName, String elementId) {
+        public static ElementKey of(BucketName bucketName, String elementId) {
             return new ElementKey(bucketName, elementId);
         }
 
@@ -74,44 +75,37 @@ public class ZookeeperElementsLocker implements ElementsLocker {
         }
     }
 
-    private final String spaceName;
     private final ZookeeperProperties properties;
     private final CuratorFramework client;
     private final ApplicationMetrics metrics;
 
     private final Map<ElementKey, ElementLock> locksMap = new HashMap<>();
 
-    private ZookeeperElementsLocker(String spaceName, ZookeeperProperties properties,
+    public ZookeeperElementsLocker(ZookeeperProperties properties,
                                     CuratorFramework client, ApplicationMetrics metrics) {
-        this.spaceName = spaceName;
         this.client = client;
         this.metrics = metrics;
         this.properties = properties;
     }
 
-    public static ZookeeperElementsLocker of(String spaceName, ZookeeperProperties properties,
-                                             CuratorFramework client, ApplicationMetrics metrics) {
-        return new ZookeeperElementsLocker(spaceName, properties, client, metrics);
-    }
-
     @Override
-    public void lockElement(String bucketName, String elementId) {
+    public void lockElement(BucketName bucketName, String elementId) {
         lockElement(bucketName, elementId, Duration.ofMillis(properties.getLockerTimeoutMillis()));
     }
 
     @Override
-    public void lockElement(String bucketName, String elementId, Duration timeout) {
-        metrics.elementLockingTimer(spaceName, bucketName).record(
+    public void lockElement(BucketName bucketName, String elementId, Duration timeout) {
+        metrics.elementLockingTimer(bucketName.getSpaceName(), bucketName.getName()).record(
                 () -> lockWithoutTimer(bucketName, elementId, timeout));
     }
 
     @Override
-    public void unlockElement(String bucketName, String elementId) {
-        metrics.elementUnlockingTimer(spaceName, bucketName).record(
+    public void unlockElement(BucketName bucketName, String elementId) {
+        metrics.elementUnlockingTimer(bucketName.getSpaceName(), bucketName.getName()).record(
                 () -> unlockWithoutTimer(bucketName, elementId));
     }
 
-    private void lockWithoutTimer(String bucketName, String elementId, Duration timeout) {
+    private void lockWithoutTimer(BucketName bucketName, String elementId, Duration timeout) {
         boolean acquired;
         ElementLock elementLock = locksMap.getOrDefault(
                 ElementKey.of(bucketName, elementId),
@@ -119,23 +113,23 @@ public class ZookeeperElementsLocker implements ElementsLocker {
         try {
             acquired = elementLock.curatorLock().acquire(timeout.toMillis(), TimeUnit.MILLISECONDS);
         } catch (Exception e) {
-            metrics.elementLockerErrorCounter(spaceName, bucketName).increment();
+            metrics.elementLockerErrorCounter(bucketName.getSpaceName(), bucketName.getName()).increment();
             throw new UnexpectedLockerException(e);
         }
         if (!acquired) {
-            metrics.elementLockerTimeoutsCounter(spaceName, bucketName).increment();
-            throw new LockTimeoutException(spaceName, bucketName, elementId, timeout);
+            metrics.elementLockerTimeoutsCounter(bucketName.getSpaceName(), bucketName.getName()).increment();
+            throw new LockTimeoutException(bucketName, elementId, timeout);
         } else {
             elementLock.incrementLockCount();
             locksMap.putIfAbsent(ElementKey.of(bucketName, elementId), elementLock);
         }
-        metrics.elementsLockerCounter(spaceName, bucketName).increment();
+        metrics.elementsLockerCounter(bucketName.getSpaceName(), bucketName.getName()).increment();
     }
 
-    private void unlockWithoutTimer(String bucketName, String elementId) {
+    private void unlockWithoutTimer(BucketName bucketName, String elementId) {
         ElementLock elementLock = locksMap.get(ElementKey.of(bucketName, elementId));
         if (elementLock == null) {
-            metrics.elementLockerErrorCounter(spaceName, bucketName).increment();
+            metrics.elementLockerErrorCounter(bucketName.getSpaceName(), bucketName.getName()).increment();
             throw new LockNotHoldException(buildLockPath(bucketName, elementId));
         }
 
@@ -145,14 +139,14 @@ public class ZookeeperElementsLocker implements ElementsLocker {
             if (elementLock.lockCount() == 0) {
                 locksMap.remove(ElementKey.of(bucketName, elementId));
             }
-            metrics.elementsLockerUnlockedCounter(spaceName, bucketName).increment();
+            metrics.elementsLockerUnlockedCounter(bucketName.getSpaceName(), bucketName.getName()).increment();
         } catch (Exception e) {
-            metrics.elementLockerErrorCounter(spaceName, bucketName).increment();
+            metrics.elementLockerErrorCounter(bucketName.getSpaceName(), bucketName.getName()).increment();
             throw new UnexpectedLockerException(e);
         }
     }
 
-    private String buildLockPath(String bucketName, String elementId) {
-        return "/" + spaceName + "/" + bucketName + "/" + elementId;
+    private String buildLockPath(BucketName bucketName, String elementId) {
+        return "/" + bucketName.getSpaceName() + "/" + bucketName.getName() + "/" + elementId;
     }
 }

@@ -26,7 +26,8 @@ public class GraphQlProvider {
     private final BucketObserversContainer observersContainer;
 
     public GraphQlProvider(MongoTemplate mongoTemplate,
-                           ElementFilterToMongoQueryConverter mongoQueryConverter, BucketObserversContainer observersContainer) {
+                           ElementFilterToMongoQueryConverter mongoQueryConverter,
+                           BucketObserversContainer observersContainer) {
         this.mongoQueryConverter = mongoQueryConverter;
         this.mongoTemplate = mongoTemplate;
         this.observersContainer = observersContainer;
@@ -44,11 +45,10 @@ public class GraphQlProvider {
     }
 
     GraphQL graphQL(BucketSubscriptionQuery subscriptionQuery) {
-        BucketEventsObserver observer = observersContainer.provide(subscriptionQuery.getSpaceName(), subscriptionQuery.getBucketName());
-        ElementEventsFilter elementEventsFilter = new ElementEventsFilter(subscriptionQuery);
+        BucketEventsObserver observer = observersContainer.provide(subscriptionQuery.getBucketName());
 
         GraphQLSchema graphQLSchema = SchemaParser.newParser().schemaString(subscriptionSchema)
-                .resolvers(new Subscription(observer, elementEventsFilter))
+                .resolvers(new Subscription(observer))
                 .build()
                 .makeExecutableSchema();
 

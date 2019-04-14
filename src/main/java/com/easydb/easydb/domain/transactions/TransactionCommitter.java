@@ -1,35 +1,34 @@
 package com.easydb.easydb.domain.transactions;
 
+import com.easydb.easydb.domain.BucketName;
 import com.easydb.easydb.domain.bucket.Element;
-import com.easydb.easydb.domain.bucket.transactions.TransactionalElementService;
+import com.easydb.easydb.domain.bucket.ElementService;
 import com.easydb.easydb.domain.bucket.transactions.VersionedElement;
 import com.easydb.easydb.domain.locker.ElementsLocker;
-import com.easydb.easydb.domain.locker.factories.ElementsLockerFactory;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-class TransactionCommitter {
+public class TransactionCommitter {
     private static final Logger logger = LoggerFactory.getLogger(TransactionCommitter.class);
 
-    private final ElementsLockerFactory lockerFactory;
+    private final ElementsLocker elementsLocker;
     private final Retryer lockerRetryer;
-    private final TransactionalElementService elementService;
+    private final ElementService elementService;
 
-    TransactionCommitter(ElementsLockerFactory lockerFactory, Retryer lockerRetryer,
-                         TransactionalElementService elementService) {
-        this.lockerFactory = lockerFactory;
+    public TransactionCommitter(ElementsLocker locker, Retryer lockerRetryer,
+                                ElementService elementService) {
+        this.elementsLocker = locker;
         this.lockerRetryer = lockerRetryer;
         this.elementService = elementService;
     }
 
     void commit(Transaction transaction) {
-        ElementsLocker locker = lockerFactory.build(transaction.getSpaceName());
-
         try {
             transaction.getOperations().forEach(o -> {
                 if (operationRequiresElementLock(o)) {
-                    lockerRetryer.performWithRetries(() -> locker.lockElement(o.getBucketName(), o.getElementId()));
+                    BucketName bucketName = new BucketName(transaction.getSpaceName(), o.getBucketName());
+                    lockerRetryer.performWithRetries(() -> elementsLocker.lockElement(bucketName, o.getElementId()));
                 }
             });
             transaction.getOperations().forEach(o -> performOperation(o, transaction));
@@ -40,7 +39,8 @@ class TransactionCommitter {
             // TODO think about corner cases (e.g. unlocking not already locked element)
             transaction.getOperations().forEach(o -> {
                 if (operationRequiresElementLock(o)) {
-                    locker.unlockElement(o.getBucketName(), o.getElementId());
+                    BucketName bucketName = new BucketName(transaction.getSpaceName(), o.getBucketName());
+                    elementsLocker.unlockElement(bucketName, o.getElementId());
                 }
             });
         }
@@ -51,7 +51,9 @@ class TransactionCommitter {
     }
 
     private void performOperation(Operation o, Transaction t) {
-        Element element = Element.of(o.getElementId(), o.getBucketName(), o.getFields());
+        BucketName bucketName = new BucketName(t.getSpaceName(), o.getBucketName());
+
+        Element element = Element.of(o.getElementId(), bucketName, o.getFields());
         switch (o.getType()) {
             case CREATE:
                 elementService.addElement(element);
@@ -60,16 +62,18 @@ class TransactionCommitter {
                 performUpdateOperation(o, t);
                 break;
             case DELETE:
-                elementService.removeElement(o.getBucketName(), o.getElementId());
+                elementService.removeElement(bucketName, o.getElementId());
                 break;
         }
     }
 
     private void performUpdateOperation(Operation o, Transaction t) {
+        BucketName bucketName = new BucketName(t.getSpaceName(), o.getBucketName());
+
         Optional<Long> version = Optional.ofNullable(t.getReadElements().get(o.getElementId()));
         VersionedElement versionedElement = version
-                .map(v -> VersionedElement.of(o.getElementId(), o.getBucketName(), o.getFields(), v))
-                .orElseGet(() -> VersionedElement.of(o.getElementId(), o.getBucketName(), o.getFields()));
+                .map(v -> VersionedElement.of(o.getElementId(), bucketName, o.getFields(), v))
+                .orElseGet(() -> VersionedElement.of(o.getElementId(), bucketName, o.getFields()));
 
         elementService.updateElement(versionedElement);
     }

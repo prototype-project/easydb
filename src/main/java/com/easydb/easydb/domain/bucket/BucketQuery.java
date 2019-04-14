@@ -1,16 +1,16 @@
 package com.easydb.easydb.domain.bucket;
 
-
+import com.easydb.easydb.domain.BucketName;
 import java.util.Optional;
 
 public class BucketQuery {
 
-    private final String bucketName;
+    private final BucketName bucketName;
     private final int limit;
     private final int offset;
     private final Optional<String> query;
 
-    private BucketQuery(String bucketName, int limit, int offset, Optional<String> query) {
+    private BucketQuery(BucketName bucketName, int limit, int offset, Optional<String> query) {
         this.bucketName = bucketName;
         this.limit = limit;
         this.offset = offset;
@@ -18,7 +18,7 @@ public class BucketQuery {
         validateConstraints();
     }
 
-    public String getBucketName() {
+    public BucketName getBucketName() {
         return bucketName;
     }
 
@@ -34,11 +34,11 @@ public class BucketQuery {
         return query;
     }
 
-    public static BucketQuery of(String name, int limit, int offset, Optional<String> query) {
+    public static BucketQuery of(BucketName name, int limit, int offset, Optional<String> query) {
         return new BucketQuery(name, limit, offset, query);
     }
 
-    public static BucketQuery of(String name, int limit, int offset) {
+    public static BucketQuery of(BucketName name, int limit, int offset) {
         return new BucketQuery(name, limit, offset, Optional.empty());
     }
 

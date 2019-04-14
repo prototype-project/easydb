@@ -8,26 +8,24 @@ import reactor.core.publisher.Flux;
 
 public class Subscription implements GraphQLSubscriptionResolver {
     final static String DEFAULT_GRAPHQL_SUBSCRIPTION =
-                    "{                 \n" +
-                    "    elements {    \n" +
-                    "        id        \n" +
-                    "        fields {  \n" +
-                    "            name  \n" +
-                    "            value \n" +
-                    "        }         \n" +
-                    "    }             \n" +
-                    "}                 \n";
+                    "{                    \n" +
+                    "  elementEvents {    \n" +
+                    "          id         \n" +
+                    "          fields {   \n" +
+                    "              name   \n" +
+                    "              value  \n" +
+                    "          }          \n" +
+                    "      }              \n" +
+                    "}                    \n";
 
     private final BucketEventsObserver eventsObserver;
-    private final ElementEventsFilter eventsFilter;
 
-    public Subscription(BucketEventsObserver eventsObserver, ElementEventsFilter eventsFilter) {
+    public Subscription(BucketEventsObserver eventsObserver) {
         this.eventsObserver = eventsObserver;
-        this.eventsFilter = eventsFilter;
     }
 
     public Flux<ElementEvent> elementEvents(Optional<ElementFilter> filter) {
         return eventsObserver.observe()
-                .filter(elementEvent -> eventsFilter.filter(elementEvent, filter));
+                .filter(elementEvent -> ElementEventsFilter.filter(elementEvent, filter));
     }
 }

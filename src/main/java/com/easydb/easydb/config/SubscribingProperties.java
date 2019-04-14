@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("bucket.subscribing")
 public class SubscribingProperties {
     private int eventsObserverQueueCapacity = 10000;
+    private int eventsObserverThreadPoolQueueCapacity = 1000000;
     private int eventsObserversThreadPoolSize = 100;
 
     public int getEventsObserverQueueCapacity() {
@@ -21,5 +22,13 @@ public class SubscribingProperties {
 
     public void setEventsObserversThreadPoolSize(int eventsObserversThreadPoolSize) {
         this.eventsObserversThreadPoolSize = eventsObserversThreadPoolSize;
+    }
+
+    public int getEventsObserverThreadPoolQueueCapacity() {
+        return eventsObserverThreadPoolQueueCapacity;
+    }
+
+    public void setEventsObserverThreadPoolQueueCapacity(int eventsObserverThreadPoolQueueCapacity) {
+        this.eventsObserverThreadPoolQueueCapacity = eventsObserverThreadPoolQueueCapacity;
     }
 }

@@ -1,5 +1,6 @@
 package com.easydb.easydb.domain.bucket.transactions;
 
+import com.easydb.easydb.domain.BucketName;
 import com.easydb.easydb.domain.bucket.BucketDoesNotExistException;
 import com.easydb.easydb.domain.bucket.BucketQuery;
 import com.easydb.easydb.domain.bucket.Element;
@@ -10,28 +11,28 @@ import java.util.List;
 
 public interface BucketRepository {
 
-    boolean bucketExists(String name);
+    boolean bucketExists(BucketName name);
 
-    void createBucket(String name);
+    void createBucket(BucketName name);
 
-    void removeBucket(String name) throws BucketDoesNotExistException;
+    void removeBucket(BucketName name) throws BucketDoesNotExistException;
 
     void insertElement(Element element) throws ElementAlreadyExistsException;
 
-    VersionedElement getElement(String bucketName, String id)
+    VersionedElement getElement(BucketName bucketName, String id)
             throws BucketDoesNotExistException, ElementDoesNotExistException;
 
-    VersionedElement getElement(String bucketName, String id, long requiredVersion)
+    VersionedElement getElement(BucketName bucketName, String id, long requiredVersion)
             throws BucketDoesNotExistException, ElementDoesNotExistException, ConcurrentTransactionDetectedException;
 
-    void removeElement(String bucketName, String id) throws BucketDoesNotExistException, ElementDoesNotExistException;
+    void removeElement(BucketName bucketName, String id) throws BucketDoesNotExistException, ElementDoesNotExistException;
 
-    boolean elementExists(String bucketName, String elementId) throws BucketDoesNotExistException;
+    boolean elementExists(BucketName bucketName, String elementId) throws BucketDoesNotExistException;
 
     void updateElement(VersionedElement toUpdate) throws BucketDoesNotExistException, ElementDoesNotExistException,
             ConcurrentTransactionDetectedException;
 
     List<Element> filterElements(BucketQuery query);
 
-    long getNumberOfElements(String bucketName) throws BucketDoesNotExistException;
+    long getNumberOfElements(BucketName bucketName) throws BucketDoesNotExistException;
 }

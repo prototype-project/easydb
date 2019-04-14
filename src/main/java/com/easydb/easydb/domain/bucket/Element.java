@@ -1,5 +1,6 @@
 package com.easydb.easydb.domain.bucket;
 
+import com.easydb.easydb.domain.BucketName;
 import com.google.common.collect.ImmutableList;
 
 import java.util.Collections;
@@ -9,20 +10,20 @@ import java.util.Objects;
 public class Element {
 
     private final String id;
-    private final String bucketName;
+    private final BucketName bucketName;
     private final List<ElementField> fields;
 
-    private Element(String id, String bucketName, List<ElementField> fields) {
+    private Element(String id, BucketName bucketName, List<ElementField> fields) {
         this.id = id;
         this.bucketName = bucketName;
         this.fields = ImmutableList.copyOf(fields);
     }
 
-    public static Element of(String id, String bucketName, List<ElementField> fields) {
+    public static Element of(String id, BucketName bucketName, List<ElementField> fields) {
         return new Element(id, bucketName, fields);
     }
 
-    public String getBucketName() {
+    public BucketName getBucketName() {
         return bucketName;
     }
 

@@ -3,6 +3,7 @@ package com.easydb.easydb.api.bucket
 import com.easydb.easydb.BaseIntegrationSpec
 import com.easydb.easydb.ElementTestBuilder
 import com.easydb.easydb.TestHttpOperations
+import com.easydb.easydb.domain.BucketName
 import com.easydb.easydb.domain.bucket.ElementField
 import org.springframework.web.client.HttpClientErrorException;
 
@@ -13,10 +14,12 @@ class BucketElementsPaginationSpec extends BaseIntegrationSpec implements TestHt
     def setup() {
         spaceName = addSampleSpace().body.spaceName
         createTestBucket(spaceName)
+
+        def testBucketName = new BucketName(spaceName, TEST_BUCKET_NAME)
         addElementToTestBucket(spaceName, buildElementBody(
                 ElementTestBuilder
                         .builder()
-                        .bucketName(TEST_BUCKET_NAME)
+                        .bucketName(testBucketName)
                         .clearFields()
                         .addField(ElementField.of("firstName", "Daniel"))
                         .addField(ElementField.of("lastName", "Faderski"))
@@ -25,7 +28,7 @@ class BucketElementsPaginationSpec extends BaseIntegrationSpec implements TestHt
         addElementToTestBucket(spaceName, buildElementBody(
                 ElementTestBuilder
                         .builder()
-                        .bucketName(TEST_BUCKET_NAME)
+                        .bucketName(testBucketName)
                         .clearFields()
                         .addField(ElementField.of("firstName", "Daniel"))
                         .addField(ElementField.of("lastName", "Faderski"))
@@ -34,7 +37,7 @@ class BucketElementsPaginationSpec extends BaseIntegrationSpec implements TestHt
         addElementToTestBucket(spaceName, buildElementBody(
                 ElementTestBuilder
                         .builder()
-                        .bucketName(TEST_BUCKET_NAME)
+                        .bucketName(testBucketName)
                         .clearFields()
                         .addField(ElementField.of("firstName", "Daniel"))
                         .addField(ElementField.of("lastName", "Faderski"))

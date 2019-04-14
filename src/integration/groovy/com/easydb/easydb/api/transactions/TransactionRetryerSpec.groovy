@@ -2,12 +2,11 @@ package com.easydb.easydb.api.transactions
 
 import com.easydb.easydb.ElementTestBuilder
 import com.easydb.easydb.IntegrationWithCleanedDatabaseSpec
+import com.easydb.easydb.domain.bucket.ElementService
 import com.easydb.easydb.domain.bucket.transactions.BucketRepository
 import com.easydb.easydb.domain.bucket.BucketService
 import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.bucket.transactions.TransactionalBucketService
-import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
-import com.easydb.easydb.domain.bucket.factories.ElementServiceFactory
 import com.easydb.easydb.domain.locker.BucketLocker
 import com.easydb.easydb.domain.locker.SpaceLocker
 import com.easydb.easydb.domain.space.SpaceRepository
@@ -30,7 +29,7 @@ class TransactionRetryerSpec extends IntegrationWithCleanedDatabaseSpec {
     Retryer lockerRetryer
 
     @Autowired
-    BucketServiceFactory bucketServiceFactory
+    BucketService bucketService
 
     @Autowired
     UUIDProvider uuidProvider
@@ -43,21 +42,21 @@ class TransactionRetryerSpec extends IntegrationWithCleanedDatabaseSpec {
 
     BucketService mockedBucketService
 
-    Element element = ElementTestBuilder.builder().bucketName(TEST_BUCKET_NAME).build()
+    Element element = ElementTestBuilder.builder().build()
 
     def optimizedTransactionManagerMock = Mock(OptimizedTransactionManager)
 
     def setup() {
-        mockedBucketService = new TransactionalBucketService("testSpace", Mock(SpaceRepository),
-                Mock(BucketRepository), Mock(ElementServiceFactory), optimizedTransactionManagerMock,
+        mockedBucketService = new TransactionalBucketService(Mock(SpaceRepository),
+                Mock(BucketRepository), Mock(ElementService), optimizedTransactionManagerMock,
                 bucketLocker, spaceLocker, transactionRetryer, lockerRetryer)
 
     }
 
     def "should retry update operation in case of transaction errors"() {
         given:
-        Transaction transaction = new Transaction(TEST_SPACE, uuidProvider.generateUUID())
-        optimizedTransactionManagerMock.beginTransaction(TEST_SPACE) >> transaction
+        Transaction transaction = new Transaction(TEST_BUCKET_NAME.spaceName, uuidProvider.generateUUID())
+        optimizedTransactionManagerMock.beginTransaction(TEST_BUCKET_NAME.spaceName) >> transaction
 
         when:
         mockedBucketService.updateElement(element)

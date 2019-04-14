@@ -52,7 +52,7 @@ trait TestHttpOperations {
 
     ResponseEntity<ElementQueryDto> addElement(String spaceName, Element element) {
         return restTemplate.exchange(
-                buildElementUrl(spaceName, element.bucketName),
+                buildElementUrl(spaceName, element.bucketName.name),
                 HttpMethod.POST,
                 httpJsonEntity(buildElementBody(element)),
                 ElementQueryDto.class)
@@ -98,23 +98,23 @@ trait TestHttpOperations {
 
     ResponseEntity<TransactionDto> beginTransaction(String spaceName) {
         return restTemplate.postForEntity(
-                localUrl("/api/v1/transactions/${spaceName}"),
+                localUrl("/api/v1/spaces/${spaceName}/transactions/"),
                 Void, TransactionDto
         )
     }
 
-    ResponseEntity<OperationResultDto> addOperation(String transactionId, Operation operation) {
+    ResponseEntity<OperationResultDto> addOperation(String spaceName, String transactionId, Operation operation) {
         return restTemplate.exchange(
-                localUrl("/api/v1/transactions/${transactionId}/add-operation"),
+                localUrl("/api/v1/spaces/${spaceName}/transactions/${transactionId}/add-operation"),
                 HttpMethod.POST,
                 httpJsonEntity(buildOperationBody(operation)),
                 OperationResultDto.class
         )
     }
 
-    ResponseEntity<Void> commitTransaction(String transactionId) {
+    ResponseEntity<Void> commitTransaction(String spaceName, String transactionId) {
         return restTemplate.postForEntity(
-                localUrl("/api/v1/transactions/${transactionId}/commit"),
+                localUrl("/api/v1/spaces/${spaceName}/transactions/${transactionId}/commit"),
                 Void, Void
         )
     }

@@ -1,25 +1,26 @@
 package com.easydb.easydb.domain.bucket;
 
+import com.easydb.easydb.domain.BucketName;
 import java.util.List;
 
 public interface BucketService {
-    boolean bucketExists(String bucketName);
+    boolean bucketExists(BucketName bucketName);
 
-    void removeBucket(String bucketName);
+    void removeBucket(BucketName bucketName);
 
-    void createBucket(String bucketName);
+    void createBucket(BucketName bucketName);
 
     void addElement(Element element);
 
-    Element getElement(String bucketName, String id);
+    Element getElement(BucketName bucketName, String id);
 
-    void removeElement(String bucketName, String elementId);
+    void removeElement(BucketName bucketName, String elementId);
 
-    boolean elementExists(String bucketName, String elementId);
+    boolean elementExists(BucketName bucketName, String elementId);
 
     void updateElement(Element toUpdate);
 
     List<Element> filterElements(BucketQuery query);
 
-    long getNumberOfElements(String bucketName);
+    long getNumberOfElements(BucketName bucketName);
 }

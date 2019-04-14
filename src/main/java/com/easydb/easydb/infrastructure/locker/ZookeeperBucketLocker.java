@@ -2,6 +2,7 @@ package com.easydb.easydb.infrastructure.locker;
 
 import com.easydb.easydb.config.ApplicationMetrics;
 import com.easydb.easydb.config.ZookeeperProperties;
+import com.easydb.easydb.domain.BucketName;
 import com.easydb.easydb.domain.locker.BucketLocker;
 import com.easydb.easydb.domain.locker.LockNotHoldException;
 import com.easydb.easydb.domain.locker.LockTimeoutException;
@@ -23,53 +24,53 @@ public class ZookeeperBucketLocker implements BucketLocker {
     }
 
     @Override
-    public void lockBucket(String spaceName, String bucketName) {
-        lockBucket(spaceName, bucketName, Duration.ofMillis(properties.getLockerTimeoutMillis()));
+    public void lockBucket(BucketName bucketName) {
+        lockBucket(bucketName, Duration.ofMillis(properties.getLockerTimeoutMillis()));
     }
 
     @Override
-    public void lockBucket(String spaceName, String bucketName, Duration timeout) {
-        metrics.bucketLockingTimer(spaceName, bucketName).record(
-                () -> lockWithoutTimer(spaceName, bucketName, timeout));
+    public void lockBucket(BucketName bucketName, Duration timeout) {
+        metrics.bucketLockingTimer(bucketName.getSpaceName(), bucketName.getName()).record(
+                () -> lockWithoutTimer(bucketName, timeout));
     }
 
     @Override
-    public void unlockBucket(String spaceName, String bucketName) {
-        metrics.bucketUnLockingTimer(spaceName, bucketName).record(
-                () -> unlockWithoutTimer(spaceName, bucketName));
+    public void unlockBucket(BucketName bucketName) {
+        metrics.bucketUnLockingTimer(bucketName.getSpaceName(), bucketName.getName()).record(
+                () -> unlockWithoutTimer(bucketName));
     }
 
-    private void lockWithoutTimer(String spaceName, String bucketName, Duration timeout) {
+    private void lockWithoutTimer(BucketName bucketName, Duration timeout) {
         boolean acquired;
 
         try {
-            acquired = zookeeperLocker.lockOnPath(buildLockPath(spaceName, bucketName), timeout);
+            acquired = zookeeperLocker.lockOnPath(buildLockPath(bucketName), timeout);
         } catch (Exception e) {
-            metrics.bucketLockerErrorCounter(spaceName, bucketName).increment();
+            metrics.bucketLockerErrorCounter(bucketName.getSpaceName(), bucketName.getName()).increment();
             throw new UnexpectedLockerException(e);
         }
         if (!acquired) {
-            metrics.bucketLockerTimeoutsCounter(spaceName, bucketName).increment();
-            throw new LockTimeoutException(spaceName, bucketName, timeout);
+            metrics.bucketLockerTimeoutsCounter(bucketName.getSpaceName(), bucketName.getName()).increment();
+            throw new LockTimeoutException(bucketName, timeout);
         }
-        metrics.bucketLockerCounter(spaceName, bucketName).increment();
+        metrics.bucketLockerCounter(bucketName.getSpaceName(), bucketName.getName()).increment();
     }
 
 
-    private void unlockWithoutTimer(String spaceName, String bucketName) {
+    private void unlockWithoutTimer(BucketName bucketName) {
         try {
-            zookeeperLocker.unlockOnPath(buildLockPath(spaceName, bucketName));
-            metrics.bucketLockerUnlockedCounter(spaceName, bucketName).increment();
+            zookeeperLocker.unlockOnPath(buildLockPath(bucketName));
+            metrics.bucketLockerUnlockedCounter(bucketName.getSpaceName(), bucketName.getName()).increment();
         } catch (LockNotHoldException e) {
-            metrics.bucketLockerErrorCounter(spaceName, bucketName).increment();
+            metrics.bucketLockerErrorCounter(bucketName.getSpaceName(), bucketName.getName()).increment();
             throw e;
         } catch (Exception e) {
-            metrics.bucketLockerErrorCounter(spaceName, bucketName).increment();
+            metrics.bucketLockerErrorCounter(bucketName.getSpaceName(), bucketName.getName()).increment();
             throw new UnexpectedLockerException(e);
         }
     }
 
-    private String buildLockPath(String spaceName, String bucketName) {
-        return "/" + spaceName + "/" + bucketName;
+    private String buildLockPath(BucketName bucketName) {
+        return "/" + bucketName.getSpaceName() + "/" + bucketName.getName();
     }
 }

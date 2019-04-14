@@ -1,6 +1,6 @@
 package com.easydb.easydb.domain.space;
 
-import com.easydb.easydb.domain.bucket.NamesResolver;
+import com.easydb.easydb.domain.BucketName;
 import com.easydb.easydb.domain.bucket.transactions.BucketRepository;
 import com.easydb.easydb.domain.locker.BucketLocker;
 import com.easydb.easydb.domain.locker.SpaceLocker;
@@ -28,20 +28,20 @@ public class SpaceRemovalService {
         try {
             Space space = spaceRepository.get(spaceName);
             space.getBuckets().stream()
-                    .map(bucket -> NamesResolver.resolve(spaceName, bucket))
-                    .forEach(bucketName -> removeBucket(spaceName, bucketName));
+                    .map(bucket -> new BucketName(spaceName, bucket))
+                    .forEach(this::removeBucket);
             spaceRepository.remove(spaceName);
         } finally {
             spaceLocker.unlockSpace(spaceName);
         }
     }
 
-    private void removeBucket(String spaceName, String bucketName) {
-        lockerRetryer.performWithRetries(() -> bucketLocker.lockBucket(spaceName, bucketName));
+    private void removeBucket(BucketName bucketName) {
+        lockerRetryer.performWithRetries(() -> bucketLocker.lockBucket(bucketName));
         try {
             bucketRepository.removeBucket(bucketName);
         } finally {
-            bucketLocker.unlockBucket(spaceName, bucketName);
+            bucketLocker.unlockBucket(bucketName);
         }
     }
 }

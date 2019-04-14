@@ -2,8 +2,8 @@ package com.easydb.easydb.api.bucket
 
 import com.easydb.easydb.BaseIntegrationSpec
 import com.easydb.easydb.TestHttpOperations
+import com.easydb.easydb.domain.BucketName
 import com.easydb.easydb.domain.bucket.BucketService
-import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.client.HttpClientErrorException
@@ -15,14 +15,12 @@ class CrudBucketSpec extends BaseIntegrationSpec implements TestHttpOperations {
     RestTemplate restTemplate = new RestTemplate()
 
     @Autowired
-    BucketServiceFactory bucketServiceFactory
+    BucketService bucketService
 
     String spaceName
-    BucketService bucketService
 
     def setup() {
         spaceName = addSampleSpace().body.spaceName
-        bucketService = bucketServiceFactory.buildBucketService(spaceName)
     }
 
     def "should create bucket"() {
@@ -30,7 +28,7 @@ class CrudBucketSpec extends BaseIntegrationSpec implements TestHttpOperations {
         def response = createBucket(spaceName, "exampleBucket")
 
         then:
-        bucketService.bucketExists("exampleBucket")
+        bucketService.bucketExists(new BucketName(spaceName, "exampleBucket"))
 
         and:
         response.getStatusCode() == HttpStatus.CREATED
@@ -58,7 +56,7 @@ class CrudBucketSpec extends BaseIntegrationSpec implements TestHttpOperations {
         deleteBucket(spaceName, "bucketToRemove")
 
         then:
-        !bucketService.bucketExists("bucketToRemove")
+        !bucketService.bucketExists(new BucketName(spaceName, "bucketToRemove"))
     }
 
     def "should return 404 when trying to remove not existing bucket"() {

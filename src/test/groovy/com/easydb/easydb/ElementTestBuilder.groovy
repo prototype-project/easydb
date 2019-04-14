@@ -1,11 +1,12 @@
 package com.easydb.easydb
 
+import com.easydb.easydb.domain.BucketName
 import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.bucket.ElementField
 
 class ElementTestBuilder {
     private String id = UUID.randomUUID()
-    private String bucketName = "people"
+    private BucketName bucketName = new BucketName("testSpace","people")
     private List<ElementField> fields = [
             ElementField.of('firstName', 'John'),
             ElementField.of('lastName', 'Smith'),
@@ -16,7 +17,7 @@ class ElementTestBuilder {
         return this
     }
 
-    ElementTestBuilder bucketName(String name) {
+    ElementTestBuilder bucketName(BucketName name) {
         this.bucketName = name
         return this
     }

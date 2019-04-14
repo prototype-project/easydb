@@ -14,16 +14,16 @@ public class OptimizedTransactionManager {
 
     private final UUIDProvider uuidProvider;
     private final TransactionConstraintsValidator transactionConstraintsValidator;
-    private final TransactionCommitterFactory transactionCommitterFactory;
+    private final TransactionCommitter transactionCommitter;
     private final ApplicationMetrics metrics;
 
     public OptimizedTransactionManager(UUIDProvider uuidProvider,
                                        TransactionConstraintsValidator transactionConstraintsValidator,
-                                       TransactionCommitterFactory transactionCommitterFactory,
+                                       TransactionCommitter transactionCommitter,
                                        ApplicationMetrics metrics) {
         this.uuidProvider = uuidProvider;
         this.transactionConstraintsValidator = transactionConstraintsValidator;
-        this.transactionCommitterFactory = transactionCommitterFactory;
+        this.transactionCommitter = transactionCommitter;
         this.metrics = metrics;
     }
 
@@ -44,7 +44,6 @@ public class OptimizedTransactionManager {
     }
 
     private void commit(Transaction transaction) {
-        TransactionCommitter transactionCommitter = transactionCommitterFactory.build(transaction.getSpaceName());
         try {
             transactionCommitter.commit(transaction);
         } catch (Exception e) {

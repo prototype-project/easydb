@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(value = "/api/v1/transactions")
+@RequestMapping(value = "/api/v1/spaces/{spaceName}/transactions")
 class TransactionController {
 
     private final PersistentTransactionManager persistentTransactionManager;
@@ -28,7 +28,7 @@ class TransactionController {
         this.metrics = metrics;
     }
 
-    @PostMapping("/{spaceName}")
+    @PostMapping
     @ResponseStatus(value = HttpStatus.CREATED)
     TransactionDto beginTransaction(@PathVariable("spaceName") String spaceName) {
         String transactionId = persistentTransactionManager.beginTransaction(spaceName);
@@ -38,7 +38,8 @@ class TransactionController {
 
     @PostMapping("/{transactionId}/add-operation")
     @ResponseStatus(value = HttpStatus.CREATED)
-    OperationResultDto addOperation(@PathVariable String transactionId,
+    OperationResultDto addOperation(@PathVariable("spaceName") String spaceName,
+                                    @PathVariable("transactionId") String transactionId,
                                     @RequestBody @Valid OperationDto dto) {
         OperationResult operationResult = persistentTransactionManager.addOperation(transactionId, dto.toDomain(uuidProvider));
         metrics.addOperationToTransactionRequestCounter(operationResult.getSpaceName(), dto.getBucketName(),

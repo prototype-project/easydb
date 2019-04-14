@@ -1,8 +1,8 @@
 package com.easydb.easydb.infrastructure.space
 
 import com.easydb.easydb.BaseIntegrationSpec
+import com.easydb.easydb.domain.BucketName
 import com.easydb.easydb.domain.bucket.BucketService
-import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
 import com.easydb.easydb.domain.space.Space
 import com.easydb.easydb.domain.space.SpaceDoesNotExistException
 import com.easydb.easydb.domain.space.SpaceNameNotUniqueException
@@ -18,7 +18,7 @@ class SpaceRepositorySpec extends BaseIntegrationSpec {
     SpaceRepository spaceRepository
 
     @Autowired
-    BucketServiceFactory bucketServiceFactory
+    BucketService bucketService
 
     def cleanup() {
         try {
@@ -67,8 +67,7 @@ class SpaceRepositorySpec extends BaseIntegrationSpec {
     def "should update space"() {
         given:
         spaceRepository.save(Space.of(TEST_SPACE))
-        BucketService bucketService = bucketServiceFactory.buildBucketService(TEST_SPACE)
-        bucketService.createBucket("sampleBucket")
+        bucketService.createBucket(new BucketName(TEST_SPACE, "sampleBucket"))
 
         when:
         spaceRepository.update(Space.of(TEST_SPACE, ["sampleBucket"] as Set))

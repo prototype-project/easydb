@@ -2,8 +2,8 @@ package com.easydb.easydb.infrastructure.bucket
 
 import com.easydb.easydb.ElementUtils
 import com.easydb.easydb.IntegrationWithCleanedDatabaseSpec
+import com.easydb.easydb.domain.BucketName
 import com.easydb.easydb.domain.bucket.*
-import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
 import com.easydb.easydb.domain.bucket.transactions.BucketRepository
 import com.easydb.easydb.domain.space.SpaceRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -12,16 +12,13 @@ import static com.easydb.easydb.ElementTestBuilder.builder
 
 class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec implements ElementUtils {
 
-    BucketService bucketService
-
-    @Autowired BucketServiceFactory bucketServiceFactory
+    @Autowired BucketService bucketService
 
     @Autowired SpaceRepository spaceRepository
 
     @Autowired BucketRepository bucketRepository
 
     def setup() {
-        bucketService = bucketServiceFactory.buildBucketService(TEST_SPACE)
         bucketService.createBucket(TEST_BUCKET_NAME)
     }
 
@@ -41,7 +38,7 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec implements El
 
     def "should throw error when trying to remove not existing bucket"() {
         when:
-        bucketService.removeBucket("notExistingBucket")
+        bucketService.removeBucket(new BucketName(TEST_BUCKET_NAME.spaceName, "notExistingBucket"))
 
         then:
         thrown BucketDoesNotExistException
@@ -77,7 +74,7 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec implements El
 
     def "should update space's buckets when creating bucket"() {
         expect:
-        spaceRepository.get(TEST_SPACE).buckets == [TEST_BUCKET_NAME] as Set
+        spaceRepository.get(TEST_BUCKET_NAME.spaceName).buckets == [TEST_BUCKET_NAME.name] as Set
     }
 
     def "should remove element from bucket"() {
@@ -94,7 +91,7 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec implements El
 
     def "should throw error when trying to remove element from not existing bucket"() {
         when:
-        bucketService.removeElement("notExistingBucket", "notExistingElement")
+        bucketService.removeElement(new BucketName(TEST_BUCKET_NAME.spaceName, "notExistingBucket"), "notExistingElement")
 
         then:
         thrown BucketDoesNotExistException
@@ -135,7 +132,7 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec implements El
 
     def "should throw exception when trying to update element in nonexistent bucket"() {
         given:
-        Element toUpdate = builder().bucketName("nonExistentBucket").fields(
+        Element toUpdate = builder().bucketName(new BucketName(TEST_BUCKET_NAME.spaceName, "nonExistentBucket")).fields(
                 [ElementField.of('lastName', 'Snow')]
         ).build()
 
@@ -179,7 +176,7 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec implements El
 
     def "should throw exception when trying to get element from nonexistent bucket"() {
         when:
-        bucketService.getElement("nonexistentBucket", "someId")
+        bucketService.getElement(new BucketName(TEST_BUCKET_NAME.spaceName, "nonexistentBucket"), "someId")
 
         then:
         thrown BucketDoesNotExistException
@@ -218,7 +215,7 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec implements El
 
     def "should throw exception when trying to get elements from nonexistent bucket"() {
         when:
-        bucketService.filterElements(BucketQuery.of("nonExistentBucket", 20, 0))
+        bucketService.filterElements(BucketQuery.of(new BucketName(TEST_BUCKET_NAME.spaceName, "nonExistentBucket"), 20, 0))
 
         then:
         thrown(BucketDoesNotExistException)
@@ -243,7 +240,7 @@ class BucketServiceSpec extends IntegrationWithCleanedDatabaseSpec implements El
 
     def "should throw error when trying to get number of elements from not existing bucket"() {
         when:
-        bucketService.getNumberOfElements("notExistingBucket")
+        bucketService.getNumberOfElements(new BucketName(TEST_BUCKET_NAME.spaceName,"notExistingBucket"))
 
         then:
         thrown BucketDoesNotExistException

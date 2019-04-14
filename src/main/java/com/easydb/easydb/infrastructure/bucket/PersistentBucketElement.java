@@ -1,5 +1,6 @@
 package com.easydb.easydb.infrastructure.bucket;
 
+import com.easydb.easydb.domain.BucketName;
 import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.bucket.ElementField;
 import com.easydb.easydb.domain.bucket.transactions.VersionedElement;
@@ -30,7 +31,7 @@ public class PersistentBucketElement {
         return new PersistentBucketElement(element.getId(), element.getFields(), 0);
     }
 
-    VersionedElement toDomainVersionedElement(String bucketName) {
+    VersionedElement toDomainVersionedElement(BucketName bucketName) {
         return VersionedElement.of(id, bucketName, fields, version);
     }
 

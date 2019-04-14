@@ -1,9 +1,9 @@
 package com.easydb.easydb.infrastructure.space
 
 import com.easydb.easydb.BaseIntegrationSpec
+import com.easydb.easydb.domain.BucketName
 import com.easydb.easydb.domain.bucket.transactions.BucketRepository
 import com.easydb.easydb.domain.bucket.BucketService
-import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory
 import com.easydb.easydb.domain.space.Space
 import com.easydb.easydb.domain.space.SpaceRepository
 import com.easydb.easydb.domain.space.SpaceRemovalService
@@ -20,19 +20,18 @@ class SpaceRemovalServiceSpec extends BaseIntegrationSpec {
     @Autowired BucketRepository bucketRepository
 
     @Autowired
-    BucketServiceFactory bucketServiceFactory
+    BucketService bucketService
 
     def "should remove all spaces buckets when removing space"() {
         given:
         spaceRepository.save(Space.of("testSpace"))
-        BucketService bucketService = bucketServiceFactory.buildBucketService("testSpace")
-        bucketService.createBucket("testBucket")
+        bucketService.createBucket(new BucketName("testSpace","testBucket"))
 
         when:
         spaceRemovalService.remove("testSpace")
 
         then:
         !spaceRepository.exists("testSpace")
-        !bucketService.bucketExists("testBucket")
+        !bucketService.bucketExists(new BucketName("testSpace", "testBucket"))
     }
 }

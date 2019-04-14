@@ -1,12 +1,10 @@
 package com.easydb.easydb.api.bucket;
 
 import com.easydb.easydb.config.ApplicationMetrics;
+import com.easydb.easydb.domain.BucketName;
 import com.easydb.easydb.domain.bucket.BucketQuery;
 import com.easydb.easydb.domain.bucket.BucketService;
 import com.easydb.easydb.domain.bucket.BucketEventsPublisher;
-import com.easydb.easydb.domain.bucket.BucketSubscriptionQuery;
-import com.easydb.easydb.domain.bucket.ElementEvent;
-import com.easydb.easydb.domain.bucket.factories.BucketServiceFactory;
 import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.space.UUIDProvider;
 
@@ -26,31 +24,31 @@ class BucketController {
 
     private final UUIDProvider uuidProvider;
     private final ApplicationMetrics metrics;
-    private final BucketServiceFactory bucketServiceFactory;
+    private final BucketService bucketService;
     private final BucketEventsPublisher bucketEventsPublisher;
 
     BucketController(
             UUIDProvider uuidProvider,
             ApplicationMetrics metrics,
-            BucketServiceFactory bucketServiceFactory,
+            BucketService bucketService,
             BucketEventsPublisher bucketEventsPublisher) {
         this.uuidProvider = uuidProvider;
         this.metrics = metrics;
-        this.bucketServiceFactory = bucketServiceFactory;
+        this.bucketService = bucketService;
         this.bucketEventsPublisher = bucketEventsPublisher;
     }
 
     @DeleteMapping(path = "/{bucketName}")
     @ResponseStatus(value = HttpStatus.OK)
     void deleteBucket(@PathVariable("spaceName") String spaceName, @PathVariable("bucketName") String bucketName) {
-        bucketServiceFactory.buildBucketService(spaceName).removeBucket(bucketName);
+        bucketService.removeBucket(new BucketName(spaceName, bucketName));
         metrics.deleteBucketRequestsCounter(spaceName).increment();
     }
 
     @PostMapping
     @ResponseStatus(value = HttpStatus.CREATED)
     void createBucket(@PathVariable("spaceName") String spaceName, @RequestBody @Valid BucketDefinitionDto toCreate) {
-        bucketServiceFactory.buildBucketService(spaceName).createBucket(toCreate.getName());
+        bucketService.createBucket(new BucketName(spaceName, toCreate.getName()));
         metrics.createBucketRequestsCounter(spaceName).increment();
     }
 
@@ -60,8 +58,8 @@ class BucketController {
             @PathVariable("spaceName") String spaceName,
             @PathVariable("bucketName") String bucketName,
             @RequestBody @Valid ElementCrudDto toCreate) {
-        Element element = toCreate.toDomain(uuidProvider.generateUUID(), bucketName);
-        bucketServiceFactory.buildBucketService(spaceName).addElement(element);
+        Element element = toCreate.toDomain(uuidProvider.generateUUID(), new BucketName(spaceName, bucketName));
+        bucketService.addElement(element);
 
         metrics.addElementRequestsCounter(spaceName, bucketName).increment();
         return ElementQueryDto.of(element);
@@ -73,7 +71,7 @@ class BucketController {
             @PathVariable("spaceName") String spaceName,
             @PathVariable("bucketName") String bucketName,
             @PathVariable("elementId") String elementId) {
-        bucketServiceFactory.buildBucketService(spaceName).removeElement(bucketName, elementId);
+        bucketService.removeElement(new BucketName(spaceName, bucketName), elementId);
         metrics.deleteElementRequestsCounter(spaceName, bucketName).increment();
     }
 
@@ -84,7 +82,7 @@ class BucketController {
             @PathVariable("bucketName") String bucketName,
             @PathVariable("elementId") String elementId,
             @RequestBody @Valid ElementCrudDto toUpdate) {
-        bucketServiceFactory.buildBucketService(spaceName).updateElement(toUpdate.toDomain(elementId, bucketName));
+        bucketService.updateElement(toUpdate.toDomain(elementId, new BucketName(spaceName, bucketName)));
         metrics.updateElementRequestsCounter(spaceName, bucketName).increment();
     }
 
@@ -94,10 +92,8 @@ class BucketController {
             @PathVariable("spaceName") String spaceName,
             @PathVariable("bucketName") String bucketName,
             @PathVariable("elementId") String elementId) {
-        BucketService bucketService = bucketServiceFactory.buildBucketService(spaceName);
-
         metrics.getElementRequestsCounter(spaceName, bucketName).increment();
-        return ElementQueryDto.of(bucketService.getElement(bucketName, elementId));
+        return ElementQueryDto.of(bucketService.getElement(new BucketName(spaceName, bucketName), elementId));
     }
 
     @GetMapping(path = "/{bucketName}/elements")
@@ -109,10 +105,8 @@ class BucketController {
             @RequestParam(value = "offset", defaultValue = "0") int offset,
             @RequestParam(value = "query") Optional<String> query,
             HttpServletRequest request) {
-        BucketService bucketService = bucketServiceFactory.buildBucketService(spaceName);
-
         Optional<String> uriDecodedQuery = query.map(UriEncoder::decode);
-        BucketQuery bucketQuery = BucketQuery.of(bucketName, limit, offset, uriDecodedQuery);
+        BucketQuery bucketQuery = BucketQuery.of(new BucketName(spaceName, bucketName), limit, offset, uriDecodedQuery);
 
         List<ElementQueryDto> results = bucketService.filterElements(bucketQuery).stream()
                 .map(ElementQueryDto::of)
@@ -120,21 +114,21 @@ class BucketController {
 
         metrics.filterElementsRequestsCounter(spaceName, bucketName).increment();
         return PaginatedElementsDto.of(
-                getNextPageLink(bucketService.getNumberOfElements(bucketName), limit, offset, request),
+                getNextPageLink(bucketService.getNumberOfElements(new BucketName(spaceName, bucketName)), limit, offset, request),
                 results);
     }
 
-    @GetMapping(path = "/{bucketName}/elements")
-    @ResponseStatus(value = HttpStatus.OK)
-    ElementEvent subscribeForChanges(
-            @PathVariable("spaceName") String spaceName,
-            @PathVariable("bucketName") String bucketName,
-            @RequestParam(value = "query") Optional<String> query,
-            HttpServletRequest request) {
-        Optional<String> uriDecodedQuery = query.map(UriEncoder::decode);
-        BucketSubscriptionQuery subscriptionQuery = BucketSubscriptionQuery.of(spaceName, bucketName, query);
-        return bucketEventsPublisher.subscribe(subscriptionQuery).next().block();
-    }
+//    @GetMapping(path = "/{bucketName}/elements")
+//    @ResponseStatus(value = HttpStatus.OK)
+//    ElementEvent subscribeForChanges(
+//            @PathVariable("spaceName") String spaceName,
+//            @PathVariable("bucketName") String bucketName,
+//            @RequestParam(value = "query") Optional<String> query,
+//            HttpServletRequest request) {
+//        Optional<String> uriDecodedQuery = query.map(UriEncoder::decode);
+//        BucketSubscriptionQuery subscriptionQuery = BucketSubscriptionQuery.of(spaceName, bucketName, query);
+//        return bucketEventsPublisher.subscribe(subscriptionQuery).next().block();
+//    }
 
     private static String getNextPageLink(long numberOfElements, int limit, int offset,
                                           HttpServletRequest request) {

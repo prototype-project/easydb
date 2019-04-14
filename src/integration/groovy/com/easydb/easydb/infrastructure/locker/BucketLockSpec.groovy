@@ -1,6 +1,7 @@
 package com.easydb.easydb.infrastructure.locker;
 
-import com.easydb.easydb.BaseIntegrationSpec;
+import com.easydb.easydb.BaseIntegrationSpec
+import com.easydb.easydb.domain.BucketName;
 import com.easydb.easydb.domain.locker.BucketLocker
 import com.easydb.easydb.domain.locker.LockNotHoldException
 import com.easydb.easydb.domain.locker.LockTimeoutException;
@@ -11,25 +12,26 @@ import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 
-
 class BucketLockSpec extends BaseIntegrationSpec {
 
     @Autowired
     BucketLocker locker
 
+    BucketName bucketName = new BucketName("SpaceX", "testBucket")
+
     def cleanup() {
         try {
-            locker.unlockBucket("SpaceX", "testBucket")
+            locker.unlockBucket(bucketName)
         }
         catch (LockNotHoldException ignored) {}
     }
 
     def "should lock bucket"() {
         given:
-        locker.lockBucket("SpaceX","testBucket")
+        locker.lockBucket(bucketName)
 
         when:
-        locker.lockBucket("SpaceX","testBucket")
+        locker.lockBucket(bucketName)
 
         then:
         thrown(LockTimeoutException)
@@ -37,12 +39,12 @@ class BucketLockSpec extends BaseIntegrationSpec {
 
     def "should unlock bucket"() {
         given:
-        locker.lockBucket("SpaceX","testBucket")
+        locker.lockBucket(bucketName)
 
-        locker.unlockBucket("SpaceX","testBucket")
+        locker.unlockBucket(bucketName)
 
         when:
-        locker.lockBucket("SpaceX","testBucket")
+        locker.lockBucket(bucketName)
 
         then:
         noExceptionThrown()
@@ -50,7 +52,7 @@ class BucketLockSpec extends BaseIntegrationSpec {
 
     def "should throw error when unlocking not held lock"() {
         when:
-        locker.unlockBucket("SpaceX","testBucket")
+        locker.unlockBucket(bucketName)
 
         then:
         thrown(LockNotHoldException)
@@ -58,14 +60,14 @@ class BucketLockSpec extends BaseIntegrationSpec {
 
     def "should wait no longer than timeout"() {
         given:
-        locker.lockBucket("SpaceX","testBucket")
+        locker.lockBucket(bucketName)
 
         when:
         long start = System.currentTimeMillis()
         long waitTime = 0
         try {
             Future<?> future = Executors.newSingleThreadExecutor().submit({
-                locker.lockBucket("SpaceX","testBucket", Duration.ofMillis(400))
+                locker.lockBucket(bucketName, Duration.ofMillis(400))
             })
             future.get()
         }
@@ -80,12 +82,13 @@ class BucketLockSpec extends BaseIntegrationSpec {
 
     def "should not block on two different buckets"() {
         given:
-        locker.lockBucket("SpaceX","testBucket")
+        locker.lockBucket(bucketName)
 
         when:
+        BucketName otherBucket = new BucketName("SpaceX", "otherBucket")
         Future<?> future = Executors.newSingleThreadExecutor().submit({
-            locker.lockBucket("SpaceX","otherBucket", Duration.ofMillis(300))
-            locker.unlockBucket("SpaceX","otherBucket")
+            locker.lockBucket(otherBucket, Duration.ofMillis(300))
+            locker.unlockBucket(otherBucket)
         })
         future.get()
 
@@ -95,11 +98,11 @@ class BucketLockSpec extends BaseIntegrationSpec {
 
     def "should block another threads"() {
         given:
-        locker.lockBucket("SpaceX","testBucket")
+        locker.lockBucket(bucketName)
 
         when:
         Future<?> future = Executors.newSingleThreadExecutor().submit({
-            locker.lockBucket("SpaceX","testBucket", Duration.ofMillis(300))
+            locker.lockBucket(bucketName, Duration.ofMillis(300))
         })
 
         future.get()

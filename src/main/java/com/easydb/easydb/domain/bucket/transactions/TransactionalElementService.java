@@ -1,73 +1,62 @@
 package com.easydb.easydb.domain.bucket.transactions;
 
+import com.easydb.easydb.domain.BucketName;
 import com.easydb.easydb.domain.bucket.BucketQuery;
 import com.easydb.easydb.domain.bucket.Element;
-import com.easydb.easydb.domain.bucket.NamesResolver;
+import com.easydb.easydb.domain.bucket.ElementService;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TransactionalElementService {
+public class TransactionalElementService implements ElementService {
 
-    private final String spaceName;
     private final BucketRepository bucketRepository;
 
     public TransactionalElementService(
-            String spaceName,
             BucketRepository bucketRepository) {
-        this.spaceName = spaceName;
         this.bucketRepository = bucketRepository;
     }
 
     public void addElement(Element element) {
         bucketRepository.insertElement(
-                Element.of(element.getId(), getBucketNameAccordinglyToSpace(element.getBucketName()), element.getFields()));
+                Element.of(element.getId(), element.getBucketName(), element.getFields()));
     }
 
-    public void removeElement(String bucketName, String elementId) {
-        bucketRepository.removeElement(getBucketNameAccordinglyToSpace(bucketName), elementId);
+    public void removeElement(BucketName bucketName, String elementId) {
+        bucketRepository.removeElement(bucketName, elementId);
     }
 
     public void updateElement(VersionedElement toUpdate) {
         VersionedElement withBucketRenamed = toUpdate.getVersion()
-                .map(v -> VersionedElement.of(toUpdate.getId(), getBucketNameAccordinglyToSpace(toUpdate.getBucketName()),
+                .map(v -> VersionedElement.of(toUpdate.getId(), toUpdate.getBucketName(),
                         toUpdate.getFields(), v))
-                .orElseGet(() -> VersionedElement.of(toUpdate.getId(), getBucketNameAccordinglyToSpace(toUpdate.getBucketName()),
+                .orElseGet(() -> VersionedElement.of(toUpdate.getId(), toUpdate.getBucketName(),
                         toUpdate.getFields()));
         bucketRepository.updateElement(withBucketRenamed);
     }
 
-    public VersionedElement getElement(String bucketName, String id) {
-        VersionedElement versionedElement = bucketRepository.getElement(getBucketNameAccordinglyToSpace(bucketName), id);
+    public VersionedElement getElement(BucketName bucketName, String id) {
+        VersionedElement versionedElement = bucketRepository.getElement(bucketName, id);
         return VersionedElement.of(versionedElement.getId(), bucketName,
                 versionedElement.getFields(), versionedElement.getVersionOrThrowErrorIfEmpty());
     }
 
-    public VersionedElement getElement(String bucketName, String id, long version) {
-        VersionedElement versionedElement = bucketRepository.getElement(getBucketNameAccordinglyToSpace(bucketName), id, version);
+    public VersionedElement getElement(BucketName bucketName, String id, long version) {
+        VersionedElement versionedElement = bucketRepository.getElement(bucketName, id, version);
         return VersionedElement.of(versionedElement.getId(), bucketName,
                 versionedElement.getFields(), versionedElement.getVersionOrThrowErrorIfEmpty());
     }
 
-    long getNumberOfElements(String bucketName) {
-        return bucketRepository.getNumberOfElements(getBucketNameAccordinglyToSpace(bucketName));
+    public long getNumberOfElements(BucketName bucketName) {
+        return bucketRepository.getNumberOfElements(bucketName);
     }
 
-    List<Element> filterElements(BucketQuery query) {
-        return bucketRepository.filterElements(rebuildForProperSpace(query)).stream()
+    public List<Element> filterElements(BucketQuery query) {
+        return bucketRepository.filterElements(query).stream()
                 .map(it -> Element.of(it.getId(), query.getBucketName(), it.getFields()))
                 .collect(Collectors.toList());
     }
 
-    boolean elementExists(String bucketName, String elementId) {
-        return bucketRepository.elementExists(getBucketNameAccordinglyToSpace(bucketName), elementId);
-    }
-
-    private String getBucketNameAccordinglyToSpace(String bucketName) {
-        return NamesResolver.resolve(spaceName, bucketName);
-    }
-
-    private BucketQuery rebuildForProperSpace(BucketQuery query) {
-        return BucketQuery.of(getBucketNameAccordinglyToSpace(query.getBucketName()), query.getLimit(),
-                query.getOffset(), query.getQuery());
+    public boolean elementExists(BucketName bucketName, String elementId) {
+        return bucketRepository.elementExists(bucketName, elementId);
     }
 }
