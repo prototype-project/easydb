@@ -11,20 +11,24 @@ import reactor.core.scheduler.Schedulers;
 
 public class BucketEventsObserver {
     private static int POLL_INTERVAL_MILLIS = 100;
-    private final BlockingQueue eventsQueue;
+    private final BlockingQueue<ElementEvent> eventsQueue;
     private final ExecutorService executorService;
 
     BucketEventsObserver(int capacity, ExecutorService executorService) {
-        this.eventsQueue = new LinkedBlockingQueue(capacity);
+        this.eventsQueue = new LinkedBlockingQueue<>(capacity);
         this.executorService = executorService;
     }
 
     public Flux<ElementEvent> observe() {
-        return Flux.interval(Duration.ofMillis(POLL_INTERVAL_MILLIS), Schedulers.fromExecutor(executorService))
+        return Flux.interval(Duration.ofMillis(POLL_INTERVAL_MILLIS))
+                .publishOn(Schedulers.fromExecutorService(executorService))
                 .flatMap(i -> Flux.fromIterable(getAvailableEvents()));
     }
 
-    @SuppressWarnings("unchecked")
+    public void addEvent(ElementEvent event) {
+        eventsQueue.offer(event);
+    }
+
     private List<ElementEvent> getAvailableEvents() {
         List<ElementEvent> events = new ArrayList<>();
         eventsQueue.drainTo(events);

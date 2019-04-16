@@ -2,21 +2,23 @@ package com.easydb.easydb.infrastructure.bucket.graphql;
 
 import com.coxautodev.graphql.tools.GraphQLSubscriptionResolver;
 import com.easydb.easydb.domain.bucket.BucketEventsObserver;
-import com.easydb.easydb.domain.bucket.ElementEvent;
 import java.util.Optional;
-import reactor.core.publisher.Flux;
+import org.reactivestreams.Publisher;
 
 public class Subscription implements GraphQLSubscriptionResolver {
     final static String DEFAULT_GRAPHQL_SUBSCRIPTION =
-                    "{                    \n" +
-                    "  elementEvents {    \n" +
-                    "          id         \n" +
-                    "          fields {   \n" +
-                    "              name   \n" +
-                    "              value  \n" +
-                    "          }          \n" +
-                    "      }              \n" +
-                    "}                    \n";
+                    " subscription {                   \n" +
+                    "     elementsEvents {             \n" +
+                    "         type                     \n" +
+                    "         element {                \n" +
+                    "             id                   \n" +
+                    "             fields {             \n" +
+                    "                 name             \n" +
+                    "                         value    \n" +
+                    "             }                    \n" +
+                    "         }                        \n" +
+                    "     }                            \n" +
+                    " }                                \n";
 
     private final BucketEventsObserver eventsObserver;
 
@@ -24,8 +26,9 @@ public class Subscription implements GraphQLSubscriptionResolver {
         this.eventsObserver = eventsObserver;
     }
 
-    public Flux<ElementEvent> elementEvents(Optional<ElementFilter> filter) {
+    public Publisher<GraphQlElementEvent> elementsEvents(Optional<ElementFilter> filter) {
         return eventsObserver.observe()
+                .map(GraphQlElementEvent::of)
                 .filter(elementEvent -> ElementEventsFilter.filter(elementEvent, filter));
     }
 }

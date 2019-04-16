@@ -46,13 +46,14 @@ public class BucketConfig {
     BucketService bucketServiceFactory(
             BucketRepository bucketRepository, SpaceRepository spaceRepository,
             ElementService elementService,
+            BucketObserversContainer observersContainer,
             OptimizedTransactionManager optimizedTransactionManager,
             BucketLocker bucketLocker,
             SpaceLocker spaceLocker,
             @Qualifier("transactionRetryer") Retryer transactionRetryer,
             @Qualifier("lockerRetryer") Retryer lockerRetryer) {
         return new TransactionalBucketService(spaceRepository, bucketRepository,
-                elementService, optimizedTransactionManager, bucketLocker,
+                elementService, observersContainer, optimizedTransactionManager, bucketLocker,
                 spaceLocker, transactionRetryer, lockerRetryer);
     }
 

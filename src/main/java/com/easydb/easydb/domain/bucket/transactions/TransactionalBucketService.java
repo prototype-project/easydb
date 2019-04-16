@@ -2,9 +2,11 @@ package com.easydb.easydb.domain.bucket.transactions;
 
 import com.easydb.easydb.domain.BucketName;
 import com.easydb.easydb.domain.bucket.BucketAlreadyExistsException;
+import com.easydb.easydb.domain.bucket.BucketObserversContainer;
 import com.easydb.easydb.domain.bucket.BucketQuery;
 import com.easydb.easydb.domain.bucket.BucketService;
 import com.easydb.easydb.domain.bucket.Element;
+import com.easydb.easydb.domain.bucket.ElementEvent;
 import com.easydb.easydb.domain.bucket.ElementService;
 import com.easydb.easydb.domain.locker.BucketLocker;
 import com.easydb.easydb.domain.locker.SpaceLocker;
@@ -16,6 +18,7 @@ import com.easydb.easydb.domain.transactions.OptimizedTransactionManager;
 import com.easydb.easydb.domain.transactions.Retryer;
 import com.easydb.easydb.domain.transactions.Transaction;
 
+import java.util.Collections;
 import java.util.List;
 
 public class TransactionalBucketService implements BucketService {
@@ -24,6 +27,7 @@ public class TransactionalBucketService implements BucketService {
     private final BucketRepository bucketRepository;
     private final OptimizedTransactionManager optimizedTransactionManager;
     private final ElementService elementService;
+    private final BucketObserversContainer observersContainer;
     private final BucketLocker bucketLocker;
     private final SpaceLocker spaceLocker;
     private final Retryer transactionRetryer;
@@ -32,6 +36,7 @@ public class TransactionalBucketService implements BucketService {
     public TransactionalBucketService(SpaceRepository spaceRepository,
                                       BucketRepository bucketRepository,
                                       ElementService elementService,
+                                      BucketObserversContainer observersContainer,
                                       OptimizedTransactionManager optimizedTransactionManager,
                                       BucketLocker bucketLocker,
                                       SpaceLocker spaceLocker,
@@ -40,6 +45,7 @@ public class TransactionalBucketService implements BucketService {
         this.spaceRepository = spaceRepository;
         this.bucketRepository = bucketRepository;
         this.elementService = elementService;
+        this.observersContainer = observersContainer;
         this.optimizedTransactionManager = optimizedTransactionManager;
         this.bucketLocker = bucketLocker;
         this.spaceLocker = spaceLocker;
@@ -90,6 +96,8 @@ public class TransactionalBucketService implements BucketService {
     @Override
     public void addElement(Element element) {
         elementService.addElement(element);
+        observersContainer.provide(element.getBucketName())
+                .addEvent(new ElementEvent(element, ElementEvent.Type.CREATE));
     }
 
     @Override
@@ -103,6 +111,10 @@ public class TransactionalBucketService implements BucketService {
         Operation operation = Operation.of(OperationType.DELETE, bucketName.getName(), elementId);
         optimizedTransactionManager.addOperation(transaction, operation);
         transactionRetryer.performWithRetries(() -> optimizedTransactionManager.commitTransaction(transaction));
+
+        Element dummyElement = Element.of(elementId, bucketName, Collections.emptyList());
+        observersContainer.provide(bucketName)
+                .addEvent(new ElementEvent(dummyElement, ElementEvent.Type.DELETE));
     }
 
     @Override
@@ -111,11 +123,14 @@ public class TransactionalBucketService implements BucketService {
     }
 
     @Override
-    public void updateElement(Element toUpdate) {
-        Transaction transaction = optimizedTransactionManager.beginTransaction(toUpdate.getBucketName().getSpaceName());
-        Operation operation = Operation.of(OperationType.UPDATE, toUpdate);
+    public void updateElement(Element updated) {
+        Transaction transaction = optimizedTransactionManager.beginTransaction(updated.getBucketName().getSpaceName());
+        Operation operation = Operation.of(OperationType.UPDATE, updated);
         optimizedTransactionManager.addOperation(transaction, operation);
         transactionRetryer.performWithRetries(() -> optimizedTransactionManager.commitTransaction(transaction));
+
+        observersContainer.provide(updated.getBucketName())
+                .addEvent(new ElementEvent(updated, ElementEvent.Type.UPDATE));
     }
 
     @Override

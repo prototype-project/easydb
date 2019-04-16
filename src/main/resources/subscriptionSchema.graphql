@@ -15,8 +15,8 @@ enum GraphQlElementEventType {
 }
 
 type GraphQlElementEvent {
-    type: EventType!
-    element: GraphQlElement
+    type: GraphQlElementEventType!
+    element: GraphQlElement!
 }
 
 input ElementFilter {
@@ -30,10 +30,13 @@ input FieldFilter {
     value: String!
 }
 
+type Query {}
+
 type Subscription {
-    elementEvents(filter: ElementFilter): GraphQlElementEvent
+    elementsEvents(filter: ElementFilter): GraphQlElementEvent!
 }
 
 schema {
+    query: Query
     subscription: Subscription
 }

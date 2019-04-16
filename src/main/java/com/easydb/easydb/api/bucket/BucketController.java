@@ -5,7 +5,9 @@ import com.easydb.easydb.domain.BucketName;
 import com.easydb.easydb.domain.bucket.BucketQuery;
 import com.easydb.easydb.domain.bucket.BucketService;
 import com.easydb.easydb.domain.bucket.BucketEventsPublisher;
+import com.easydb.easydb.domain.bucket.BucketSubscriptionQuery;
 import com.easydb.easydb.domain.bucket.Element;
+import com.easydb.easydb.domain.bucket.ElementEvent;
 import com.easydb.easydb.domain.space.UUIDProvider;
 
 import java.util.List;
@@ -118,7 +120,7 @@ class BucketController {
                 results);
     }
 
-//    @GetMapping(path = "/{bucketName}/elements")
+//    @GetMapping(path = "/{bucketName}/elementsEvents")
 //    @ResponseStatus(value = HttpStatus.OK)
 //    ElementEvent subscribeForChanges(
 //            @PathVariable("spaceName") String spaceName,
@@ -126,8 +128,8 @@ class BucketController {
 //            @RequestParam(value = "query") Optional<String> query,
 //            HttpServletRequest request) {
 //        Optional<String> uriDecodedQuery = query.map(UriEncoder::decode);
-//        BucketSubscriptionQuery subscriptionQuery = BucketSubscriptionQuery.of(spaceName, bucketName, query);
-//        return bucketEventsPublisher.subscribe(subscriptionQuery).next().block();
+//        BucketSubscriptionQuery subscriptionQuery = BucketSubscriptionQuery.of(new BucketName(spaceName, bucketName), query);
+//        return bucketEventsPublisher.subscription(subscriptionQuery).next().block();
 //    }
 
     private static String getNextPageLink(long numberOfElements, int limit, int offset,

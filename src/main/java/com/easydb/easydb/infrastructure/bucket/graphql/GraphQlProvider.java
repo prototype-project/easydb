@@ -1,5 +1,6 @@
 package com.easydb.easydb.infrastructure.bucket.graphql;
 
+import com.coxautodev.graphql.tools.GraphQLQueryResolver;
 import com.coxautodev.graphql.tools.SchemaParser;
 import com.easydb.easydb.domain.bucket.BucketEventsObserver;
 import com.easydb.easydb.domain.bucket.BucketObserversContainer;
@@ -48,7 +49,7 @@ public class GraphQlProvider {
         BucketEventsObserver observer = observersContainer.provide(subscriptionQuery.getBucketName());
 
         GraphQLSchema graphQLSchema = SchemaParser.newParser().schemaString(subscriptionSchema)
-                .resolvers(new Subscription(observer))
+                .resolvers(new GraphQLQueryResolver() {} ,new Subscription(observer))
                 .build()
                 .makeExecutableSchema();
 
