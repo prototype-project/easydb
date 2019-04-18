@@ -3,8 +3,8 @@ package com.easydb.easydb.infrastructure.bucket
 import com.easydb.easydb.IntegrationWithCleanedDatabaseSpec
 import com.easydb.easydb.domain.bucket.BucketEventsPublisher
 import com.easydb.easydb.domain.bucket.BucketSubscriptionQuery
-import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.bucket.ElementEvent
+import com.easydb.easydb.domain.bucket.ElementField
 import org.springframework.beans.factory.annotation.Autowired
 import reactor.core.publisher.Flux
 
@@ -19,7 +19,30 @@ class BucketSubscribingTest extends IntegrationWithCleanedDatabaseSpec {
     @Autowired
     BucketEventsPublisher bucketEventsPublisher
 
+    def danielFaderski = builder()
+            .bucketName(TEST_BUCKET_NAME)
+            .clearFields()
+            .addField(ElementField.of("firstName", "Daniel"))
+            .addField(ElementField.of("lastName", "Faderski"))
+            .build()
+
+    def janBrzechwa = builder()
+            .bucketName(TEST_BUCKET_NAME)
+            .clearFields()
+            .addField(ElementField.of("firstName", "Jan"))
+            .addField(ElementField.of("lastName", "Brzechwa"))
+            .build()
+
+    def jurekOgorek = builder()
+            .bucketName(TEST_BUCKET_NAME)
+            .clearFields()
+            .addField(ElementField.of("firstName", "Jurek"))
+            .addField(ElementField.of("lastName", "Ogórek"))
+            .build()
+
+
     def setup() {
+        makeBucketChanges()
         bucketService.createBucket(TEST_BUCKET_NAME)
     }
 
@@ -31,35 +54,71 @@ class BucketSubscribingTest extends IntegrationWithCleanedDatabaseSpec {
     }
 
     def "should subscribe to all data changes"() {
-        given:
-        Element toCreate = builder().bucketName(TEST_BUCKET_NAME).build()
-
-        Executors.newSingleThreadScheduledExecutor().schedule({
-            bucketService.addElement(toCreate)
-        }, 50, TimeUnit.MILLISECONDS)
-
-        String eventsQuery = """
-              subscription {
-                elementsEvents {  
-                        type
-                        element {
-                            id
-                            fields { 
-                                name 
-                                value
-                            }
-                        }
-                    }
-                }            
-        """
         when:
-        Flux<ElementEvent> allEvents = bucketEventsPublisher.subscription(new BucketSubscriptionQuery(TEST_BUCKET_NAME, Optional.of(eventsQuery)))
+        Flux<ElementEvent> eventFlux = bucketEventsPublisher.subscription(new BucketSubscriptionQuery(TEST_BUCKET_NAME, Optional.empty()))
 
         then:
-        ElementEvent event = allEvents.take(1).blockFirst(Duration.ofMillis(1000))
-        with(event) {
-            event.type == ElementEvent.Type.CREATE
-            event.element == toCreate
+        List<ElementEvent> receivedEvents = eventFlux.take(3).collectList().block(Duration.ofMillis(10000))
+        receivedEvents as Set == [new ElementEvent(danielFaderski, ElementEvent.Type.CREATE), new ElementEvent(janBrzechwa, ElementEvent.Type.CREATE),
+                                  new ElementEvent(jurekOgorek, ElementEvent.Type.CREATE)] as Set
+
+    }
+
+    def "should subscribe to changes with query using `or` operator"() {
+        given:
+        String query = """
+        {   
+            subscription {
+                elementsEvents(filter: {
+                    or: [
+                            {
+                                fieldsFilters: [
+                                    {
+                                        name: "firstName"
+                                        value: "Jan"
+                                    }
+                                ]
+                            },
+                            {
+                                fieldsFilters: [
+                                    {
+                                        name: "lastName"
+                                        value: "Faderski"
+                                    }
+                                ]
+                            }
+                        ]
+                }
+            }) {
+                type                 
+                element {            
+                    id               
+                    fields {         
+                        name         
+                        value
+                    }                
+                } 
+            }
         }
+        """
+
+        makeBucketChanges()
+
+        when:
+        Flux<ElementEvent> eventFlux = bucketEventsPublisher.subscription(new BucketSubscriptionQuery(TEST_BUCKET_NAME, Optional.of(query)))
+
+        then:
+        List<ElementEvent> receivedEvents = eventFlux.take(2).collectList().block(Duration.ofMillis(1000))
+
+        receivedEvents as Set == [new ElementEvent(danielFaderski, ElementEvent.Type.CREATE), new ElementEvent(janBrzechwa, ElementEvent.Type.CREATE)]
+
+    }
+
+    def makeBucketChanges() {
+        Executors.newSingleThreadScheduledExecutor().schedule({
+            bucketService.addElement(danielFaderski)
+            bucketService.addElement(janBrzechwa)
+            bucketService.addElement(jurekOgorek)
+        }, 100, TimeUnit.MILLISECONDS)
     }
 }

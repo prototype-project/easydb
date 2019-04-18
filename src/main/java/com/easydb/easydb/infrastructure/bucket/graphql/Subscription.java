@@ -14,7 +14,7 @@ public class Subscription implements GraphQLSubscriptionResolver {
                     "             id                   \n" +
                     "             fields {             \n" +
                     "                 name             \n" +
-                    "                         value    \n" +
+                    "                 value            \n" +
                     "             }                    \n" +
                     "         }                        \n" +
                     "     }                            \n" +

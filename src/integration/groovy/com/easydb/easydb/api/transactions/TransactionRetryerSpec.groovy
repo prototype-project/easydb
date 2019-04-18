@@ -2,6 +2,7 @@ package com.easydb.easydb.api.transactions
 
 import com.easydb.easydb.ElementTestBuilder
 import com.easydb.easydb.IntegrationWithCleanedDatabaseSpec
+import com.easydb.easydb.domain.bucket.BucketObserversContainer
 import com.easydb.easydb.domain.bucket.ElementService
 import com.easydb.easydb.domain.bucket.transactions.BucketRepository
 import com.easydb.easydb.domain.bucket.BucketService
@@ -40,7 +41,11 @@ class TransactionRetryerSpec extends IntegrationWithCleanedDatabaseSpec {
     @Autowired
     BucketLocker bucketLocker
 
+    @Autowired
+    BucketObserversContainer observersContainer
+
     BucketService mockedBucketService
+
 
     Element element = ElementTestBuilder.builder().build()
 
@@ -48,8 +53,8 @@ class TransactionRetryerSpec extends IntegrationWithCleanedDatabaseSpec {
 
     def setup() {
         mockedBucketService = new TransactionalBucketService(Mock(SpaceRepository),
-                Mock(BucketRepository), Mock(ElementService), optimizedTransactionManagerMock,
-                bucketLocker, spaceLocker, transactionRetryer, lockerRetryer)
+                Mock(BucketRepository), Mock(ElementService), observersContainer,
+                optimizedTransactionManagerMock, bucketLocker, spaceLocker, transactionRetryer, lockerRetryer)
 
     }
 

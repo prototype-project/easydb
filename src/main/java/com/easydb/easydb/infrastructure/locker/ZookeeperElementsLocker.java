@@ -95,13 +95,13 @@ public class ZookeeperElementsLocker implements ElementsLocker {
 
     @Override
     public void lockElement(BucketName bucketName, String elementId, Duration timeout) {
-        metrics.elementLockingTimer(bucketName.getSpaceName(), bucketName.getName()).record(
+        metrics.elementLockingTimer(bucketName).record(
                 () -> lockWithoutTimer(bucketName, elementId, timeout));
     }
 
     @Override
     public void unlockElement(BucketName bucketName, String elementId) {
-        metrics.elementUnlockingTimer(bucketName.getSpaceName(), bucketName.getName()).record(
+        metrics.elementUnlockingTimer(bucketName).record(
                 () -> unlockWithoutTimer(bucketName, elementId));
     }
 
@@ -113,23 +113,23 @@ public class ZookeeperElementsLocker implements ElementsLocker {
         try {
             acquired = elementLock.curatorLock().acquire(timeout.toMillis(), TimeUnit.MILLISECONDS);
         } catch (Exception e) {
-            metrics.elementLockerErrorCounter(bucketName.getSpaceName(), bucketName.getName()).increment();
+            metrics.elementLockerErrorCounter(bucketName).increment();
             throw new UnexpectedLockerException(e);
         }
         if (!acquired) {
-            metrics.elementLockerTimeoutsCounter(bucketName.getSpaceName(), bucketName.getName()).increment();
+            metrics.elementLockerTimeoutsCounter(bucketName).increment();
             throw new LockTimeoutException(bucketName, elementId, timeout);
         } else {
             elementLock.incrementLockCount();
             locksMap.putIfAbsent(ElementKey.of(bucketName, elementId), elementLock);
         }
-        metrics.elementsLockerCounter(bucketName.getSpaceName(), bucketName.getName()).increment();
+        metrics.elementsLockerCounter(bucketName).increment();
     }
 
     private void unlockWithoutTimer(BucketName bucketName, String elementId) {
         ElementLock elementLock = locksMap.get(ElementKey.of(bucketName, elementId));
         if (elementLock == null) {
-            metrics.elementLockerErrorCounter(bucketName.getSpaceName(), bucketName.getName()).increment();
+            metrics.elementLockerErrorCounter(bucketName).increment();
             throw new LockNotHoldException(buildLockPath(bucketName, elementId));
         }
 
@@ -139,9 +139,9 @@ public class ZookeeperElementsLocker implements ElementsLocker {
             if (elementLock.lockCount() == 0) {
                 locksMap.remove(ElementKey.of(bucketName, elementId));
             }
-            metrics.elementsLockerUnlockedCounter(bucketName.getSpaceName(), bucketName.getName()).increment();
+            metrics.elementsLockerUnlockedCounter(bucketName).increment();
         } catch (Exception e) {
-            metrics.elementLockerErrorCounter(bucketName.getSpaceName(), bucketName.getName()).increment();
+            metrics.elementLockerErrorCounter(bucketName).increment();
             throw new UnexpectedLockerException(e);
         }
     }

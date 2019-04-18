@@ -1,6 +1,7 @@
 package com.easydb.easydb.api.transaction;
 
 import com.easydb.easydb.config.ApplicationMetrics;
+import com.easydb.easydb.domain.BucketName;
 import com.easydb.easydb.domain.space.UUIDProvider;
 import com.easydb.easydb.domain.transactions.OperationResult;
 import com.easydb.easydb.domain.transactions.PersistentTransactionManager;
@@ -42,8 +43,9 @@ class TransactionController {
                                     @PathVariable("transactionId") String transactionId,
                                     @RequestBody @Valid OperationDto dto) {
         OperationResult operationResult = persistentTransactionManager.addOperation(transactionId, dto.toDomain(uuidProvider));
-        metrics.addOperationToTransactionRequestCounter(operationResult.getSpaceName(), dto.getBucketName(),
-                dto.getType().toString()).increment();
+
+        BucketName bucketName = new BucketName(operationResult.getSpaceName(), dto.getBucketName());
+        metrics.addOperationToTransactionRequestCounter(bucketName, dto.getType().toString()).increment();
         return OperationResultDto.of(operationResult);
     }
 

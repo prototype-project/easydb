@@ -63,7 +63,7 @@ class BucketController {
         Element element = toCreate.toDomain(uuidProvider.generateUUID(), new BucketName(spaceName, bucketName));
         bucketService.addElement(element);
 
-        metrics.addElementRequestsCounter(spaceName, bucketName).increment();
+        metrics.addElementRequestsCounter(new BucketName(spaceName, bucketName)).increment();
         return ElementQueryDto.of(element);
     }
 
@@ -74,7 +74,7 @@ class BucketController {
             @PathVariable("bucketName") String bucketName,
             @PathVariable("elementId") String elementId) {
         bucketService.removeElement(new BucketName(spaceName, bucketName), elementId);
-        metrics.deleteElementRequestsCounter(spaceName, bucketName).increment();
+        metrics.deleteElementRequestsCounter(new BucketName(spaceName, bucketName)).increment();
     }
 
     @PutMapping(path = "/{bucketName}/elements/{elementId}")
@@ -85,7 +85,7 @@ class BucketController {
             @PathVariable("elementId") String elementId,
             @RequestBody @Valid ElementCrudDto toUpdate) {
         bucketService.updateElement(toUpdate.toDomain(elementId, new BucketName(spaceName, bucketName)));
-        metrics.updateElementRequestsCounter(spaceName, bucketName).increment();
+        metrics.updateElementRequestsCounter(new BucketName(spaceName, bucketName)).increment();
     }
 
     @GetMapping(path = "/{bucketName}/elements/{elementId}")
@@ -94,7 +94,7 @@ class BucketController {
             @PathVariable("spaceName") String spaceName,
             @PathVariable("bucketName") String bucketName,
             @PathVariable("elementId") String elementId) {
-        metrics.getElementRequestsCounter(spaceName, bucketName).increment();
+        metrics.getElementRequestsCounter(new BucketName(spaceName, bucketName)).increment();
         return ElementQueryDto.of(bucketService.getElement(new BucketName(spaceName, bucketName), elementId));
     }
 
@@ -114,7 +114,7 @@ class BucketController {
                 .map(ElementQueryDto::of)
                 .collect(Collectors.toList());
 
-        metrics.filterElementsRequestsCounter(spaceName, bucketName).increment();
+        metrics.filterElementsRequestsCounter(new BucketName(spaceName, bucketName)).increment();
         return PaginatedElementsDto.of(
                 getNextPageLink(bucketService.getNumberOfElements(new BucketName(spaceName, bucketName)), limit, offset, request),
                 results);

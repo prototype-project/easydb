@@ -30,13 +30,13 @@ public class ZookeeperBucketLocker implements BucketLocker {
 
     @Override
     public void lockBucket(BucketName bucketName, Duration timeout) {
-        metrics.bucketLockingTimer(bucketName.getSpaceName(), bucketName.getName()).record(
+        metrics.bucketLockingTimer(bucketName).record(
                 () -> lockWithoutTimer(bucketName, timeout));
     }
 
     @Override
     public void unlockBucket(BucketName bucketName) {
-        metrics.bucketUnLockingTimer(bucketName.getSpaceName(), bucketName.getName()).record(
+        metrics.bucketUnLockingTimer(bucketName).record(
                 () -> unlockWithoutTimer(bucketName));
     }
 
@@ -46,26 +46,26 @@ public class ZookeeperBucketLocker implements BucketLocker {
         try {
             acquired = zookeeperLocker.lockOnPath(buildLockPath(bucketName), timeout);
         } catch (Exception e) {
-            metrics.bucketLockerErrorCounter(bucketName.getSpaceName(), bucketName.getName()).increment();
+            metrics.bucketLockerErrorCounter(bucketName).increment();
             throw new UnexpectedLockerException(e);
         }
         if (!acquired) {
-            metrics.bucketLockerTimeoutsCounter(bucketName.getSpaceName(), bucketName.getName()).increment();
+            metrics.bucketLockerTimeoutsCounter(bucketName).increment();
             throw new LockTimeoutException(bucketName, timeout);
         }
-        metrics.bucketLockerCounter(bucketName.getSpaceName(), bucketName.getName()).increment();
+        metrics.bucketLockerCounter(bucketName).increment();
     }
 
 
     private void unlockWithoutTimer(BucketName bucketName) {
         try {
             zookeeperLocker.unlockOnPath(buildLockPath(bucketName));
-            metrics.bucketLockerUnlockedCounter(bucketName.getSpaceName(), bucketName.getName()).increment();
+            metrics.bucketLockerUnlockedCounter(bucketName).increment();
         } catch (LockNotHoldException e) {
-            metrics.bucketLockerErrorCounter(bucketName.getSpaceName(), bucketName.getName()).increment();
+            metrics.bucketLockerErrorCounter(bucketName).increment();
             throw e;
         } catch (Exception e) {
-            metrics.bucketLockerErrorCounter(bucketName.getSpaceName(), bucketName.getName()).increment();
+            metrics.bucketLockerErrorCounter(bucketName).increment();
             throw new UnexpectedLockerException(e);
         }
     }

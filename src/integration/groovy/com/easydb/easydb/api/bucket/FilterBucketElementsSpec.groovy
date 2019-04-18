@@ -50,7 +50,7 @@ class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOp
                         .build())).getBody()
     }
 
-    def "should filter elements with `and` operator"() {
+    def "should filter elements with `or` operator"() {
         given: "given query to find all people with lastName 'Faderski' or name 'Jan'"
         String query = """
         {
@@ -91,7 +91,7 @@ class FilterBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOp
         elements.results as Set == [janBrzechwa, danielFaderski] as Set
     }
 
-    def "should filter elements with `or` operator"() {
+    def "should filter elements with `and` operator"() {
         given: "given query to find all people with lastName 'Faderski' and name 'Daniel'"
         String query = """
         {
