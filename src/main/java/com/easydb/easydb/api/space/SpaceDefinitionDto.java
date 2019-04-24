@@ -1,6 +1,5 @@
 package com.easydb.easydb.api.space;
 
-import com.easydb.easydb.domain.space.Space;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -15,9 +14,5 @@ public class SpaceDefinitionDto {
 
     public String getSpaceName() {
         return spaceName;
-    }
-
-    Space toDomain() {
-        return Space.of(spaceName);
     }
 }

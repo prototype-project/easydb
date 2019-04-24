@@ -3,7 +3,7 @@ package com.easydb.easydb.api.bucket
 import com.easydb.easydb.BaseIntegrationSpec
 import com.easydb.easydb.ElementTestBuilder
 import com.easydb.easydb.TestHttpOperations
-import com.easydb.easydb.domain.BucketName
+import com.easydb.easydb.domain.bucket.BucketName
 import com.easydb.easydb.domain.bucket.ElementField
 import org.springframework.web.client.HttpClientErrorException;
 

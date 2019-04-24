@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 import org.hibernate.validator.constraints.NotEmpty;
 
-public class ElementFieldDto implements Comparable<ElementFieldDto> {
+public class ElementFieldDto {
     @NotEmpty
     private final String name;
 
@@ -31,11 +31,6 @@ public class ElementFieldDto implements Comparable<ElementFieldDto> {
 
     public ElementField toDomain() {
         return ElementField.of(name, value);
-    }
-
-    @Override
-    public int compareTo(ElementFieldDto o) {
-        return name.compareTo(o.name);
     }
 
     @Override

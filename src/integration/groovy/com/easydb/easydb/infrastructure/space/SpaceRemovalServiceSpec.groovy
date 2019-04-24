@@ -1,7 +1,7 @@
 package com.easydb.easydb.infrastructure.space
 
 import com.easydb.easydb.BaseIntegrationSpec
-import com.easydb.easydb.domain.BucketName
+import com.easydb.easydb.domain.bucket.BucketName
 import com.easydb.easydb.domain.bucket.transactions.BucketRepository
 import com.easydb.easydb.domain.bucket.BucketService
 import com.easydb.easydb.domain.space.Space

@@ -1,6 +1,6 @@
 package com.easydb.easydb.api.bucket;
 
-import com.easydb.easydb.domain.BucketName;
+import com.easydb.easydb.domain.bucket.BucketName;
 import com.easydb.easydb.domain.bucket.Element;
 
 import com.fasterxml.jackson.annotation.JsonCreator;

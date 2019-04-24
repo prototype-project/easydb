@@ -1,7 +1,7 @@
 package com.easydb.easydb.domain.transactions;
 
 import com.easydb.easydb.config.ApplicationMetrics;
-import com.easydb.easydb.domain.BucketName;
+import com.easydb.easydb.domain.bucket.BucketName;
 import com.easydb.easydb.domain.bucket.ElementService;
 import com.easydb.easydb.domain.space.UUIDProvider;
 import java.util.Optional;

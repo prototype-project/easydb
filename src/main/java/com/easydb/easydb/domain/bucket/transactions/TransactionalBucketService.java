@@ -1,6 +1,6 @@
 package com.easydb.easydb.domain.bucket.transactions;
 
-import com.easydb.easydb.domain.BucketName;
+import com.easydb.easydb.domain.bucket.BucketName;
 import com.easydb.easydb.domain.bucket.BucketAlreadyExistsException;
 import com.easydb.easydb.domain.bucket.BucketObserversContainer;
 import com.easydb.easydb.domain.bucket.BucketQuery;

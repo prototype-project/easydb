@@ -1,6 +1,5 @@
 package com.easydb.easydb.domain.bucket;
 
-import com.easydb.easydb.domain.BucketName;
 import com.easydb.easydb.domain.bucket.transactions.VersionedElement;
 import java.util.List;
 

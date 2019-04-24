@@ -2,7 +2,7 @@ package com.easydb.easydb.infrastructure.locker;
 
 import com.easydb.easydb.config.ApplicationMetrics;
 import com.easydb.easydb.config.ZookeeperProperties;
-import com.easydb.easydb.domain.BucketName;
+import com.easydb.easydb.domain.bucket.BucketName;
 import com.easydb.easydb.domain.locker.BucketLocker;
 import com.easydb.easydb.domain.locker.LockNotHoldException;
 import com.easydb.easydb.domain.locker.LockTimeoutException;

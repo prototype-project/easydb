@@ -1,6 +1,5 @@
 package com.easydb.easydb.domain.bucket;
 
-import com.easydb.easydb.domain.BucketName;
 import com.google.common.collect.ImmutableList;
 
 import java.util.Collections;

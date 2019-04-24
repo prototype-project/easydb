@@ -1,6 +1,5 @@
 package com.easydb.easydb.domain.bucket;
 
-import com.easydb.easydb.domain.BucketName;
 import java.util.List;
 
 public interface BucketService {

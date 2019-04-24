@@ -1,6 +1,6 @@
 package com.easydb.easydb.infrastructure.bucket;
 
-import com.easydb.easydb.domain.BucketName;
+import com.easydb.easydb.domain.bucket.BucketName;
 import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.bucket.ElementField;
 import com.easydb.easydb.domain.bucket.transactions.VersionedElement;

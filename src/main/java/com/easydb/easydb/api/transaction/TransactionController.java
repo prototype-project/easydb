@@ -1,7 +1,7 @@
 package com.easydb.easydb.api.transaction;
 
 import com.easydb.easydb.config.ApplicationMetrics;
-import com.easydb.easydb.domain.BucketName;
+import com.easydb.easydb.domain.bucket.BucketName;
 import com.easydb.easydb.domain.space.UUIDProvider;
 import com.easydb.easydb.domain.transactions.OperationResult;
 import com.easydb.easydb.domain.transactions.PersistentTransactionManager;

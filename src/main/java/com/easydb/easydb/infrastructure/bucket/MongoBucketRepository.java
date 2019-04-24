@@ -1,7 +1,7 @@
 package com.easydb.easydb.infrastructure.bucket;
 
 import com.easydb.easydb.config.MongoProperties;
-import com.easydb.easydb.domain.BucketName;
+import com.easydb.easydb.domain.bucket.BucketName;
 import com.easydb.easydb.domain.bucket.BucketDoesNotExistException;
 import com.easydb.easydb.domain.bucket.BucketQuery;
 import com.easydb.easydb.domain.bucket.ElementAlreadyExistsException;

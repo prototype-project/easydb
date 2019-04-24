@@ -4,7 +4,7 @@ import com.easydb.easydb.BaseIntegrationSpec
 import com.easydb.easydb.ElementTestBuilder
 import com.easydb.easydb.ElementUtils
 import com.easydb.easydb.TestHttpOperations
-import com.easydb.easydb.domain.BucketName
+import com.easydb.easydb.domain.bucket.BucketName
 import com.easydb.easydb.domain.bucket.BucketQuery
 import com.easydb.easydb.domain.bucket.BucketService
 import com.easydb.easydb.domain.bucket.Element

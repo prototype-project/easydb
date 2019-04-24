@@ -1,10 +1,9 @@
 package com.easydb.easydb.infrastructure.bucket.graphql;
 
-import com.easydb.easydb.domain.BucketName;
+import com.easydb.easydb.domain.bucket.BucketName;
 import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.bucket.ElementEvent;
 import com.easydb.easydb.domain.bucket.ElementField;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;

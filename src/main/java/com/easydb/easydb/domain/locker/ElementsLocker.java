@@ -1,6 +1,6 @@
 package com.easydb.easydb.domain.locker;
 
-import com.easydb.easydb.domain.BucketName;
+import com.easydb.easydb.domain.bucket.BucketName;
 import java.time.Duration;
 
 public interface ElementsLocker {

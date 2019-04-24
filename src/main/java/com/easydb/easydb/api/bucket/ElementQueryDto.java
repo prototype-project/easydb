@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -22,7 +21,6 @@ public class ElementQueryDto {
             @JsonProperty("id") String id,
             @JsonProperty("fields") List<ElementFieldDto> fields) {
         this.id = id;
-        Collections.sort(fields);
         this.fields = ImmutableList.copyOf(fields);
     }
 

@@ -1,9 +1,6 @@
 package com.easydb.easydb.api.transaction;
 
 import com.easydb.easydb.api.bucket.ElementFieldDto;
-import com.easydb.easydb.api.bucket.ElementFieldsMustNotBeNullException;
-import com.easydb.easydb.api.bucket.ElementIdMustBeEmptyException;
-import com.easydb.easydb.api.bucket.ElementIdMustNotBeEmptyException;
 import com.easydb.easydb.domain.bucket.ElementField;
 import com.easydb.easydb.domain.space.UUIDProvider;
 import com.easydb.easydb.domain.transactions.Operation;
@@ -12,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Strings;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
@@ -47,7 +43,6 @@ public class OperationDto {
         this.bucketName = bucketName;
         this.elementId = elementId;
         this.fields = fields;
-        Collections.sort(fields);
         validate();
     }
 

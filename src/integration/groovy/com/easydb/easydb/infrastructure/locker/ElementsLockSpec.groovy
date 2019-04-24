@@ -1,7 +1,7 @@
 package com.easydb.easydb.infrastructure.locker
 
 import com.easydb.easydb.BaseIntegrationSpec
-import com.easydb.easydb.domain.BucketName
+import com.easydb.easydb.domain.bucket.BucketName
 import com.easydb.easydb.domain.locker.ElementsLocker
 import com.easydb.easydb.domain.locker.LockNotHoldException
 import com.easydb.easydb.domain.locker.LockTimeoutException

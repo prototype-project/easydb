@@ -1,13 +1,10 @@
 package com.easydb.easydb.api.bucket;
 
 import com.easydb.easydb.config.ApplicationMetrics;
-import com.easydb.easydb.domain.BucketName;
+import com.easydb.easydb.domain.bucket.BucketName;
 import com.easydb.easydb.domain.bucket.BucketQuery;
 import com.easydb.easydb.domain.bucket.BucketService;
-import com.easydb.easydb.domain.bucket.BucketEventsPublisher;
-import com.easydb.easydb.domain.bucket.BucketSubscriptionQuery;
 import com.easydb.easydb.domain.bucket.Element;
-import com.easydb.easydb.domain.bucket.ElementEvent;
 import com.easydb.easydb.domain.space.UUIDProvider;
 
 import java.util.List;
@@ -27,17 +24,14 @@ class BucketController {
     private final UUIDProvider uuidProvider;
     private final ApplicationMetrics metrics;
     private final BucketService bucketService;
-    private final BucketEventsPublisher bucketEventsPublisher;
 
     BucketController(
             UUIDProvider uuidProvider,
             ApplicationMetrics metrics,
-            BucketService bucketService,
-            BucketEventsPublisher bucketEventsPublisher) {
+            BucketService bucketService) {
         this.uuidProvider = uuidProvider;
         this.metrics = metrics;
         this.bucketService = bucketService;
-        this.bucketEventsPublisher = bucketEventsPublisher;
     }
 
     @DeleteMapping(path = "/{bucketName}")
@@ -119,18 +113,6 @@ class BucketController {
                 getNextPageLink(bucketService.getNumberOfElements(new BucketName(spaceName, bucketName)), limit, offset, request),
                 results);
     }
-
-//    @GetMapping(path = "/{bucketName}/elementsEvents")
-//    @ResponseStatus(value = HttpStatus.OK)
-//    ElementEvent subscribeForChanges(
-//            @PathVariable("spaceName") String spaceName,
-//            @PathVariable("bucketName") String bucketName,
-//            @RequestParam(value = "query") Optional<String> query,
-//            HttpServletRequest request) {
-//        Optional<String> uriDecodedQuery = query.map(UriEncoder::decode);
-//        BucketSubscriptionQuery subscriptionQuery = BucketSubscriptionQuery.of(new BucketName(spaceName, bucketName), query);
-//        return bucketEventsPublisher.subscription(subscriptionQuery).next().block();
-//    }
 
     private static String getNextPageLink(long numberOfElements, int limit, int offset,
                                           HttpServletRequest request) {

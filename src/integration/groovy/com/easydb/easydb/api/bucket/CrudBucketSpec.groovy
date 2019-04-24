@@ -2,7 +2,7 @@ package com.easydb.easydb.api.bucket
 
 import com.easydb.easydb.BaseIntegrationSpec
 import com.easydb.easydb.TestHttpOperations
-import com.easydb.easydb.domain.BucketName
+import com.easydb.easydb.domain.bucket.BucketName
 import com.easydb.easydb.domain.bucket.BucketService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus

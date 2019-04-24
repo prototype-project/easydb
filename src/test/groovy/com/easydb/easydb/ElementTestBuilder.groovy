@@ -1,6 +1,6 @@
 package com.easydb.easydb
 
-import com.easydb.easydb.domain.BucketName
+import com.easydb.easydb.domain.bucket.BucketName
 import com.easydb.easydb.domain.bucket.Element
 import com.easydb.easydb.domain.bucket.ElementField
 

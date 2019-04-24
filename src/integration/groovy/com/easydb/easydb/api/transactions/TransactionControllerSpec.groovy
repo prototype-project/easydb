@@ -7,7 +7,7 @@ import com.easydb.easydb.TestHttpOperations
 import com.easydb.easydb.api.bucket.ElementFieldDto
 import com.easydb.easydb.api.transaction.OperationResultDto
 import com.easydb.easydb.api.transaction.TransactionDto
-import com.easydb.easydb.domain.BucketName
+import com.easydb.easydb.domain.bucket.BucketName
 import com.easydb.easydb.domain.bucket.BucketService
 import com.easydb.easydb.domain.bucket.ElementField
 import com.easydb.easydb.domain.transactions.Operation

@@ -1,6 +1,5 @@
 package com.easydb.easydb.domain.bucket;
 
-import com.easydb.easydb.domain.BucketName;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
