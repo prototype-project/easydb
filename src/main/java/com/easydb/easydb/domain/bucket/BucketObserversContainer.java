@@ -2,6 +2,7 @@ package com.easydb.easydb.domain.bucket;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -25,7 +26,15 @@ public class BucketObserversContainer {
                 TimeUnit.SECONDS, new LinkedBlockingQueue<>(threadQueueCapacity), threadFactory);
     }
 
-    public BucketEventsObserver provide(BucketName bucketName) {
+    public Optional<BucketEventsObserver> get(BucketName bucketName) {
+        return Optional.ofNullable(observers.get(bucketName));
+    }
+
+    public BucketEventsObserver getOrCreate(BucketName bucketName) {
         return observers.computeIfAbsent(bucketName, name -> new BucketEventsObserver(eventsQueueCapacity, executorService));
+    }
+
+    public void remove(BucketName bucketName) {
+        observers.remove(bucketName);
     }
 }

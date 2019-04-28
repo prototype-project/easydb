@@ -43,8 +43,8 @@ class BucketSubscribingTest extends IntegrationWithCleanedDatabaseSpec {
 
 
     def setup() {
-        makeBucketChanges()
         bucketService.createBucket(TEST_BUCKET_NAME)
+        makeBucketChanges()
     }
 
     def cleanup() {
@@ -59,10 +59,11 @@ class BucketSubscribingTest extends IntegrationWithCleanedDatabaseSpec {
         Flux<ElementEvent> eventFlux = bucketEventsPublisher.subscription(new BucketSubscriptionQuery(TEST_BUCKET_NAME, Optional.empty()))
 
         then:
-        List<ElementEvent> receivedEvents = eventFlux.take(3).collectList().block(Duration.ofMillis(5000))
-        receivedEvents as Set == [new ElementEvent(danielFaderski, ElementEvent.Type.CREATE), new ElementEvent(janBrzechwa, ElementEvent.Type.CREATE),
-                                  new ElementEvent(jurekOgorek, ElementEvent.Type.CREATE)] as Set
+        List<ElementEvent> receivedEvents = eventFlux.take(3).doOnNext({it -> logger.info("Received event...")}).collectList().block(Duration.ofMillis(5000))
 
+        receivedEvents as Set == [new ElementEvent(danielFaderski, ElementEvent.Type.CREATE),
+                                  new ElementEvent(janBrzechwa, ElementEvent.Type.UPDATE),
+                                  new ElementEvent(jurekOgorek, ElementEvent.Type.DELETE)] as Set
     }
 
     def "should subscribe to changes with query using `or` operator"() {
@@ -101,15 +102,14 @@ class BucketSubscribingTest extends IntegrationWithCleanedDatabaseSpec {
             }                    
         """
 
-        makeBucketChanges()
-
         when:
         Flux<ElementEvent> eventFlux = bucketEventsPublisher.subscription(new BucketSubscriptionQuery(TEST_BUCKET_NAME, Optional.of(query)))
 
         then:
         List<ElementEvent> receivedEvents = eventFlux.take(2).collectList().block(Duration.ofMillis(5000))
 
-        receivedEvents as Set == [new ElementEvent(danielFaderski, ElementEvent.Type.CREATE), new ElementEvent(janBrzechwa, ElementEvent.Type.CREATE)] as Set
+        receivedEvents as Set == [new ElementEvent(danielFaderski, ElementEvent.Type.CREATE),
+                                  new ElementEvent(janBrzechwa, ElementEvent.Type.UPDATE)] as Set
 
     }
 
@@ -148,8 +148,6 @@ class BucketSubscribingTest extends IntegrationWithCleanedDatabaseSpec {
                 }                
             }                    
         """
-
-        makeBucketChanges()
 
         when:
         Flux<ElementEvent> eventFlux = bucketEventsPublisher.subscription(new BucketSubscriptionQuery(TEST_BUCKET_NAME, Optional.of(query)))
@@ -270,10 +268,13 @@ class BucketSubscribingTest extends IntegrationWithCleanedDatabaseSpec {
     }
 
     def makeBucketChanges() {
+        bucketService.addElement(janBrzechwa)
+        bucketService.addElement(jurekOgorek)
+
         Executors.newSingleThreadScheduledExecutor().schedule({
             bucketService.addElement(danielFaderski)
-            bucketService.addElement(janBrzechwa)
-            bucketService.addElement(jurekOgorek)
-        }, 100, TimeUnit.MILLISECONDS)
+            bucketService.updateElement(janBrzechwa)
+            bucketService.removeElement(TEST_BUCKET_NAME, jurekOgorek.getId())
+        }, 300, TimeUnit.MILLISECONDS)
     }
 }

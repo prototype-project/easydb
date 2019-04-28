@@ -96,8 +96,9 @@ public class TransactionalBucketService implements BucketService {
     @Override
     public void addElement(Element element) {
         elementService.addElement(element);
-        observersContainer.provide(element.getBucketName())
-                .addEvent(new ElementEvent(element, ElementEvent.Type.CREATE));
+        observersContainer.get(element.getBucketName())
+                .ifPresent(observer -> observer.addEvent(new ElementEvent(element, ElementEvent.Type.CREATE)));
+
     }
 
     @Override
@@ -107,14 +108,15 @@ public class TransactionalBucketService implements BucketService {
 
     @Override
     public void removeElement(BucketName bucketName, String elementId) {
+        Element toRemove = bucketRepository.getElement(bucketName, elementId).toSimpleElement();
+
         Transaction transaction = optimizedTransactionManager.beginTransaction(bucketName.getSpaceName());
         Operation operation = Operation.of(OperationType.DELETE, bucketName.getName(), elementId);
         optimizedTransactionManager.addOperation(transaction, operation);
         transactionRetryer.performWithRetries(() -> optimizedTransactionManager.commitTransaction(transaction));
 
-        Element dummyElement = Element.of(elementId, bucketName, Collections.emptyList());
-        observersContainer.provide(bucketName)
-                .addEvent(new ElementEvent(dummyElement, ElementEvent.Type.DELETE));
+        observersContainer.get(bucketName)
+                .ifPresent(observer -> observer.addEvent(new ElementEvent(toRemove, ElementEvent.Type.DELETE)));
     }
 
     @Override
@@ -129,8 +131,8 @@ public class TransactionalBucketService implements BucketService {
         optimizedTransactionManager.addOperation(transaction, operation);
         transactionRetryer.performWithRetries(() -> optimizedTransactionManager.commitTransaction(transaction));
 
-        observersContainer.provide(updated.getBucketName())
-                .addEvent(new ElementEvent(updated, ElementEvent.Type.UPDATE));
+        observersContainer.get(updated.getBucketName())
+                .ifPresent(observer -> observer.addEvent(new ElementEvent(updated, ElementEvent.Type.UPDATE)));
     }
 
     @Override

@@ -18,8 +18,9 @@ public class GraphqlConfig {
     }
 
     @Bean
-    public GraphQlElementsFetcher graphQlElementsFetcher(GraphQlProvider graphQlProvider) {
-        return new GraphQlElementsFetcher(graphQlProvider);
+    public GraphQlElementsFetcher graphQlElementsFetcher(GraphQlProvider graphQlProvider,
+                                                         BucketObserversContainer observersContainer) {
+        return new GraphQlElementsFetcher(graphQlProvider, observersContainer);
     }
 
     @Bean

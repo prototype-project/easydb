@@ -1,5 +1,6 @@
 package com.easydb.easydb.infrastructure.bucket.graphql;
 
+import com.easydb.easydb.domain.bucket.BucketObserversContainer;
 import com.easydb.easydb.domain.bucket.BucketQuery;
 import com.easydb.easydb.domain.bucket.BucketSubscriptionQuery;
 import com.easydb.easydb.domain.bucket.Element;
@@ -11,9 +12,12 @@ import reactor.core.publisher.Flux;
 
 public class GraphQlElementsFetcher {
     private final GraphQlProvider graphQlProvider;
+    private final BucketObserversContainer observersContainer;
 
-    public GraphQlElementsFetcher(GraphQlProvider graphQlProvider) {
+    public GraphQlElementsFetcher(GraphQlProvider graphQlProvider,
+                                  BucketObserversContainer observersContainer) {
         this.graphQlProvider = graphQlProvider;
+        this.observersContainer = observersContainer;
     }
 
     public List<Element> elements(BucketQuery query) {
@@ -32,7 +36,8 @@ public class GraphQlElementsFetcher {
 
         Publisher<ExecutionResult> elementsEvents = executionResult.getData();
         validateResult(executionResult);
-        return Flux.from(elementsEvents).map(result -> converter.convertToDomainElementEvent(result.getData()));
+        return Flux.from(elementsEvents).map(result -> converter.convertToDomainElementEvent(result.getData()))
+                .doFinally(it -> observersContainer.remove(query.getBucketName()));
     }
 
     private void validateResult(ExecutionResult executionResult) {

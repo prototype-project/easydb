@@ -46,7 +46,7 @@ public class GraphQlProvider {
     }
 
     GraphQL graphQL(BucketSubscriptionQuery subscriptionQuery) {
-        BucketEventsObserver observer = observersContainer.provide(subscriptionQuery.getBucketName());
+        BucketEventsObserver observer = observersContainer.getOrCreate(subscriptionQuery.getBucketName());
 
         GraphQLSchema graphQLSchema = SchemaParser.newParser().schemaString(subscriptionSchema)
                 .resolvers(new GraphQLQueryResolver() {} ,new Subscription(observer))

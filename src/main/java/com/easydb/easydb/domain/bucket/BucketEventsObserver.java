@@ -11,6 +11,7 @@ import reactor.core.scheduler.Schedulers;
 
 public class BucketEventsObserver {
     private static int POLL_INTERVAL_MILLIS = 100;
+
     private final BlockingQueue<ElementEvent> eventsQueue;
     private final ExecutorService executorService;
 
