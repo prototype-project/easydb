@@ -53,8 +53,8 @@ class TransactionRetryerSpec extends IntegrationWithCleanedDatabaseSpec {
 
     def setup() {
         mockedBucketService = new TransactionalBucketService(Mock(SpaceRepository),
-                Mock(BucketRepository), Mock(ElementService), observersContainer,
-                optimizedTransactionManagerMock, bucketLocker, spaceLocker, transactionRetryer, lockerRetryer)
+                Mock(BucketRepository), Mock(ElementService), optimizedTransactionManagerMock,
+                bucketLocker, spaceLocker, transactionRetryer, lockerRetryer, observersContainer)
 
     }
 
@@ -68,6 +68,6 @@ class TransactionRetryerSpec extends IntegrationWithCleanedDatabaseSpec {
 
         then:
         2 * optimizedTransactionManagerMock.commitTransaction(transaction) >>
-                {t -> throw new TransactionAbortedException("msg", new RuntimeException())} >> null
+                { t -> throw new TransactionAbortedException("msg", new RuntimeException()) } >> null
     }
 }

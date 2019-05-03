@@ -95,10 +95,11 @@ public class MongoBucketRepository implements BucketRepository {
     }
 
     @Override
-    public void removeElement(BucketName bucketName, String id) {
-        ensureElementExists(bucketName, id);
+    public VersionedElement removeElement(BucketName bucketName, String id) {
+        VersionedElement element = getElement(bucketName, id);
 
         mongoTemplate.remove(getPersistentElement(bucketName, id), NamesResolver.resolve(bucketName));
+        return element;
     }
 
     @Override
@@ -150,10 +151,6 @@ public class MongoBucketRepository implements BucketRepository {
         shardCollection.put("key", shardKey);
         mongoAdminClient.getDatabase(MONGO_ADMIN_DATABASE_NAME)
                 .runCommand(shardCollection);
-    }
-
-    private void ensureElementExists(BucketName bucketName, String id) {
-        getElement(bucketName, id);
     }
 
     private PersistentBucketElement getPersistentElement(BucketName bucketName, String id) {

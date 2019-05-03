@@ -25,7 +25,7 @@ public interface BucketRepository {
     VersionedElement getElement(BucketName bucketName, String id, long requiredVersion)
             throws BucketDoesNotExistException, ElementDoesNotExistException, ConcurrentTransactionDetectedException;
 
-    void removeElement(BucketName bucketName, String id) throws BucketDoesNotExistException, ElementDoesNotExistException;
+    VersionedElement removeElement(BucketName bucketName, String id) throws BucketDoesNotExistException, ElementDoesNotExistException;
 
     boolean elementExists(BucketName bucketName, String elementId) throws BucketDoesNotExistException;
 

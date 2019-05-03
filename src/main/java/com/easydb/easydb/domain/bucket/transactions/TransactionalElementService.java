@@ -21,8 +21,8 @@ public class TransactionalElementService implements ElementService {
                 Element.of(element.getId(), element.getBucketName(), element.getFields()));
     }
 
-    public void removeElement(BucketName bucketName, String elementId) {
-        bucketRepository.removeElement(bucketName, elementId);
+    public VersionedElement removeElement(BucketName bucketName, String elementId) {
+        return bucketRepository.removeElement(bucketName, elementId);
     }
 
     public void updateElement(VersionedElement toUpdate) {

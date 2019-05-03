@@ -59,7 +59,7 @@ class BucketSubscribingTest extends IntegrationWithCleanedDatabaseSpec {
         Flux<ElementEvent> eventFlux = bucketEventsPublisher.subscription(new BucketSubscriptionQuery(TEST_BUCKET_NAME, Optional.empty()))
 
         then:
-        List<ElementEvent> receivedEvents = eventFlux.take(3).doOnNext({it -> logger.info("Received event...")}).collectList().block(Duration.ofMillis(5000))
+        List<ElementEvent> receivedEvents = eventFlux.take(3).collectList().block(Duration.ofMillis(5000))
 
         receivedEvents as Set == [new ElementEvent(danielFaderski, ElementEvent.Type.CREATE),
                                   new ElementEvent(janBrzechwa, ElementEvent.Type.UPDATE),

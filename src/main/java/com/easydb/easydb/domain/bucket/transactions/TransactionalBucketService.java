@@ -18,7 +18,6 @@ import com.easydb.easydb.domain.transactions.OptimizedTransactionManager;
 import com.easydb.easydb.domain.transactions.Retryer;
 import com.easydb.easydb.domain.transactions.Transaction;
 
-import java.util.Collections;
 import java.util.List;
 
 public class TransactionalBucketService implements BucketService {
@@ -27,30 +26,29 @@ public class TransactionalBucketService implements BucketService {
     private final BucketRepository bucketRepository;
     private final OptimizedTransactionManager optimizedTransactionManager;
     private final ElementService elementService;
-    private final BucketObserversContainer observersContainer;
     private final BucketLocker bucketLocker;
     private final SpaceLocker spaceLocker;
     private final Retryer transactionRetryer;
     private final Retryer lockerRetryer;
+    private final BucketObserversContainer observersContainer;
 
     public TransactionalBucketService(SpaceRepository spaceRepository,
                                       BucketRepository bucketRepository,
                                       ElementService elementService,
-                                      BucketObserversContainer observersContainer,
                                       OptimizedTransactionManager optimizedTransactionManager,
                                       BucketLocker bucketLocker,
                                       SpaceLocker spaceLocker,
                                       Retryer transactionRetryer,
-                                      Retryer lockerRetryer) {
+                                      Retryer lockerRetryer, BucketObserversContainer observersContainer) {
         this.spaceRepository = spaceRepository;
         this.bucketRepository = bucketRepository;
         this.elementService = elementService;
-        this.observersContainer = observersContainer;
         this.optimizedTransactionManager = optimizedTransactionManager;
         this.bucketLocker = bucketLocker;
         this.spaceLocker = spaceLocker;
         this.transactionRetryer = transactionRetryer;
         this.lockerRetryer = lockerRetryer;
+        this.observersContainer = observersContainer;
     }
 
     @Override
@@ -96,9 +94,7 @@ public class TransactionalBucketService implements BucketService {
     @Override
     public void addElement(Element element) {
         elementService.addElement(element);
-        observersContainer.get(element.getBucketName())
-                .ifPresent(observer -> observer.addEvent(new ElementEvent(element, ElementEvent.Type.CREATE)));
-
+        emit(new ElementEvent(element, ElementEvent.Type.CREATE));
     }
 
     @Override
@@ -108,15 +104,10 @@ public class TransactionalBucketService implements BucketService {
 
     @Override
     public void removeElement(BucketName bucketName, String elementId) {
-        Element toRemove = bucketRepository.getElement(bucketName, elementId).toSimpleElement();
-
         Transaction transaction = optimizedTransactionManager.beginTransaction(bucketName.getSpaceName());
         Operation operation = Operation.of(OperationType.DELETE, bucketName.getName(), elementId);
         optimizedTransactionManager.addOperation(transaction, operation);
         transactionRetryer.performWithRetries(() -> optimizedTransactionManager.commitTransaction(transaction));
-
-        observersContainer.get(bucketName)
-                .ifPresent(observer -> observer.addEvent(new ElementEvent(toRemove, ElementEvent.Type.DELETE)));
     }
 
     @Override
@@ -130,9 +121,6 @@ public class TransactionalBucketService implements BucketService {
         Operation operation = Operation.of(OperationType.UPDATE, updated);
         optimizedTransactionManager.addOperation(transaction, operation);
         transactionRetryer.performWithRetries(() -> optimizedTransactionManager.commitTransaction(transaction));
-
-        observersContainer.get(updated.getBucketName())
-                .ifPresent(observer -> observer.addEvent(new ElementEvent(updated, ElementEvent.Type.UPDATE)));
     }
 
     @Override
@@ -143,5 +131,9 @@ public class TransactionalBucketService implements BucketService {
     @Override
     public long getNumberOfElements(BucketName bucketName) {
         return elementService.getNumberOfElements(bucketName);
+    }
+
+    private void emit(ElementEvent event) {
+        observersContainer.get(event.getElement().getBucketName()).ifPresent(observer -> observer.addEvent(event));
     }
 }

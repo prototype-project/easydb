@@ -7,7 +7,7 @@ public interface ElementService {
 
     void addElement(Element element);
 
-    void removeElement(BucketName bucketName, String elementId);
+    VersionedElement removeElement(BucketName bucketName, String elementId);
 
     void updateElement(VersionedElement toUpdate);
 

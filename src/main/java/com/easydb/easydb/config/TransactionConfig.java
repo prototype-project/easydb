@@ -1,5 +1,6 @@
 package com.easydb.easydb.config;
 
+import com.easydb.easydb.domain.bucket.BucketObserversContainer;
 import com.easydb.easydb.domain.bucket.ElementService;
 import com.easydb.easydb.domain.bucket.transactions.BucketRepository;
 
@@ -48,8 +49,9 @@ public class TransactionConfig {
     @Bean
     TransactionCommitter transactionCommitter(ElementsLocker elementsLocker,
                                               @Qualifier("lockerRetryer") Retryer lockerRetryer,
-                                              ElementService elementService) {
-        return new TransactionCommitter(elementsLocker, lockerRetryer, elementService);
+                                              ElementService elementService,
+                                              BucketObserversContainer observersContainer) {
+        return new TransactionCommitter(elementsLocker, lockerRetryer, elementService, observersContainer);
     }
 
     @Bean
