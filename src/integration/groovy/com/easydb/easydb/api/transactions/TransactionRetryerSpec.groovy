@@ -1,7 +1,7 @@
 package com.easydb.easydb.api.transactions
 
+import com.easydb.easydb.BaseIntegrationSpec
 import com.easydb.easydb.ElementTestBuilder
-import com.easydb.easydb.IntegrationWithCleanedDatabaseSpec
 import com.easydb.easydb.domain.bucket.BucketObserversContainer
 import com.easydb.easydb.domain.bucket.ElementService
 import com.easydb.easydb.domain.bucket.transactions.BucketRepository
@@ -19,7 +19,7 @@ import com.easydb.easydb.domain.transactions.Retryer
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 
-class TransactionRetryerSpec extends IntegrationWithCleanedDatabaseSpec {
+class TransactionRetryerSpec extends BaseIntegrationSpec {
 
     @Autowired
     @Qualifier("transactionRetryer")
@@ -60,8 +60,8 @@ class TransactionRetryerSpec extends IntegrationWithCleanedDatabaseSpec {
 
     def "should retry update operation in case of transaction errors"() {
         given:
-        Transaction transaction = new Transaction(TEST_BUCKET_NAME.spaceName, uuidProvider.generateUUID())
-        optimizedTransactionManagerMock.beginTransaction(TEST_BUCKET_NAME.spaceName) >> transaction
+        Transaction transaction = new Transaction("testSpace", uuidProvider.generateUUID())
+        optimizedTransactionManagerMock.beginTransaction("testSpace") >> transaction
 
         when:
         mockedBucketService.updateElement(element)

@@ -1,8 +1,8 @@
 package com.easydb.easydb.api.bucket
 
-import com.easydb.easydb.BaseIntegrationSpec
 import com.easydb.easydb.ElementTestBuilder
 import com.easydb.easydb.ElementUtils
+import com.easydb.easydb.IntegrationDatabaseSpec
 import com.easydb.easydb.TestHttpOperations
 import com.easydb.easydb.domain.bucket.BucketName
 import com.easydb.easydb.domain.bucket.BucketQuery
@@ -17,7 +17,7 @@ import org.springframework.web.client.HttpClientErrorException
 
 import java.util.stream.Collectors
 
-class CrudBucketElementsSpec extends BaseIntegrationSpec implements TestHttpOperations, ElementUtils {
+class CrudBucketElementsSpec extends IntegrationDatabaseSpec implements TestHttpOperations, ElementUtils {
 
     @Autowired
     SpaceRemovalService spaceRemovalService

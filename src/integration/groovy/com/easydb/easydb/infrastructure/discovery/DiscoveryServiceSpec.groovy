@@ -3,7 +3,7 @@ package com.easydb.easydb.infrastructure.discovery
 import com.easydb.easydb.BaseIntegrationSpec
 import org.apache.curator.framework.CuratorFramework
 import org.apache.curator.x.discovery.ServiceDiscoveryBuilder
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Autowired
 
 class DiscoveryServiceSpec extends BaseIntegrationSpec {
 
@@ -16,7 +16,8 @@ class DiscoveryServiceSpec extends BaseIntegrationSpec {
                 .client(curatorFramework)
                 .basePath("/discovery")
                 .watchInstances(false)
-                .build();
+                .build()
+
         expect:
         serviceDiscovery.start()
         serviceDiscovery.queryForInstances("Easydb").size() == 1

@@ -1,13 +1,13 @@
 package com.easydb.easydb.api.space
 
-import com.easydb.easydb.BaseIntegrationSpec
+import com.easydb.easydb.IntegrationDatabaseSpec
 import com.easydb.easydb.TestHttpOperations
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.HttpClientErrorException
 
 
-class SpaceControllerSpec extends BaseIntegrationSpec implements TestHttpOperations {
+class SpaceControllerSpec extends IntegrationDatabaseSpec implements TestHttpOperations {
 
     def "should create new space"() {
         when:

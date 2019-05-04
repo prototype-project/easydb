@@ -1,6 +1,6 @@
 package com.easydb.easydb.api.bucket
 
-import com.easydb.easydb.BaseIntegrationSpec
+import com.easydb.easydb.IntegrationDatabaseSpec
 import com.easydb.easydb.TestHttpOperations
 import com.easydb.easydb.domain.bucket.BucketName
 import com.easydb.easydb.domain.bucket.BucketService
@@ -10,7 +10,7 @@ import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 
 
-class CrudBucketSpec extends BaseIntegrationSpec implements TestHttpOperations {
+class CrudBucketSpec extends IntegrationDatabaseSpec implements TestHttpOperations {
 
     RestTemplate restTemplate = new RestTemplate()
 

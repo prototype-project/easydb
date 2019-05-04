@@ -8,7 +8,6 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.context.ContextConfiguration
 import org.springframework.web.client.RestTemplate
 import spock.lang.Specification
 
@@ -16,9 +15,8 @@ import spock.lang.Specification
         classes = [EasydbApplication],
         properties = "application.environment=integration",
         webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
-@DirtiesContext
-@ContextConfiguration(classes = SpaceTestConfig)
 @ActiveProfiles("integration")
+@DirtiesContext
 abstract class BaseIntegrationSpec extends Specification {
 
     static ZOOKEEPER_PORT = 2182

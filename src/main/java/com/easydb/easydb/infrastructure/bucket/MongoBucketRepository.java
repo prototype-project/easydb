@@ -29,17 +29,15 @@ public class MongoBucketRepository implements BucketRepository {
     private final static String MONGO_ADMIN_DATABASE_NAME = "admin";
 
     private final MongoTemplate mongoTemplate;
-    private final MongoClient mongoClient;
     private final MongoClient mongoAdminClient;
     private final MongoProperties mongoProperties;
     private final GraphQlElementsFetcher graphQlElementsFetcher;
 
-    public MongoBucketRepository(MongoTemplate mongoTemplate, MongoClient mongoClient,
+    public MongoBucketRepository(MongoTemplate mongoTemplate,
                                  MongoClient mongoAdminClient,
                                  MongoProperties mongoProperties,
                                  GraphQlElementsFetcher graphQlElementsFetcher) {
         this.mongoTemplate = mongoTemplate;
-        this.mongoClient = mongoClient;
         this.mongoAdminClient = mongoAdminClient;
         this.mongoProperties = mongoProperties;
         this.graphQlElementsFetcher = graphQlElementsFetcher;
@@ -145,9 +143,8 @@ public class MongoBucketRepository implements BucketRepository {
     }
 
     private void createShardedCollection(BucketName bucketName) {
-        mongoClient.getDatabase(mongoProperties.getDatabaseName()).createCollection(NamesResolver.resolve(bucketName));
         BasicDBObject shardKey = new BasicDBObject("_id", "hashed");
-        BasicDBObject shardCollection = new BasicDBObject("shardCollection", mongoProperties.getDatabaseName() + "." + bucketName);
+        BasicDBObject shardCollection = new BasicDBObject("shardCollection", mongoProperties.getDatabaseName() + "." + NamesResolver.resolve(bucketName));
         shardCollection.put("key", shardKey);
         mongoAdminClient.getDatabase(MONGO_ADMIN_DATABASE_NAME)
                 .runCommand(shardCollection);

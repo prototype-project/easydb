@@ -1,6 +1,6 @@
 package com.easydb.easydb.infrastructure.space
 
-import com.easydb.easydb.BaseIntegrationSpec
+import com.easydb.easydb.IntegrationDatabaseSpec
 import com.easydb.easydb.domain.bucket.BucketName
 import com.easydb.easydb.domain.bucket.BucketService
 import com.easydb.easydb.domain.space.Space
@@ -10,7 +10,7 @@ import com.easydb.easydb.domain.space.SpaceRepository
 import org.springframework.beans.factory.annotation.Autowired
 
 
-class SpaceRepositorySpec extends BaseIntegrationSpec {
+class SpaceRepositorySpec extends IntegrationDatabaseSpec {
 
     String TEST_SPACE = "repositoryTestSpace"
 

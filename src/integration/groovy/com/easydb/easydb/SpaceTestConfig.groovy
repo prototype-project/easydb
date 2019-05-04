@@ -1,29 +1,35 @@
 package com.easydb.easydb
 
-import com.github.fakemongo.Fongo
 import com.mongodb.Mongo
 import com.mongodb.MongoClient
 import com.mongodb.client.MongoDatabase
 import org.bson.Document
 import org.bson.conversions.Bson
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 import org.springframework.data.mongodb.MongoDbFactory
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory
+import org.testcontainers.containers.GenericContainer
 
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
 
-@Configuration
 class SpaceTestConfig {
-    private static final String DB_NAME = "testSpace";
-    private static final String SERVER_NAME = "testServer";
+
+    static def MONGO_PORT = 27017
+    static def DB_NAME = "testSpace"
+
+    @Bean(initMethod = "start", destroyMethod = "stop")
+    GenericContainer mongoContainer() {
+        GenericContainer genericContainer = new GenericContainer("mongo:4.0.2")
+                .withExposedPorts(MONGO_PORT)
+        return genericContainer
+    }
 
     @Bean
-    Mongo mongo() {
-        return mongoClient()
+    Mongo mongo(GenericContainer container) {
+        return mongoClient(container)
     }
 
     @Bean
@@ -32,9 +38,8 @@ class SpaceTestConfig {
     }
 
     @Bean
-    MongoClient mongoClient() {
-        Fongo fongo = new Fongo(SERVER_NAME)
-        return fongo.getMongo()
+    MongoClient mongoClient(GenericContainer container) {
+        return new MongoClient(container.getContainerIpAddress(), container.getMappedPort(MONGO_PORT))
     }
 
     @Bean

@@ -1,6 +1,6 @@
 package com.easydb.easydb.infrastructure.space
 
-import com.easydb.easydb.BaseIntegrationSpec
+import com.easydb.easydb.IntegrationDatabaseSpec
 import com.easydb.easydb.domain.bucket.BucketName
 import com.easydb.easydb.domain.bucket.transactions.BucketRepository
 import com.easydb.easydb.domain.bucket.BucketService
@@ -10,7 +10,7 @@ import com.easydb.easydb.domain.space.SpaceRemovalService
 import org.springframework.beans.factory.annotation.Autowired
 
 
-class SpaceRemovalServiceSpec extends BaseIntegrationSpec {
+class SpaceRemovalServiceSpec extends IntegrationDatabaseSpec {
 
     @Autowired
     SpaceRemovalService spaceRemovalService

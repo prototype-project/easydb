@@ -1,7 +1,7 @@
 package com.easydb.easydb.api.transactions
 
-import com.easydb.easydb.BaseIntegrationSpec
 import com.easydb.easydb.ElementTestBuilder
+import com.easydb.easydb.IntegrationDatabaseSpec
 import com.easydb.easydb.OperationTestBuilder
 import com.easydb.easydb.TestHttpOperations
 import com.easydb.easydb.api.bucket.ElementFieldDto
@@ -20,7 +20,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.client.HttpClientErrorException
 
 
-class TransactionControllerSpec extends BaseIntegrationSpec implements TestHttpOperations {
+class TransactionControllerSpec extends IntegrationDatabaseSpec implements TestHttpOperations {
 
     @Autowired
     BucketService bucketService

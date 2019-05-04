@@ -31,10 +31,10 @@ public class BucketConfig {
     }
 
     @Bean
-    BucketRepository bucketRepository(MongoTemplate mongoTemplate, @Qualifier("mongoClient") MongoClient mongoClient,
+    BucketRepository bucketRepository(MongoTemplate mongoTemplate,
                                       @Qualifier("mongoAdminClient") MongoClient mongoAdminClient,
                                       MongoProperties mongoProperties, GraphQlElementsFetcher graphQlElementsFetcher) {
-        return new MongoBucketRepository(mongoTemplate, mongoClient, mongoAdminClient, mongoProperties, graphQlElementsFetcher);
+        return new MongoBucketRepository(mongoTemplate, mongoAdminClient, mongoProperties, graphQlElementsFetcher);
     }
 
     @Bean
