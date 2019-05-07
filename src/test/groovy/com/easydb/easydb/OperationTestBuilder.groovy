@@ -6,7 +6,7 @@ import com.easydb.easydb.domain.transactions.Operation
 class OperationTestBuilder {
     Operation.OperationType type = Operation.OperationType.UPDATE
     String bucketName = "people"
-    String elementId = UUID.randomUUID();
+    String elementId = UUID.randomUUID()
     List<ElementField> fields = [
             ElementField.of('firstName', 'John'),
             ElementField.of('lastName', 'Smith'),

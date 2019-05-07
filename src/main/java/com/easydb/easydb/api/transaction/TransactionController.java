@@ -39,9 +39,10 @@ class TransactionController {
 
     @PostMapping("/{transactionId}/add-operation")
     @ResponseStatus(value = HttpStatus.CREATED)
-    OperationResultDto addOperation(@PathVariable("spaceName") String spaceName,
+    OperationResultDto addOperation(@PathVariable("spaceName") String spaceName, // TODO
                                     @PathVariable("transactionId") String transactionId,
                                     @RequestBody @Valid OperationDto dto) {
+        dto.validate();
         OperationResult operationResult = persistentTransactionManager.addOperation(transactionId, dto.toDomain(uuidProvider));
 
         BucketName bucketName = new BucketName(operationResult.getSpaceName(), dto.getBucketName());

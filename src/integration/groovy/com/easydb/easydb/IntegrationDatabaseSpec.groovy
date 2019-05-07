@@ -11,7 +11,7 @@ import org.springframework.test.context.ContextConfiguration
 
 @ContextConfiguration(classes = SpaceTestConfig)
 class IntegrationDatabaseSpec extends BaseIntegrationSpec {
-    public static TEST_BUCKET_NAME = new BucketName("testSpace","testBucket")
+    public static TEST_BUCKET_NAME = new BucketName("testSpace", "testBucket")
 
     @Autowired
     SpaceRepository spaceRepository

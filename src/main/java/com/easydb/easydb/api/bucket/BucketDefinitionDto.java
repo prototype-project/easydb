@@ -2,7 +2,7 @@ package com.easydb.easydb.api.bucket;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
 public class BucketDefinitionDto {
 

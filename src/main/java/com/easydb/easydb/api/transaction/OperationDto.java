@@ -12,8 +12,8 @@ import com.google.common.base.Strings;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.util.CollectionUtils;
 
 import static com.easydb.easydb.domain.transactions.Operation.OperationType.*;
@@ -43,10 +43,9 @@ public class OperationDto {
         this.bucketName = bucketName;
         this.elementId = elementId;
         this.fields = fields;
-        validate();
     }
 
-    public Operation toDomain(UUIDProvider uuidProvider) {
+    Operation toDomain(UUIDProvider uuidProvider) {
         if (type.equals(CREATE)) {
             return Operation.of(type, bucketName, uuidProvider.generateUUID(), toDomainFields());
         }
@@ -61,7 +60,7 @@ public class OperationDto {
         return bucketName;
     }
 
-    private void validate() {
+    void validate() {
         if (!type.equals(CREATE) && hasEmptyId()) {
             throw new ElementIdMustNotBeEmptyException();
         }

@@ -11,13 +11,13 @@ import com.easydb.easydb.domain.bucket.transactions.VersionedElement;
 import com.easydb.easydb.infrastructure.bucket.graphql.GraphQlElementsFetcher;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
+import com.mongodb.client.result.UpdateResult;
 import java.util.List;
 import java.util.Optional;
 
 import com.easydb.easydb.domain.bucket.ElementDoesNotExistException;
 import com.easydb.easydb.domain.bucket.transactions.BucketRepository;
 import com.easydb.easydb.domain.bucket.Element;
-import com.mongodb.WriteResult;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -119,7 +119,7 @@ public class MongoBucketRepository implements BucketRepository {
         update.set("version", element.getVersionOrThrowErrorIfEmpty() + 1);
         update.set("fields", toUpdate.getFields());
 
-        WriteResult updateResult = mongoTemplate.updateFirst(query, update, NamesResolver.resolve(toUpdate.getBucketName()));
+        UpdateResult updateResult = mongoTemplate.updateFirst(query, update, NamesResolver.resolve(toUpdate.getBucketName()));
         validateUpdateResultAgainstConcurrency(updateResult, toUpdate);
     }
 
@@ -164,8 +164,8 @@ public class MongoBucketRepository implements BucketRepository {
         return query;
     }
 
-    private void validateUpdateResultAgainstConcurrency(WriteResult writeResult, VersionedElement toUpdate) {
-        if (writeResult.getN() == 0) {
+    private void validateUpdateResultAgainstConcurrency(UpdateResult updateResult, VersionedElement toUpdate) {
+        if (updateResult.getModifiedCount() == 0) {
             throw new ConcurrentTransactionDetectedException(
                     String.format("%s was updated by concurrent transaction", toUpdate));
         }

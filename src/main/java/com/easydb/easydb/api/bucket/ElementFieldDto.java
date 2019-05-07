@@ -4,7 +4,7 @@ import com.easydb.easydb.domain.bucket.ElementField;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
-import org.hibernate.validator.constraints.NotEmpty;
+import javax.validation.constraints.NotEmpty;
 
 public class ElementFieldDto {
     @NotEmpty

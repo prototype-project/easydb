@@ -13,7 +13,7 @@ import spock.lang.Specification
 
 @SpringBootTest(
         classes = [EasydbApplication],
-        properties = "application.environment=integration",
+        properties = ["application.environment=integration", "spring.main.allow-bean-definition-overriding=true"],
         webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("integration")
 @DirtiesContext

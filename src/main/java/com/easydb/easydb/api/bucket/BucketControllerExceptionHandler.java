@@ -2,6 +2,9 @@ package com.easydb.easydb.api.bucket;
 
 import com.easydb.easydb.api.ApiError;
 import com.easydb.easydb.api.ApiErrorMapper;
+import com.easydb.easydb.api.transaction.ElementFieldsMustNotBeNullException;
+import com.easydb.easydb.api.transaction.ElementIdMustBeEmptyException;
+import com.easydb.easydb.api.transaction.ElementIdMustNotBeEmptyException;
 import com.easydb.easydb.domain.bucket.BucketAlreadyExistsException;
 import com.easydb.easydb.domain.bucket.BucketDoesNotExistException;
 import com.easydb.easydb.domain.bucket.ElementAlreadyExistsException;
@@ -45,6 +48,21 @@ public class BucketControllerExceptionHandler extends ResponseEntityExceptionHan
     @ExceptionHandler(value = {QueryValidationException.class})
     ResponseEntity<ApiError> handleQueryValidationException(QueryValidationException ex) {
         return mapError(ApiError.of("INVALID_QUERY", HttpStatus.BAD_REQUEST, ex.getMessage()));
+    }
+
+    @ExceptionHandler(value = {ElementIdMustBeEmptyException.class})
+    ResponseEntity<ApiError> elementIdMustBeEmptyException(ElementIdMustBeEmptyException ex) {
+        return mapError(ApiError.of("ELEMENT_ID_MUST_BE_EMPTY", HttpStatus.BAD_REQUEST, ex.getMessage()));
+    }
+
+    @ExceptionHandler(value = {ElementIdMustNotBeEmptyException.class})
+    ResponseEntity<ApiError> elementIdMustNotBeEmptyException(ElementIdMustNotBeEmptyException ex) {
+        return mapError(ApiError.of("ELEMENT_ID_MUST_NOT_BE_EMPTY", HttpStatus.BAD_REQUEST, ex.getMessage()));
+    }
+
+    @ExceptionHandler(value = {ElementFieldsMustNotBeNullException.class})
+    ResponseEntity<ApiError> elementFieldsMustNotBeNullException(ElementFieldsMustNotBeNullException ex) {
+        return mapError(ApiError.of("ELEMENT_FIELDS_MUST_NOT_BE_NULL", HttpStatus.BAD_REQUEST, ex.getMessage()));
     }
 
     private ResponseEntity<ApiError> mapError(ApiError apiError) {

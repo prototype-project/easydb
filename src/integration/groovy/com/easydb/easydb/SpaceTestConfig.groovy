@@ -1,11 +1,11 @@
 package com.easydb.easydb
 
-import com.mongodb.Mongo
 import com.mongodb.MongoClient
 import com.mongodb.client.MongoDatabase
+import org.bson.BsonDocument
 import org.bson.Document
-import org.bson.conversions.Bson
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 import org.springframework.data.mongodb.MongoDbFactory
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory
@@ -28,13 +28,8 @@ class SpaceTestConfig {
     }
 
     @Bean
-    Mongo mongo(GenericContainer container) {
-        return mongoClient(container)
-    }
-
-    @Bean
-    MongoTemplate mongoTemplate(Mongo mongo) {
-        return new MongoTemplate(mongo, DB_NAME)
+    MongoTemplate mongoTemplate(MongoClient mongoClient) {
+        return new MongoTemplate(mongoClient, DB_NAME)
     }
 
     @Bean
@@ -46,13 +41,13 @@ class SpaceTestConfig {
     MongoClient mongoAdminClient() {
         MongoClient mongoClient = mock(MongoClient)
         MongoDatabase mongoDatabase = mock(MongoDatabase)
-        when(mongoDatabase.runCommand(any(Bson.class))).thenReturn(new Document())
+        when(mongoDatabase.runCommand(any(BsonDocument))).thenReturn(new Document())
         when(mongoClient.getDatabase(any(String.class))).thenReturn(mongoDatabase)
         return mongoClient
     }
 
     @Bean
-    MongoDbFactory mongoDbFactory(Mongo mongo) {
-        return new SimpleMongoDbFactory(mongo, DB_NAME)
+    MongoDbFactory mongoDbFactory(MongoClient mongoClient) {
+        return new SimpleMongoDbFactory(mongoClient, DB_NAME)
     }
 }
