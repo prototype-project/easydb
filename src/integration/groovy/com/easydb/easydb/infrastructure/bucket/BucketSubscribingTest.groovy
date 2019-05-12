@@ -41,6 +41,7 @@ class BucketSubscribingTest extends IntegrationWithCleanedDatabaseSpec {
             .addField(ElementField.of("lastName", "Ogórek"))
             .build()
 
+    Duration BLOCK_TIMEOUT = Duration.ofSeconds(5)
 
     def setup() {
         bucketService.createBucket(TEST_BUCKET_NAME)
@@ -56,10 +57,10 @@ class BucketSubscribingTest extends IntegrationWithCleanedDatabaseSpec {
 
     def "should subscribe to all data changes"() {
         when:
-        Flux<ElementEvent> eventFlux = bucketEventsPublisher.subscription(new BucketSubscriptionQuery(TEST_BUCKET_NAME, Optional.empty()))
+        Flux<ElementEvent> eventFlux = bucketEventsPublisher.subscription(BucketSubscriptionQuery.of(TEST_BUCKET_NAME, Optional.empty()))
 
         then:
-        List<ElementEvent> receivedEvents = eventFlux.take(3).collectList().block(Duration.ofMillis(5000))
+        List<ElementEvent> receivedEvents = eventFlux.take(3).collectList().block(BLOCK_TIMEOUT)
 
         receivedEvents as Set == [new ElementEvent(danielFaderski, ElementEvent.Type.CREATE),
                                   new ElementEvent(janBrzechwa, ElementEvent.Type.UPDATE),
@@ -103,10 +104,10 @@ class BucketSubscribingTest extends IntegrationWithCleanedDatabaseSpec {
         """
 
         when:
-        Flux<ElementEvent> eventFlux = bucketEventsPublisher.subscription(new BucketSubscriptionQuery(TEST_BUCKET_NAME, Optional.of(query)))
+        Flux<ElementEvent> eventFlux = bucketEventsPublisher.subscription(BucketSubscriptionQuery.of(TEST_BUCKET_NAME, Optional.of(query)))
 
         then:
-        List<ElementEvent> receivedEvents = eventFlux.take(2).collectList().block(Duration.ofMillis(5000))
+        List<ElementEvent> receivedEvents = eventFlux.take(2).collectList().block(BLOCK_TIMEOUT)
 
         receivedEvents as Set == [new ElementEvent(danielFaderski, ElementEvent.Type.CREATE),
                                   new ElementEvent(janBrzechwa, ElementEvent.Type.UPDATE)] as Set
@@ -150,10 +151,10 @@ class BucketSubscribingTest extends IntegrationWithCleanedDatabaseSpec {
         """
 
         when:
-        Flux<ElementEvent> eventFlux = bucketEventsPublisher.subscription(new BucketSubscriptionQuery(TEST_BUCKET_NAME, Optional.of(query)))
+        Flux<ElementEvent> eventFlux = bucketEventsPublisher.subscription(BucketSubscriptionQuery.of(TEST_BUCKET_NAME, Optional.of(query)))
 
         then:
-        List<ElementEvent> receivedEvents = eventFlux.take(1).collectList().block(Duration.ofMillis(5000))
+        List<ElementEvent> receivedEvents = eventFlux.take(1).collectList().block(BLOCK_TIMEOUT)
 
         receivedEvents == [new ElementEvent(danielFaderski, ElementEvent.Type.CREATE)]
     }
@@ -177,7 +178,7 @@ class BucketSubscribingTest extends IntegrationWithCleanedDatabaseSpec {
         """
 
         when:
-        bucketEventsPublisher.subscription(new BucketSubscriptionQuery(TEST_BUCKET_NAME, Optional.of(query))).blockFirst()
+        bucketEventsPublisher.subscription(BucketSubscriptionQuery.of(TEST_BUCKET_NAME, Optional.of(query))).blockFirst(BLOCK_TIMEOUT)
 
         then:
         thrown(QueryValidationException)
@@ -204,21 +205,21 @@ class BucketSubscribingTest extends IntegrationWithCleanedDatabaseSpec {
                                            ]
                                        }
                                ]
-            }) { 
-                    type         
-                    element {    
-                        id       
-                        fields { 
-                            name 
-                            value
-                        }        
-                    }            
-                }                
+                }) { 
+                        type         
+                        element {    
+                            id       
+                            fields { 
+                                name 
+                                value
+                            }        
+                        }            
+                    }                
             }                    
         """
 
         when:
-        bucketEventsPublisher.subscription(new BucketSubscriptionQuery(TEST_BUCKET_NAME, Optional.of(query))).blockFirst()
+        bucketEventsPublisher.subscription(BucketSubscriptionQuery.of(TEST_BUCKET_NAME, Optional.of(query))).blockFirst(BLOCK_TIMEOUT)
 
         then:
         thrown(QueryValidationException)
@@ -261,7 +262,7 @@ class BucketSubscribingTest extends IntegrationWithCleanedDatabaseSpec {
         """
 
         when:
-        bucketEventsPublisher.subscription(new BucketSubscriptionQuery(TEST_BUCKET_NAME, Optional.of(query))).blockFirst()
+        bucketEventsPublisher.subscription(BucketSubscriptionQuery.of(TEST_BUCKET_NAME, Optional.of(query))).blockFirst(BLOCK_TIMEOUT)
 
         then:
         thrown(QueryValidationException)
