@@ -34,20 +34,20 @@ trait TestHttpOperations {
                 buildElementUrl(spaceName, bucketName, id), ElementQueryDto).body
     }
 
-    ResponseEntity<ElementQueryDto> addElementToTestBucket(String spaceName, String bucketName, String body) {
-        return restTemplate.exchange(
-                buildElementUrl(spaceName, bucketName),
-                HttpMethod.POST,
-                httpJsonEntity(body),
-                ElementQueryDto.class)
-    }
-
     ResponseEntity<ElementQueryDto> addElementToTestBucket(String spaceName, String body) {
         addElementToTestBucket(spaceName, TEST_BUCKET_NAME, body)
     }
 
     ResponseEntity<ElementQueryDto> addSampleElementToTestBucket(String spaceName) {
         addElementToTestBucket(spaceName, TEST_BUCKET_NAME, sampleElementBody())
+    }
+
+    ResponseEntity<ElementQueryDto> addElementToTestBucket(String spaceName, String bucketName, String body) {
+        return restTemplate.exchange(
+                buildElementUrl(spaceName, bucketName),
+                HttpMethod.POST,
+                httpJsonEntity(body),
+                ElementQueryDto.class)
     }
 
     ResponseEntity<ElementQueryDto> addElement(String spaceName, Element element) {
@@ -58,7 +58,7 @@ trait TestHttpOperations {
                 ElementQueryDto.class)
     }
 
-    def createTestBucket(String spaceName) {
+    ResponseEntity<Void> createTestBucket(String spaceName) {
         createBucket(spaceName, TEST_BUCKET_NAME)
     }
 
@@ -71,11 +71,11 @@ trait TestHttpOperations {
         )
     }
 
-    def deleteTestBucket(String spaceName) {
+    void deleteTestBucket(String spaceName) {
         deleteBucket(spaceName, TEST_BUCKET_NAME)
     }
 
-    def deleteBucket(String spaceName, String bucketName) {
+    void deleteBucket(String spaceName, String bucketName) {
         restTemplate.delete(buildBucketUrl(spaceName, bucketName))
     }
 

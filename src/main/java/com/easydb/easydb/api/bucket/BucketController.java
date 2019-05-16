@@ -1,9 +1,11 @@
 package com.easydb.easydb.api.bucket;
 
 import com.easydb.easydb.config.ApplicationMetrics;
+import com.easydb.easydb.domain.bucket.BucketEventsPublisher;
 import com.easydb.easydb.domain.bucket.BucketName;
 import com.easydb.easydb.domain.bucket.BucketQuery;
 import com.easydb.easydb.domain.bucket.BucketService;
+import com.easydb.easydb.domain.bucket.BucketSubscriptionQuery;
 import com.easydb.easydb.domain.bucket.Element;
 import com.easydb.easydb.domain.space.UUIDProvider;
 
@@ -14,8 +16,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.yaml.snakeyaml.util.UriEncoder;
+import reactor.core.publisher.Flux;
 
 @RestController
 @RequestMapping(value = "/api/v1/spaces/{spaceName}/buckets")
@@ -24,14 +28,16 @@ class BucketController {
     private final UUIDProvider uuidProvider;
     private final ApplicationMetrics metrics;
     private final BucketService bucketService;
+    private final BucketEventsPublisher bucketEventsPublisher;
 
     BucketController(
             UUIDProvider uuidProvider,
             ApplicationMetrics metrics,
-            BucketService bucketService) {
+            BucketService bucketService, BucketEventsPublisher bucketEventsPublisher) {
         this.uuidProvider = uuidProvider;
         this.metrics = metrics;
         this.bucketService = bucketService;
+        this.bucketEventsPublisher = bucketEventsPublisher;
     }
 
     @DeleteMapping(path = "/{bucketName}")
@@ -112,6 +118,19 @@ class BucketController {
         return PaginatedElementsDto.of(
                 getNextPageLink(bucketService.getNumberOfElements(new BucketName(spaceName, bucketName)), limit, offset, request),
                 results);
+    }
+
+    @GetMapping(path = "/{bucketName}/element-events", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @ResponseStatus(value = HttpStatus.OK)
+    Flux<ElementEventDto> subscribeEvents(
+            @PathVariable("spaceName") String spaceName,
+            @PathVariable("bucketName") String bucketName,
+            @RequestParam(value = "query") Optional<String> query) {
+        Optional<String> uriDecodedQuery = query.map(UriEncoder::decode);
+        BucketSubscriptionQuery bucketQuery = BucketSubscriptionQuery.of(new BucketName(spaceName, bucketName), uriDecodedQuery);
+
+        return bucketEventsPublisher.subscription(bucketQuery).map(ElementEventDto::of);
+        // TODO metrics
     }
 
     private static String getNextPageLink(long numberOfElements, int limit, int offset,

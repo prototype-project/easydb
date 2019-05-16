@@ -68,6 +68,7 @@ dependencies {
     testCompile group: 'org.spockframework', name: 'spock-spring', version: '1.1-groovy-2.4'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.23.0'
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: project.springBootVersion
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-webflux', version: project.springBootVersion
     testCompile group: 'org.apache.curator', name: 'curator-test', version: '4.1.0'
     testCompile group: 'cglib', name: 'cglib-nodep', version: '3.2.4'
     testCompile 'org.codehaus.groovy:groovy-all:2.4.4'

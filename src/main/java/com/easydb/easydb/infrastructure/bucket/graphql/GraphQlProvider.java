@@ -49,7 +49,7 @@ public class GraphQlProvider {
         BucketEventsObserver observer = observersContainer.getOrCreate(subscriptionQuery.getBucketName());
 
         GraphQLSchema graphQLSchema = SchemaParser.newParser().schemaString(subscriptionSchema)
-                .resolvers(new GraphQLQueryResolver() {} ,new Subscription(observer))
+                .resolvers(new GraphQLQueryResolver() {}, new Subscription(observer))
                 .build()
                 .makeExecutableSchema();
 
