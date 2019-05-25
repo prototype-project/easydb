@@ -1,15 +1,13 @@
 package com.easydb.easydb.api.transactions
 
-import com.easydb.easydb.ElementTestBuilder
+import com.easydb.easydb.ElementCrudDtoTestBuilder
 import com.easydb.easydb.IntegrationDatabaseSpec
-import com.easydb.easydb.OperationTestBuilder
+import com.easydb.easydb.OperationDtoTestBuilder
 import com.easydb.easydb.TestHttpOperations
 import com.easydb.easydb.api.bucket.ElementFieldDto
 import com.easydb.easydb.api.transaction.OperationResultDto
 import com.easydb.easydb.api.transaction.TransactionDto
-import com.easydb.easydb.domain.bucket.BucketName
 import com.easydb.easydb.domain.bucket.BucketService
-import com.easydb.easydb.domain.bucket.ElementField
 import com.easydb.easydb.domain.transactions.Operation
 import com.easydb.easydb.domain.transactions.TransactionRepository
 import groovy.json.JsonOutput
@@ -18,6 +16,8 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.HttpClientErrorException
+
+import java.util.stream.Collectors
 
 
 class TransactionControllerSpec extends IntegrationDatabaseSpec implements TestHttpOperations {
@@ -48,10 +48,10 @@ class TransactionControllerSpec extends IntegrationDatabaseSpec implements TestH
         given:
         def transactionId = beginTransaction(spaceName).body.transactionId
 
-        def operation = OperationTestBuilder
+        def operation = OperationDtoTestBuilder
                 .builder()
                 .type(Operation.OperationType.CREATE)
-                .fields([ElementField.of("name", "Daniel")])
+                .fields([new ElementFieldDto("name", "Daniel")])
                 .elementId(null)
                 .bucketName(TEST_BUCKET_NAME)
                 .build()
@@ -65,17 +65,17 @@ class TransactionControllerSpec extends IntegrationDatabaseSpec implements TestH
         operations.size() == 1
         operations[0].type == operation.type
         operations[0].bucketName == operation.bucketName
-        operations[0].fields == operation.fields
+        operations[0].fields == operation.fields.stream().map({ it.toDomain() }).collect(Collectors.toList())
     }
 
     def "should throw 404 when adding create operation in not existing bucket"() {
         given:
         def transactionId = beginTransaction(spaceName).body.transactionId
 
-        def operation = OperationTestBuilder
+        def operation = OperationDtoTestBuilder
                 .builder()
                 .type(Operation.OperationType.CREATE)
-                .fields([ElementField.of("name", "Daniel")])
+                .fields([new ElementFieldDto("name", "Daniel")])
                 .elementId(null)
                 .bucketName("notExistingBucket")
                 .build()
@@ -84,7 +84,7 @@ class TransactionControllerSpec extends IntegrationDatabaseSpec implements TestH
         addOperation(spaceName, transactionId, operation)
 
         then:
-        def ex= thrown(HttpClientErrorException)
+        def ex = thrown(HttpClientErrorException)
         ex.statusCode == HttpStatus.NOT_FOUND
     }
 
@@ -100,12 +100,10 @@ class TransactionControllerSpec extends IntegrationDatabaseSpec implements TestH
     def "should throw 404 when adding operation to not existing transaction"() {
         given:
         // create bucket and element to be sure that 404 it thrown due to missing transaction
-        def element = ElementTestBuilder.builder()
-                .bucketName(new BucketName(spaceName, TEST_BUCKET_NAME))
-                .build()
+        def element = ElementCrudDtoTestBuilder.builder().build()
 
-        String elementId = addElement(spaceName, element).body.id
-        def operation = OperationTestBuilder.builder()
+        String elementId = addElement(spaceName, TEST_BUCKET_NAME, element).body.id
+        def operation = OperationDtoTestBuilder.builder()
                 .bucketName(TEST_BUCKET_NAME)
                 .elementId(elementId)
                 .build()
@@ -126,7 +124,7 @@ class TransactionControllerSpec extends IntegrationDatabaseSpec implements TestH
         given:
         def transactionId = beginTransaction(spaceName).body.transactionId
 
-        def operation = OperationTestBuilder
+        def operation = OperationDtoTestBuilder
                 .builder()
                 .type(Operation.OperationType.CREATE)
                 .build()
@@ -143,7 +141,7 @@ class TransactionControllerSpec extends IntegrationDatabaseSpec implements TestH
         given:
         def transactionId = beginTransaction(spaceName).body.transactionId
 
-        def operation = OperationTestBuilder.builder()
+        def operation = OperationDtoTestBuilder.builder()
                 .type(Operation.OperationType.UPDATE)
                 .elementId(null)
                 .build()
@@ -180,17 +178,13 @@ class TransactionControllerSpec extends IntegrationDatabaseSpec implements TestH
 
     def "should throw 400 when adding update operation without fields given"() {
         given:
-        def element = ElementTestBuilder
-                .builder()
-                .bucketName(new BucketName(spaceName, TEST_BUCKET_NAME))
-                .id(null)
-                .build()
+        def element = ElementCrudDtoTestBuilder.builder().build()
 
-        def elementId = addElement(spaceName, element).body.id
+        def elementId = addElement(spaceName, TEST_BUCKET_NAME, element).body.id
 
         def transactionId = beginTransaction(spaceName).body.transactionId
 
-        def operation = OperationTestBuilder.builder()
+        def operation = OperationDtoTestBuilder.builder()
                 .type(Operation.OperationType.UPDATE)
                 .bucketName(TEST_BUCKET_NAME)
                 .elementId(elementId)
@@ -209,7 +203,7 @@ class TransactionControllerSpec extends IntegrationDatabaseSpec implements TestH
         given:
         def transactionId = beginTransaction(spaceName).body.transactionId
 
-        def operation = OperationTestBuilder.builder()
+        def operation = OperationDtoTestBuilder.builder()
                 .type(Operation.OperationType.CREATE)
                 .bucketName(TEST_BUCKET_NAME)
                 .elementId(null)
@@ -228,18 +222,18 @@ class TransactionControllerSpec extends IntegrationDatabaseSpec implements TestH
         given:
         def transactionId = beginTransaction(spaceName).body.transactionId
 
-        def operationWithoutFieldName = OperationTestBuilder.builder()
+        def operationWithoutFieldName = OperationDtoTestBuilder.builder()
                 .type(Operation.OperationType.CREATE)
                 .bucketName(TEST_BUCKET_NAME)
                 .elementId(null)
-                .fields([ElementField.of("", "test")])
+                .fields([new ElementFieldDto("", "test")])
                 .build()
 
-        def operationWithoutFieldValue = OperationTestBuilder.builder()
+        def operationWithoutFieldValue = OperationDtoTestBuilder.builder()
                 .type(Operation.OperationType.CREATE)
                 .bucketName(TEST_BUCKET_NAME)
                 .elementId(null)
-                .fields([ElementField.of("test", "")])
+                .fields([new ElementFieldDto("test", "")])
                 .build()
 
         when:
@@ -261,15 +255,12 @@ class TransactionControllerSpec extends IntegrationDatabaseSpec implements TestH
         given:
         def transactionId = beginTransaction(spaceName).body.transactionId
 
-        def element = ElementTestBuilder.builder()
-                .bucketName(new BucketName(spaceName, TEST_BUCKET_NAME))
-                .id(null)
-                .build()
+        def element = ElementCrudDtoTestBuilder.builder().build()
 
         // creates bucket implicitly
-        addElement(spaceName, element)
+        addElement(spaceName, TEST_BUCKET_NAME, element)
 
-        def operation = OperationTestBuilder.builder()
+        def operation = OperationDtoTestBuilder.builder()
                 .type(Operation.OperationType.UPDATE)
                 .bucketName(TEST_BUCKET_NAME)
                 .build()
@@ -286,7 +277,7 @@ class TransactionControllerSpec extends IntegrationDatabaseSpec implements TestH
         given:
         def transactionId = beginTransaction(spaceName).body.transactionId
 
-        def operation = OperationTestBuilder.builder()
+        def operation = OperationDtoTestBuilder.builder()
                 .type(Operation.OperationType.DELETE)
                 .bucketName("notExistingBucket")
                 .build()
@@ -302,30 +293,26 @@ class TransactionControllerSpec extends IntegrationDatabaseSpec implements TestH
     def "should commit transaction"() {
         given:
         def transactionId = beginTransaction(spaceName).body.transactionId
-        def element1ToCreate = ElementTestBuilder.builder()
-                .fields([ElementField.of("name", "Antek")])
-                .bucketName(new BucketName(spaceName, TEST_BUCKET_NAME))
-                .id(null)
+        def element1ToCreate = ElementCrudDtoTestBuilder.builder()
+                .fields([new ElementFieldDto("name", "Antek")])
                 .build()
-        def element2ToCreate = ElementTestBuilder.builder()
-                .fields([ElementField.of("name", "Grażynka")])
-                .bucketName(new BucketName(spaceName, TEST_BUCKET_NAME))
-                .id(null)
+        def element2ToCreate = ElementCrudDtoTestBuilder.builder()
+                .fields([new ElementFieldDto("name", "Grażynka")])
                 .build()
 
-        def element1Id = addElement(spaceName, element1ToCreate).body.id
-        def element2Id = addElement(spaceName, element2ToCreate).body.id
+        def element1Id = addElement(spaceName, TEST_BUCKET_NAME, element1ToCreate).body.id
+        def element2Id = addElement(spaceName, TEST_BUCKET_NAME, element2ToCreate).body.id
 
         assert getElementsFromTestBucket(spaceName).results.size() == 2
 
-        def operationUpdateElement1 = OperationTestBuilder.builder()
+        def operationUpdateElement1 = OperationDtoTestBuilder.builder()
                 .type(Operation.OperationType.UPDATE)
                 .elementId(element1Id)
                 .bucketName(TEST_BUCKET_NAME)
-                .fields([ElementField.of("name", "Tadzik"), ElementField.of("age", "30")])
+                .fields([new ElementFieldDto("name", "Tadzik"), new ElementFieldDto("age", "30")])
                 .build()
 
-        def operationDeleteElement2 = OperationTestBuilder.builder()
+        def operationDeleteElement2 = OperationDtoTestBuilder.builder()
                 .type(Operation.OperationType.DELETE)
                 .bucketName(TEST_BUCKET_NAME)
                 .elementId(element2Id)
@@ -345,16 +332,13 @@ class TransactionControllerSpec extends IntegrationDatabaseSpec implements TestH
 
     def "should return operation read result"() {
         given:
-        def element = ElementTestBuilder.builder()
-                .bucketName(new BucketName(spaceName, TEST_BUCKET_NAME))
-                .id(null)
-                .build()
+        def element = ElementCrudDtoTestBuilder.builder().build()
 
-        def elementDto = addElement(spaceName, element).body
+        def elementDto = addElement(spaceName, TEST_BUCKET_NAME, element).body
 
         def transactionId = beginTransaction(spaceName).body.transactionId
 
-        def operation = OperationTestBuilder.builder()
+        def operation = OperationDtoTestBuilder.builder()
                 .bucketName(TEST_BUCKET_NAME)
                 .type(Operation.OperationType.READ)
                 .elementId(elementDto.id)

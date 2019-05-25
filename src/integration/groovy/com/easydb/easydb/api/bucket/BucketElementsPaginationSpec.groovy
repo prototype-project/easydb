@@ -1,10 +1,8 @@
 package com.easydb.easydb.api.bucket
 
-import com.easydb.easydb.ElementTestBuilder
+import com.easydb.easydb.ElementCrudDtoTestBuilder
 import com.easydb.easydb.IntegrationDatabaseSpec
 import com.easydb.easydb.TestHttpOperations
-import com.easydb.easydb.domain.bucket.BucketName
-import com.easydb.easydb.domain.bucket.ElementField
 import org.springframework.web.client.HttpClientErrorException;
 
 class BucketElementsPaginationSpec extends IntegrationDatabaseSpec implements TestHttpOperations {
@@ -15,32 +13,28 @@ class BucketElementsPaginationSpec extends IntegrationDatabaseSpec implements Te
         spaceName = addSampleSpace().body.spaceName
         createTestBucket(spaceName)
 
-        def testBucketName = new BucketName(spaceName, TEST_BUCKET_NAME)
         addElementToTestBucket(spaceName, buildElementBody(
-                ElementTestBuilder
+                ElementCrudDtoTestBuilder
                         .builder()
-                        .bucketName(testBucketName)
                         .clearFields()
-                        .addField(ElementField.of("firstName", "Daniel"))
-                        .addField(ElementField.of("lastName", "Faderski"))
+                        .addField(new ElementFieldDto("firstName", "Daniel"))
+                        .addField(new ElementFieldDto("lastName", "Faderski"))
                         .build()))
 
         addElementToTestBucket(spaceName, buildElementBody(
-                ElementTestBuilder
+                ElementCrudDtoTestBuilder
                         .builder()
-                        .bucketName(testBucketName)
                         .clearFields()
-                        .addField(ElementField.of("firstName", "Daniel"))
-                        .addField(ElementField.of("lastName", "Faderski"))
+                        .addField(new ElementFieldDto("firstName", "Daniel"))
+                        .addField(new ElementFieldDto("lastName", "Faderski"))
                         .build()))
 
         addElementToTestBucket(spaceName, buildElementBody(
-                ElementTestBuilder
+                ElementCrudDtoTestBuilder
                         .builder()
-                        .bucketName(testBucketName)
                         .clearFields()
-                        .addField(ElementField.of("firstName", "Daniel"))
-                        .addField(ElementField.of("lastName", "Faderski"))
+                        .addField(new ElementFieldDto("firstName", "Daniel"))
+                        .addField(new ElementFieldDto("lastName", "Faderski"))
                         .build()))
     }
 

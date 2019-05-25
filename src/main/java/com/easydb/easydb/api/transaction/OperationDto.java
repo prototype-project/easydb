@@ -60,6 +60,14 @@ public class OperationDto {
         return bucketName;
     }
 
+    public List<ElementFieldDto> getFields() {
+        return fields;
+    }
+
+    public String getElementId() {
+        return elementId;
+    }
+
     void validate() {
         if (!type.equals(CREATE) && hasEmptyId()) {
             throw new ElementIdMustNotBeEmptyException();

@@ -14,7 +14,7 @@ public class ElementFieldDto {
     private final String value;
 
     @JsonCreator
-    ElementFieldDto(
+    public ElementFieldDto(
             @JsonProperty("name") String name,
             @JsonProperty("value") String value) {
         this.name = name;

@@ -1,13 +1,13 @@
 package com.easydb.easydb
 
+import com.easydb.easydb.api.bucket.ElementCrudDto
+import com.easydb.easydb.api.bucket.ElementFieldDto
 import com.easydb.easydb.api.bucket.ElementQueryDto
+import com.easydb.easydb.api.transaction.OperationDto
 import com.easydb.easydb.api.transaction.OperationResultDto
 import com.easydb.easydb.api.bucket.PaginatedElementsDto
 import com.easydb.easydb.api.space.SpaceDefinitionDto
 import com.easydb.easydb.api.transaction.TransactionDto
-import com.easydb.easydb.domain.bucket.Element
-import com.easydb.easydb.domain.bucket.ElementField
-import com.easydb.easydb.domain.transactions.Operation
 import groovy.json.JsonOutput
 import groovy.transform.SelfType
 import org.springframework.http.HttpMethod
@@ -50,9 +50,9 @@ trait TestHttpOperations {
                 ElementQueryDto.class)
     }
 
-    ResponseEntity<ElementQueryDto> addElement(String spaceName, Element element) {
+    ResponseEntity<ElementQueryDto> addElement(String spaceName, String bucketName, ElementCrudDto element) {
         return restTemplate.exchange(
-                buildElementUrl(spaceName, element.bucketName.name),
+                buildElementUrl(spaceName, bucketName),
                 HttpMethod.POST,
                 httpJsonEntity(buildElementBody(element)),
                 ElementQueryDto.class)
@@ -81,11 +81,11 @@ trait TestHttpOperations {
 
     String sampleUpdateElementBody() {
         buildElementBody(
-                ElementTestBuilder
+                ElementCrudDtoTestBuilder
                         .builder()
                         .clearFields()
-                        .addField(ElementField.of("firstName", "john"))
-                        .addField(ElementField.of("lastName", "snow"))
+                        .addField(new ElementFieldDto("firstName", "john"))
+                        .addField(new ElementFieldDto("lastName", "snow"))
                         .build())
     }
 
@@ -103,7 +103,7 @@ trait TestHttpOperations {
         )
     }
 
-    ResponseEntity<OperationResultDto> addOperation(String spaceName, String transactionId, Operation operation) {
+    ResponseEntity<OperationResultDto> addOperation(String spaceName, String transactionId, OperationDto operation) {
         return restTemplate.exchange(
                 localUrl("/api/v1/spaces/${spaceName}/transactions/${transactionId}/add-operation"),
                 HttpMethod.POST,
@@ -119,13 +119,13 @@ trait TestHttpOperations {
         )
     }
 
-    String buildElementBody(Element element) {
+    String buildElementBody(ElementCrudDto element) {
         JsonOutput.toJson([
                 fields: element.fields.collect { ["name": it.name, "value": it.value] }
         ])
     }
 
-    String buildOperationBody(Operation operation) {
+    String buildOperationBody(OperationDto operation) {
         JsonOutput.toJson([
                 type      : operation.type,
                 fields    : operation.fields.collect { ["name": it.name, "value": it.value] },
@@ -153,8 +153,7 @@ trait TestHttpOperations {
     }
 
     private String sampleElementBody() {
-        buildElementBody(
-                ElementTestBuilder.builder().build())
+        buildElementBody(ElementCrudDtoTestBuilder.builder().build())
     }
 
     private String buildUrl(String spaceId, String bucketName, int limit, int offset, String query) {

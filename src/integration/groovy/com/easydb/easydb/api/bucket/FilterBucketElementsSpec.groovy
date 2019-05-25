@@ -1,10 +1,8 @@
 package com.easydb.easydb.api.bucket
 
-import com.easydb.easydb.ElementTestBuilder
+import com.easydb.easydb.ElementCrudDtoTestBuilder
 import com.easydb.easydb.IntegrationDatabaseSpec
 import com.easydb.easydb.TestHttpOperations
-import com.easydb.easydb.domain.bucket.BucketName
-import com.easydb.easydb.domain.bucket.ElementField
 import org.springframework.http.HttpStatus
 import org.springframework.web.client.HttpClientErrorException
 
@@ -21,32 +19,28 @@ class FilterBucketElementsSpec extends IntegrationDatabaseSpec implements TestHt
         spaceName = addSampleSpace().body.spaceName
         createTestBucket(spaceName)
 
-        def testBucketName = new BucketName(spaceName, TEST_BUCKET_NAME)
         danielFaderski = addElementToTestBucket(spaceName, buildElementBody(
-                ElementTestBuilder
+                ElementCrudDtoTestBuilder
                         .builder()
-                        .bucketName(testBucketName)
                         .clearFields()
-                        .addField(ElementField.of("firstName", "Daniel"))
-                        .addField(ElementField.of("lastName", "Faderski"))
+                        .addField(new ElementFieldDto("firstName", "Daniel"))
+                        .addField(new ElementFieldDto("lastName", "Faderski"))
                         .build())).getBody()
 
         janBrzechwa = addElementToTestBucket(spaceName, buildElementBody(
-                ElementTestBuilder
+                ElementCrudDtoTestBuilder
                         .builder()
-                        .bucketName(testBucketName)
                         .clearFields()
-                        .addField(ElementField.of("firstName", "Jan"))
-                        .addField(ElementField.of("lastName", "Brzechwa"))
+                        .addField(new ElementFieldDto("firstName", "Jan"))
+                        .addField(new ElementFieldDto("lastName", "Brzechwa"))
                         .build())).getBody()
 
         jurekOgorek = addElementToTestBucket(spaceName, buildElementBody(
-                ElementTestBuilder
+                ElementCrudDtoTestBuilder
                         .builder()
-                        .bucketName(testBucketName)
                         .clearFields()
-                        .addField(ElementField.of("firstName", "Jurek"))
-                        .addField(ElementField.of("lastName", "Ogórek"))
+                        .addField(new ElementFieldDto("firstName", "Jurek"))
+                        .addField(new ElementFieldDto("lastName", "Ogórek"))
                         .build())).getBody()
     }
 

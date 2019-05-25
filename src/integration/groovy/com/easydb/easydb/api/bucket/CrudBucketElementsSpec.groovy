@@ -1,6 +1,6 @@
 package com.easydb.easydb.api.bucket
 
-import com.easydb.easydb.ElementTestBuilder
+import com.easydb.easydb.ElementCrudDtoTestBuilder
 import com.easydb.easydb.ElementUtils
 import com.easydb.easydb.IntegrationDatabaseSpec
 import com.easydb.easydb.TestHttpOperations
@@ -31,11 +31,8 @@ class CrudBucketElementsSpec extends IntegrationDatabaseSpec implements TestHttp
     def setup() {
         spaceName = addSampleSpace().body.spaceName
         createTestBucket(spaceName)
-        someForSureExistingElementId = addElement(spaceName,
-                ElementTestBuilder
-                        .builder()
-                        .bucketName(new BucketName(spaceName, TEST_BUCKET_NAME))
-                        .build()).body.id
+        someForSureExistingElementId = addElement(spaceName, TEST_BUCKET_NAME,
+                ElementCrudDtoTestBuilder.builder().build()).body.id
     }
 
     def "should add element to bucket"() {

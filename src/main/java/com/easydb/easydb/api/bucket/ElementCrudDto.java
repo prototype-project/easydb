@@ -26,7 +26,7 @@ public class ElementCrudDto {
         return fields;
     }
 
-    public Element toDomain(String id, BucketName bucketName) {
+    Element toDomain(String id, BucketName bucketName) {
         return Element.of(id, bucketName, fields.stream()
                 .map(ElementFieldDto::toDomain)
                 .collect(Collectors.toList()));

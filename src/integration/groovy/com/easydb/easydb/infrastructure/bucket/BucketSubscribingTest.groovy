@@ -174,7 +174,7 @@ class BucketSubscribingTest extends IntegrationWithCleanedDatabaseSpec {
                         }        
                     }            
                 }                
-            }                    
+            }               
         """
 
         when:
