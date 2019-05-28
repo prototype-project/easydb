@@ -1,6 +1,5 @@
 package com.easydb.easydb
 
-import com.easydb.easydb.domain.bucket.BucketName
 import com.easydb.easydb.domain.bucket.BucketService
 import com.easydb.easydb.domain.bucket.transactions.BucketRepository
 import com.easydb.easydb.domain.space.SpaceRemovalService
@@ -11,7 +10,6 @@ import org.springframework.test.context.ContextConfiguration
 
 @ContextConfiguration(classes = SpaceTestConfig)
 class IntegrationDatabaseSpec extends BaseIntegrationSpec {
-    public static TEST_BUCKET_NAME = new BucketName("testSpace", "testBucket")
 
     @Autowired
     SpaceRepository spaceRepository

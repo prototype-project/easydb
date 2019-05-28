@@ -134,16 +134,16 @@ trait TestHttpOperations {
         ])
     }
 
-    String buildSpaceUrl(String spaceName = "") {
-        return localUrl("/api/v1/spaces/${spaceName}")
+    String buildElementUrl(String spaceName, String bucketName, String elementId = "") {
+        return buildBucketUrl(spaceName, bucketName) + "/elements/${elementId}"
     }
 
     String buildBucketUrl(String spaceName, String bucketName = "") {
         return buildSpaceUrl(spaceName) + "/buckets/${bucketName}"
     }
 
-    String buildElementUrl(String spaceName, String bucketName, String elementId = "") {
-        return buildBucketUrl(spaceName, bucketName) + "/elements/${elementId}"
+    String buildSpaceUrl(String spaceName = "") {
+        return localUrl("/api/v1/spaces/${spaceName}")
     }
 
     String buildBucketBody(String bucketName) {

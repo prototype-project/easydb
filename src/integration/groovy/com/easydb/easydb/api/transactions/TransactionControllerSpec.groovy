@@ -1,9 +1,8 @@
 package com.easydb.easydb.api.transactions
 
+import com.easydb.easydb.ApiIntegrationWithAutoCreatedSpace
 import com.easydb.easydb.ElementCrudDtoTestBuilder
-import com.easydb.easydb.IntegrationDatabaseSpec
 import com.easydb.easydb.OperationDtoTestBuilder
-import com.easydb.easydb.TestHttpOperations
 import com.easydb.easydb.api.bucket.ElementFieldDto
 import com.easydb.easydb.api.transaction.OperationResultDto
 import com.easydb.easydb.api.transaction.TransactionDto
@@ -20,7 +19,7 @@ import org.springframework.web.client.HttpClientErrorException
 import java.util.stream.Collectors
 
 
-class TransactionControllerSpec extends IntegrationDatabaseSpec implements TestHttpOperations {
+class TransactionControllerSpec extends ApiIntegrationWithAutoCreatedSpace {
 
     @Autowired
     BucketService bucketService
@@ -28,10 +27,7 @@ class TransactionControllerSpec extends IntegrationDatabaseSpec implements TestH
     @Autowired
     TransactionRepository repository
 
-    String spaceName
-
     def setup() {
-        spaceName = addSampleSpace().body.spaceName
         createTestBucket(spaceName)
     }
 

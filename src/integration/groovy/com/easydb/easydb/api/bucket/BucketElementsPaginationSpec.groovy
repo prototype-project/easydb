@@ -1,16 +1,12 @@
 package com.easydb.easydb.api.bucket
 
+import com.easydb.easydb.ApiIntegrationWithAutoCreatedSpace
 import com.easydb.easydb.ElementCrudDtoTestBuilder
-import com.easydb.easydb.IntegrationDatabaseSpec
-import com.easydb.easydb.TestHttpOperations
 import org.springframework.web.client.HttpClientErrorException;
 
-class BucketElementsPaginationSpec extends IntegrationDatabaseSpec implements TestHttpOperations {
-
-    private String spaceName
+class BucketElementsPaginationSpec extends ApiIntegrationWithAutoCreatedSpace {
 
     def setup() {
-        spaceName = addSampleSpace().body.spaceName
         createTestBucket(spaceName)
 
         addElementToTestBucket(spaceName, buildElementBody(

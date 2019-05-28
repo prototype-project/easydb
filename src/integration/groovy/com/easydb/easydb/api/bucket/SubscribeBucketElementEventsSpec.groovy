@@ -1,8 +1,7 @@
 package com.easydb.easydb.api.bucket
 
+import com.easydb.easydb.ApiIntegrationWithAutoCreatedSpace
 import com.easydb.easydb.ElementCrudDtoTestBuilder
-import com.easydb.easydb.IntegrationDatabaseSpec
-import com.easydb.easydb.TestHttpOperations
 import com.easydb.easydb.domain.bucket.ElementEvent
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.FluxExchangeResult
@@ -13,14 +12,11 @@ import java.time.Duration
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
-class SubscribeBucketElementEventsSpec extends IntegrationDatabaseSpec implements TestHttpOperations {
+class SubscribeBucketElementEventsSpec extends ApiIntegrationWithAutoCreatedSpace {
 
     static TIMEOUT = Duration.ofSeconds(5)
 
-    private String spaceName
-
     def setup() {
-        spaceName = addSampleSpace().body.spaceName
         createTestBucket(spaceName)
     }
 

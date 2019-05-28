@@ -1,9 +1,8 @@
 package com.easydb.easydb.api.bucket
 
+import com.easydb.easydb.ApiIntegrationWithAutoCreatedSpace
 import com.easydb.easydb.ElementCrudDtoTestBuilder
 import com.easydb.easydb.ElementUtils
-import com.easydb.easydb.IntegrationDatabaseSpec
-import com.easydb.easydb.TestHttpOperations
 import com.easydb.easydb.domain.bucket.BucketName
 import com.easydb.easydb.domain.bucket.BucketQuery
 import com.easydb.easydb.domain.bucket.BucketService
@@ -17,7 +16,7 @@ import org.springframework.web.client.HttpClientErrorException
 
 import java.util.stream.Collectors
 
-class CrudBucketElementsSpec extends IntegrationDatabaseSpec implements TestHttpOperations, ElementUtils {
+class CrudBucketElementsSpec extends ApiIntegrationWithAutoCreatedSpace implements ElementUtils {
 
     @Autowired
     SpaceRemovalService spaceRemovalService
@@ -25,11 +24,9 @@ class CrudBucketElementsSpec extends IntegrationDatabaseSpec implements TestHttp
     @Autowired
     BucketService bucketService
 
-    String spaceName
     String someForSureExistingElementId
 
     def setup() {
-        spaceName = addSampleSpace().body.spaceName
         createTestBucket(spaceName)
         someForSureExistingElementId = addElement(spaceName, TEST_BUCKET_NAME,
                 ElementCrudDtoTestBuilder.builder().build()).body.id

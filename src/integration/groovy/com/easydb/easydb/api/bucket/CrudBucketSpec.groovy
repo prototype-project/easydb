@@ -1,7 +1,6 @@
 package com.easydb.easydb.api.bucket
 
-import com.easydb.easydb.IntegrationDatabaseSpec
-import com.easydb.easydb.TestHttpOperations
+import com.easydb.easydb.ApiIntegrationWithAutoCreatedSpace
 import com.easydb.easydb.domain.bucket.BucketName
 import com.easydb.easydb.domain.bucket.BucketService
 import org.springframework.beans.factory.annotation.Autowired
@@ -10,18 +9,12 @@ import org.springframework.web.client.HttpClientErrorException
 import org.springframework.web.client.RestTemplate
 
 
-class CrudBucketSpec extends IntegrationDatabaseSpec implements TestHttpOperations {
+class CrudBucketSpec extends ApiIntegrationWithAutoCreatedSpace {
 
     RestTemplate restTemplate = new RestTemplate()
 
     @Autowired
     BucketService bucketService
-
-    String spaceName
-
-    def setup() {
-        spaceName = addSampleSpace().body.spaceName
-    }
 
     def "should create bucket"() {
         when:
