@@ -37,7 +37,7 @@ public class TransactionCommitter {
 
             transaction.getOperations().forEach(o -> performOperation(o, transaction, eventsToEmit));
         } catch (Exception e) {
-            logger.info("Error during committing transaction {}. Making rollback...", transaction.getId(), e);
+            logger.info("Error during committing transaction {}. Making rollback...", transaction.getKey(), e);
             throw e;
         } finally {
             cleanupLocks(transaction);
@@ -50,7 +50,7 @@ public class TransactionCommitter {
     }
 
     private void performOperation(Operation o, Transaction t, List<ElementEvent> events) {
-        BucketName bucketName = new BucketName(t.getSpaceName(), o.getBucketName());
+        BucketName bucketName = new BucketName(t.getKey().getSpaceName(), o.getBucketName());
 
         Element element = Element.of(o.getElementId(), bucketName, o.getFields());
         switch (o.getType()) {
@@ -69,7 +69,7 @@ public class TransactionCommitter {
     }
 
     private Element performUpdateOperation(Operation o, Transaction t) {
-        BucketName bucketName = new BucketName(t.getSpaceName(), o.getBucketName());
+        BucketName bucketName = new BucketName(t.getKey().getSpaceName(), o.getBucketName());
 
         Optional<Long> version = Optional.ofNullable(t.getReadElements().get(o.getElementId()));
         VersionedElement versionedElement = version.map(v -> VersionedElement.of(o.getElementId(), bucketName, o.getFields(), v))
@@ -82,7 +82,7 @@ public class TransactionCommitter {
     private void setupLocks(Transaction transaction) {
         transaction.getOperations().forEach(o -> {
             if (operationRequiresElementLock(o)) {
-                BucketName bucketName = new BucketName(transaction.getSpaceName(), o.getBucketName());
+                BucketName bucketName = new BucketName(transaction.getKey().getSpaceName(), o.getBucketName());
                 lockerRetryer.performWithRetries(() -> elementsLocker.lockElement(bucketName, o.getElementId()));
             }
         });
@@ -92,7 +92,7 @@ public class TransactionCommitter {
         // TODO think about corner cases (e.g. unlocking not already locked element)
         transaction.getOperations().forEach(o -> {
             if (operationRequiresElementLock(o)) {
-                BucketName bucketName = new BucketName(transaction.getSpaceName(), o.getBucketName());
+                BucketName bucketName = new BucketName(transaction.getKey().getSpaceName(), o.getBucketName());
                 elementsLocker.unlockElement(bucketName, o.getElementId());
             }
         });

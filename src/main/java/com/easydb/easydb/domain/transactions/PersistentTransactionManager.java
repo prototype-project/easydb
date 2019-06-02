@@ -40,10 +40,12 @@ public class PersistentTransactionManager {
         return uuid;
     }
 
-    public OperationResult addOperation(String transactionId, Operation operation) {
-        Transaction transaction = transactionRepository.get(transactionId);
+    public OperationResult addOperation(TransactionKey transactionKey, Operation operation) {
+        transactionConstraintsValidator.ensureSpaceExists(transactionKey.getSpaceName());
 
-        transactionConstraintsValidator.ensureOperationConstraints(transaction.getSpaceName(), operation);
+        Transaction transaction = transactionRepository.get(transactionKey);
+
+        transactionConstraintsValidator.ensureOperationConstraints(transaction.getKey().getSpaceName(), operation);
 
         OperationResult result = getResultForOperation(transaction, operation);
 
@@ -55,42 +57,42 @@ public class PersistentTransactionManager {
         return result;
     }
 
-    public Transaction commitTransaction(String transactionId) {
-        Transaction transaction = transactionRepository.get(transactionId);
-        metrics.compoundTransactionTimer(transaction.getSpaceName())
+    public void commitTransaction(TransactionKey transactionKey) {
+        transactionConstraintsValidator.ensureSpaceExists(transactionKey.getSpaceName());
+
+        Transaction transaction = transactionRepository.get(transactionKey);
+        metrics.compoundTransactionTimer(transaction.getKey().getSpaceName())
                 .record(() -> commit(transaction));
-        return transaction;
     }
 
     private void commit(Transaction transaction) {
-
         try {
             transactionCommitter.commit(transaction);
         } catch (Exception e) {
-            logger.info("Aborting transaction {} ...", transaction.getId(), e);
-            metrics.abortedTransactionCounter(transaction.getSpaceName()).increment();
+            logger.info("Aborting transaction {} ...", transaction.getKey().getId(), e);
+            metrics.abortedTransactionCounter(transaction.getKey().getId()).increment();
             throw new TransactionAbortedException(
-                    "Transaction " + transaction.getId() + " was aborted", e);
+                    "Transaction " + transaction.getKey().getId() + " was aborted", e);
         } finally {
             transactionRepository.delete(transaction);
         }
     }
 
     private OperationResult getResultForOperation(Transaction t, Operation o) {
-        BucketName bucketName = new BucketName(t.getSpaceName(), o.getBucketName());
+        BucketName bucketName = new BucketName(t.getKey().getSpaceName(), o.getBucketName());
         try {
             if (o.getType().equals(Operation.OperationType.READ)) {
                 return Optional.ofNullable(t.getReadElements().get(o.getElementId()))
                         .map(version ->
-                                OperationResult.of(elementService.getElement(bucketName, o.getElementId(), version), t.getSpaceName()))
-                        .orElseGet(() -> OperationResult.of(elementService.getElement(bucketName, o.getElementId()), t.getSpaceName()));
+                                OperationResult.of(elementService.getElement(bucketName, o.getElementId(), version), t.getKey().getSpaceName()))
+                        .orElseGet(() -> OperationResult.of(elementService.getElement(bucketName, o.getElementId()), t.getKey().getSpaceName()));
             }
-            return OperationResult.emptyResult(t.getSpaceName());
+            return OperationResult.emptyResult(t.getKey().getSpaceName());
         } catch (ConcurrentTransactionDetectedException e) {
-            logger.info("Aborting transaction {} ...", t.getId(), e);
-            metrics.abortedTransactionCounter(t.getSpaceName()).increment();
+            logger.info("Aborting transaction {} ...", t.getKey(), e);
+            metrics.abortedTransactionCounter(t.getKey().getSpaceName()).increment();
             throw new TransactionAbortedException(
-                    "Transaction " + t.getId() + " was aborted", e);
+                    "Transaction " + t.getKey() + " was aborted", e);
         }
     }
 

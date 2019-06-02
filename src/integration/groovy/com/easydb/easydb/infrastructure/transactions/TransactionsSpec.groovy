@@ -14,6 +14,7 @@ import com.easydb.easydb.domain.transactions.OperationResult
 import com.easydb.easydb.domain.transactions.TransactionAbortedException
 import com.easydb.easydb.domain.transactions.PersistentTransactionManager
 import com.easydb.easydb.domain.transactions.TransactionDoesNotExistException
+import com.easydb.easydb.domain.transactions.TransactionKey
 import com.easydb.easydb.domain.transactions.TransactionRepository
 import org.springframework.beans.factory.annotation.Autowired
 
@@ -56,13 +57,13 @@ class TransactionsSpec extends IntegrationWithCleanedDatabaseSpec implements Ele
                 .fields([ElementField.of("counter", "1")])
                 .elementId(element.id)
                 .build()
-        transactionManager.addOperation(transactionId, modifyOperation)
+        transactionManager.addOperation(TransactionKey.of(TEST_BUCKET_NAME.spaceName, transactionId), modifyOperation)
 
         then: "element has still old value until transaction commits"
         bucketService.getElement(TEST_BUCKET_NAME, element.id).fields[0].value == '0'
 
         and: "transaction finally commits"
-        transactionManager.commitTransaction(transactionId)
+        transactionManager.commitTransaction(TransactionKey.of(TEST_BUCKET_NAME.getSpaceName(), transactionId))
 
         then: "element has value changed"
         bucketService.getElement(TEST_BUCKET_NAME, element.id).fields[0].value == '1'
@@ -83,7 +84,7 @@ class TransactionsSpec extends IntegrationWithCleanedDatabaseSpec implements Ele
                 .type(Operation.OperationType.READ)
                 .elementId(element.id)
                 .build()
-        OperationResult readResult = transactionManager.addOperation(transactionId, readOperation)
+        OperationResult readResult = transactionManager.addOperation(TransactionKey.of(TEST_BUCKET_NAME.spaceName, transactionId), readOperation)
 
         then:
         readResult.element.isPresent()
@@ -97,7 +98,7 @@ class TransactionsSpec extends IntegrationWithCleanedDatabaseSpec implements Ele
                 .build())
 
         when: "second read should prevent non-repeatable read and cause the transaction to abort"
-        transactionManager.addOperation(transactionId, readOperation)
+        transactionManager.addOperation(TransactionKey.of(TEST_BUCKET_NAME.spaceName, transactionId), readOperation)
 
         then:
         thrown(TransactionAbortedException)
@@ -118,7 +119,7 @@ class TransactionsSpec extends IntegrationWithCleanedDatabaseSpec implements Ele
                 .type(Operation.OperationType.UPDATE)
                 .elementId(element.id)
                 .build()
-        OperationResult updateResult = transactionManager.addOperation(transactionId, updateOperation)
+        OperationResult updateResult = transactionManager.addOperation(TransactionKey.of(TEST_BUCKET_NAME.getSpaceName(), transactionId), updateOperation)
 
         then:
         !updateResult.element.isPresent()
@@ -127,7 +128,7 @@ class TransactionsSpec extends IntegrationWithCleanedDatabaseSpec implements Ele
         bucketService.removeElement(TEST_BUCKET_NAME, element.id)
 
         when: "when first transaction commits it should prevent dirty write and abort"
-        transactionManager.commitTransaction(transactionId)
+        transactionManager.commitTransaction(TransactionKey.of(TEST_BUCKET_NAME.spaceName, transactionId))
 
         then:
         thrown(TransactionAbortedException)
@@ -148,7 +149,7 @@ class TransactionsSpec extends IntegrationWithCleanedDatabaseSpec implements Ele
                 .type(Operation.OperationType.READ)
                 .elementId(element.id)
                 .build()
-        OperationResult readResult = transactionManager.addOperation(transactionId, readOperation)
+        OperationResult readResult = transactionManager.addOperation(TransactionKey.of(TEST_BUCKET_NAME.spaceName, transactionId), readOperation)
 
         then:
         readResult.element.isPresent()
@@ -166,13 +167,13 @@ class TransactionsSpec extends IntegrationWithCleanedDatabaseSpec implements Ele
                 .type(Operation.OperationType.UPDATE)
                 .elementId(element.id)
                 .build()
-        OperationResult updateResult = transactionManager.addOperation(transactionId, updateOperation)
+        OperationResult updateResult = transactionManager.addOperation(TransactionKey.of(TEST_BUCKET_NAME.spaceName, transactionId), updateOperation)
 
         then:
         !updateResult.element.isPresent()
 
         when: "when first transaction commits it should prevent dirty write and abort"
-        transactionManager.commitTransaction(transactionId)
+        transactionManager.commitTransaction(TransactionKey.of(TEST_BUCKET_NAME.spaceName, transactionId))
 
         then:
         thrown(TransactionAbortedException)
@@ -181,10 +182,10 @@ class TransactionsSpec extends IntegrationWithCleanedDatabaseSpec implements Ele
     def "should remove transaction after commit"() {
         given:
         def transactionId = transactionManager.beginTransaction(TEST_BUCKET_NAME.spaceName)
-        transactionManager.commitTransaction(transactionId)
+        transactionManager.commitTransaction(TransactionKey.of(TEST_BUCKET_NAME.spaceName, transactionId))
 
         when:
-        transactionRepository.get(transactionId)
+        transactionRepository.get(TransactionKey.of(TEST_BUCKET_NAME.spaceName, transactionId))
 
         then:
         thrown(TransactionDoesNotExistException)

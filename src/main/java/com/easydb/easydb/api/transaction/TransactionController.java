@@ -5,6 +5,7 @@ import com.easydb.easydb.domain.bucket.BucketName;
 import com.easydb.easydb.domain.space.UUIDProvider;
 import com.easydb.easydb.domain.transactions.OperationResult;
 import com.easydb.easydb.domain.transactions.PersistentTransactionManager;
+import com.easydb.easydb.domain.transactions.TransactionKey;
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,11 +40,12 @@ class TransactionController {
 
     @PostMapping("/{transactionId}/add-operation")
     @ResponseStatus(value = HttpStatus.CREATED)
-    OperationResultDto addOperation(@PathVariable("spaceName") String spaceName, // TODO
+    OperationResultDto addOperation(@PathVariable("spaceName") String spaceName,
                                     @PathVariable("transactionId") String transactionId,
                                     @RequestBody @Valid OperationDto dto) {
         dto.validate();
-        OperationResult operationResult = persistentTransactionManager.addOperation(transactionId, dto.toDomain(uuidProvider));
+        TransactionKey transactionKey = TransactionKey.of(spaceName, transactionId);
+        OperationResult operationResult = persistentTransactionManager.addOperation(transactionKey, dto.toDomain(uuidProvider));
 
         BucketName bucketName = new BucketName(operationResult.getSpaceName(), dto.getBucketName());
         metrics.addOperationToTransactionRequestCounter(bucketName, dto.getType().toString()).increment();
@@ -52,8 +54,9 @@ class TransactionController {
 
     @PostMapping("/{transactionId}/commit")
     @ResponseStatus(value = HttpStatus.OK)
-    void commitTransaction(@PathVariable String transactionId) {
-        String spaceName = persistentTransactionManager.commitTransaction(transactionId).getSpaceName();
+    void commitTransaction(@PathVariable("spaceName") String spaceName,
+                           @PathVariable String transactionId) {
+        persistentTransactionManager.commitTransaction(TransactionKey.of(spaceName, transactionId));
         metrics.commitTransactionRequestCounter(spaceName).increment();
     }
 }

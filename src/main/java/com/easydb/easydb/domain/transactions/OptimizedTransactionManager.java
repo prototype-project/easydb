@@ -34,12 +34,12 @@ public class OptimizedTransactionManager {
     }
 
     public void addOperation(Transaction transaction, Operation operation) {
-        transactionConstraintsValidator.ensureOperationConstraints(transaction.getSpaceName(), operation);
+        transactionConstraintsValidator.ensureOperationConstraints(transaction.getKey().getSpaceName(), operation);
         transaction.addOperation(operation);
     }
 
     public void commitTransaction(Transaction transaction) {
-        metrics.singleElementTransactionTimer(transaction.getSpaceName())
+        metrics.singleElementTransactionTimer(transaction.getKey().getSpaceName())
                 .record(() -> commit(transaction));
     }
 
@@ -47,10 +47,10 @@ public class OptimizedTransactionManager {
         try {
             transactionCommitter.commit(transaction);
         } catch (Exception e) {
-            logger.info("Aborting transaction {} ...", transaction.getId(), e);
-            metrics.abortedTransactionCounter(transaction.getSpaceName()).increment();
+            logger.info("Aborting transaction {}...", transaction.getKey(), e);
+            metrics.abortedTransactionCounter(transaction.getKey().getSpaceName()).increment();
             throw new TransactionAbortedException(
-                    "Transaction " + transaction.getId() + " was aborted", e);
+                    "Transaction " + transaction.getKey() + " was aborted", e);
         }
     }
 }

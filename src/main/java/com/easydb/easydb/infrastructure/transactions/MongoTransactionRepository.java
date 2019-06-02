@@ -2,6 +2,7 @@ package com.easydb.easydb.infrastructure.transactions;
 
 import com.easydb.easydb.domain.transactions.Transaction;
 import com.easydb.easydb.domain.transactions.TransactionDoesNotExistException;
+import com.easydb.easydb.domain.transactions.TransactionKey;
 import com.easydb.easydb.domain.transactions.TransactionRepository;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
@@ -15,41 +16,45 @@ public class MongoTransactionRepository implements TransactionRepository {
 
     @Override
     public void save(Transaction t) {
-        mongoTemplate.insert(fromDomain(t));
+        mongoTemplate.insert(fromDomain(t), resolveTransactionCollectionName(t.getKey().getSpaceName()));
     }
 
     @Override
-    public Transaction get(String uuid) {
-        PersistentTransaction persistentTransaction = getPersistentTransaction(uuid);
+    public Transaction get(TransactionKey transactionKey) {
+        PersistentTransaction persistentTransaction = getPersistentTransaction(transactionKey);
         if (persistentTransaction == null) {
-            throw new TransactionDoesNotExistException(uuid);
+            throw new TransactionDoesNotExistException(transactionKey);
         }
-        return persistentTransaction.toDomain();
+        return persistentTransaction.toDomain(transactionKey.getSpaceName());
     }
 
     @Override
     public void update(Transaction t) {
-        ensureTransactionExists(t.getId());
-        mongoTemplate.save(fromDomain(t));
+        ensureTransactionExists(t.getKey());
+        mongoTemplate.save(fromDomain(t), resolveTransactionCollectionName(t.getKey().getSpaceName()));
     }
 
     @Override
     public void delete(Transaction t) throws TransactionDoesNotExistException {
-        ensureTransactionExists(t.getId());
-        mongoTemplate.remove(fromDomain(t));
+        ensureTransactionExists(t.getKey());
+        mongoTemplate.remove(fromDomain(t), resolveTransactionCollectionName(t.getKey().getSpaceName()));
     }
 
-    private PersistentTransaction getPersistentTransaction(String id) {
-        return mongoTemplate.findById(id, PersistentTransaction.class);
-    }
-
-    private void ensureTransactionExists(String id) {
-        if (getPersistentTransaction(id) == null) {
-            throw new TransactionDoesNotExistException(id);
+    private void ensureTransactionExists(TransactionKey transactionKey) {
+        if (getPersistentTransaction(transactionKey) == null) {
+            throw new TransactionDoesNotExistException(transactionKey);
         }
     }
 
+    private PersistentTransaction getPersistentTransaction(TransactionKey transactionKey) {
+        return mongoTemplate.findById(transactionKey.getId(), PersistentTransaction.class, resolveTransactionCollectionName(transactionKey.getSpaceName()));
+    }
+
     private PersistentTransaction fromDomain(Transaction t) {
-        return new PersistentTransaction(t.getSpaceName(), t.getId(), t.getOperations(), t.getReadElements());
+        return new PersistentTransaction(t.getKey().getId(), t.getOperations(), t.getReadElements());
+    }
+
+    private String resolveTransactionCollectionName(String spaceName) {
+        return spaceName + ":transactions";
     }
 }

@@ -10,8 +10,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 class PersistentTransaction {
 
-    private final String spaceName;
-
     @Id
     private final String id;
 
@@ -20,16 +18,15 @@ class PersistentTransaction {
     private final Map<String, Long> readElements;
 
 
-    PersistentTransaction(String spaceName, String id,
+    PersistentTransaction(String id,
                           List<Operation> operations,
                           Map<String, Long> readElements) {
-        this.spaceName = spaceName;
         this.id = id;
         this.operations = operations;
         this.readElements = readElements;
     }
 
-    Transaction toDomain() {
+    Transaction toDomain(String spaceName) {
         return new Transaction(spaceName, id, operations, readElements);
     }
 

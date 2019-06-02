@@ -8,6 +8,7 @@ import com.easydb.easydb.api.transaction.OperationResultDto
 import com.easydb.easydb.api.transaction.TransactionDto
 import com.easydb.easydb.domain.bucket.BucketService
 import com.easydb.easydb.domain.transactions.Operation
+import com.easydb.easydb.domain.transactions.TransactionKey
 import com.easydb.easydb.domain.transactions.TransactionRepository
 import groovy.json.JsonOutput
 import org.springframework.beans.factory.annotation.Autowired
@@ -37,7 +38,7 @@ class TransactionControllerSpec extends ApiIntegrationWithAutoCreatedSpace {
 
         then:
         response.statusCodeValue == 201
-        repository.get(response.body.transactionId) != null
+        repository.get(TransactionKey.of(spaceName, response.body.transactionId)) != null
     }
 
     def "should add operation to transaction"() {
@@ -57,63 +58,11 @@ class TransactionControllerSpec extends ApiIntegrationWithAutoCreatedSpace {
 
         then:
         response.statusCode == HttpStatus.CREATED
-        def operations = repository.get(transactionId).operations
+        def operations = repository.get(TransactionKey.of(spaceName, transactionId)).operations
         operations.size() == 1
         operations[0].type == operation.type
         operations[0].bucketName == operation.bucketName
         operations[0].fields == operation.fields.stream().map({ it.toDomain() }).collect(Collectors.toList())
-    }
-
-    def "should throw 404 when adding create operation in not existing bucket"() {
-        given:
-        def transactionId = beginTransaction(spaceName).body.transactionId
-
-        def operation = OperationDtoTestBuilder
-                .builder()
-                .type(Operation.OperationType.CREATE)
-                .fields([new ElementFieldDto("name", "Daniel")])
-                .elementId(null)
-                .bucketName("notExistingBucket")
-                .build()
-
-        when:
-        addOperation(spaceName, transactionId, operation)
-
-        then:
-        def ex = thrown(HttpClientErrorException)
-        ex.statusCode == HttpStatus.NOT_FOUND
-    }
-
-    def "should throw 404 when creating transaction for not existing space"() {
-        when:
-        beginTransaction("notExistingSpace")
-
-        then:
-        def response = thrown(HttpClientErrorException)
-        response.statusCode == HttpStatus.NOT_FOUND
-    }
-
-    def "should throw 404 when adding operation to not existing transaction"() {
-        given:
-        // create bucket and element to be sure that 404 it thrown due to missing transaction
-        def element = ElementCrudDtoTestBuilder.builder().build()
-
-        String elementId = addElement(spaceName, TEST_BUCKET_NAME, element).body.id
-        def operation = OperationDtoTestBuilder.builder()
-                .bucketName(TEST_BUCKET_NAME)
-                .elementId(elementId)
-                .build()
-
-        when:
-        restTemplate.exchange(
-                localUrl("/api/v1/transactions/${spaceName}/add-operation/notExistingTransaction"),
-                HttpMethod.POST,
-                httpJsonEntity(buildOperationBody(operation)),
-                Void.class)
-
-        then:
-        def response = thrown(HttpClientErrorException)
-        response.statusCode == HttpStatus.NOT_FOUND
     }
 
     def "should throw 400 when adding create operation with given element id"() {
@@ -247,45 +196,6 @@ class TransactionControllerSpec extends ApiIntegrationWithAutoCreatedSpace {
         responseOperationWithoutFieldValue.statusCode == HttpStatus.BAD_REQUEST
     }
 
-    def "should throw 404 when adding operation for not existing element"() {
-        given:
-        def transactionId = beginTransaction(spaceName).body.transactionId
-
-        def element = ElementCrudDtoTestBuilder.builder().build()
-
-        // creates bucket implicitly
-        addElement(spaceName, TEST_BUCKET_NAME, element)
-
-        def operation = OperationDtoTestBuilder.builder()
-                .type(Operation.OperationType.UPDATE)
-                .bucketName(TEST_BUCKET_NAME)
-                .build()
-
-        when:
-        addOperation(spaceName, transactionId, operation)
-
-        then:
-        def response = thrown(HttpClientErrorException)
-        response.statusCode == HttpStatus.NOT_FOUND
-    }
-
-    def "should throw 404 when adding operation for not existing bucket"() {
-        given:
-        def transactionId = beginTransaction(spaceName).body.transactionId
-
-        def operation = OperationDtoTestBuilder.builder()
-                .type(Operation.OperationType.DELETE)
-                .bucketName("notExistingBucket")
-                .build()
-
-        when:
-        addOperation(spaceName, transactionId, operation)
-
-        then:
-        def response = thrown(HttpClientErrorException)
-        response.statusCode == HttpStatus.NOT_FOUND
-    }
-
     def "should commit transaction"() {
         given:
         def transactionId = beginTransaction(spaceName).body.transactionId
@@ -345,5 +255,112 @@ class TransactionControllerSpec extends ApiIntegrationWithAutoCreatedSpace {
         then:
         result.element.isPresent()
         result.element.get().fields == elementDto.fields
+    }
+
+    def "should throw 404 when adding operation to not existing space"() {
+        def operation = OperationDtoTestBuilder.builder()
+                .bucketName(TEST_BUCKET_NAME)
+                .build()
+
+        when:
+        restTemplate.exchange(
+                localUrl("/api/v1/spaces/notExisting/transactions/whatever/add-operation"),
+                HttpMethod.POST,
+                httpJsonEntity(buildOperationBody(operation)),
+                Void.class)
+
+        then:
+        def response = thrown(HttpClientErrorException)
+        response.statusCode == HttpStatus.NOT_FOUND
+        response.responseBodyAsString =~ "SPACE_DOES_NOT_EXIST"
+    }
+
+    def "should throw 404 when adding operation for not existing bucket"() {
+        given:
+        def transactionId = beginTransaction(spaceName).body.transactionId
+
+        def operation = OperationDtoTestBuilder.builder()
+                .type(Operation.OperationType.DELETE)
+                .bucketName("notExistingBucket")
+                .build()
+
+        when:
+        addOperation(spaceName, transactionId, operation)
+
+        then:
+        def response = thrown(HttpClientErrorException)
+        response.statusCode == HttpStatus.NOT_FOUND
+        response.responseBodyAsString =~ "BUCKET_DOES_NOT_EXIST"
+    }
+
+    def "should throw 404 when adding operation for not existing element"() {
+        given:
+        def transactionId = beginTransaction(spaceName).body.transactionId
+
+        def operation = OperationDtoTestBuilder.builder()
+                .type(Operation.OperationType.UPDATE)
+                .bucketName(TEST_BUCKET_NAME)
+                .build()
+
+        when:
+        addOperation(spaceName, transactionId, operation)
+
+        then:
+        def response = thrown(HttpClientErrorException)
+        response.statusCode == HttpStatus.NOT_FOUND
+        response.responseBodyAsString =~ "ELEMENT_DOES_NOT_EXIST"
+    }
+
+    def "should throw 404 when creating transaction for not existing space"() {
+        when:
+        beginTransaction("notExistingSpace")
+
+        then:
+        def response = thrown(HttpClientErrorException)
+        response.statusCode == HttpStatus.NOT_FOUND
+        response.responseBodyAsString =~ "SPACE_DOES_NOT_EXIST"
+    }
+
+    def "should throw 404 when adding operation to not existing transaction"() {
+        given:
+        def element = ElementCrudDtoTestBuilder.builder().build()
+
+        String elementId = addElement(spaceName, TEST_BUCKET_NAME, element).body.id
+        def operation = OperationDtoTestBuilder.builder()
+                .bucketName(TEST_BUCKET_NAME)
+                .elementId(elementId)
+                .build()
+
+        when:
+        restTemplate.exchange(
+                localUrl("/api/v1/spaces/${spaceName}/transactions/notExistingTransaction/add-operation"),
+                HttpMethod.POST,
+                httpJsonEntity(buildOperationBody(operation)),
+                Void.class)
+
+        then:
+        def response = thrown(HttpClientErrorException)
+        response.statusCode == HttpStatus.NOT_FOUND
+        response.responseBodyAsString =~ "TRANSACTION_DOES_NOT_EXIST"
+    }
+
+    def "should throw 404 when committing transaction in not existing space"() {
+        when:
+        commitTransaction("not existing space", "whatever")
+
+        then:
+        def response = thrown(HttpClientErrorException)
+        response.statusCode == HttpStatus.NOT_FOUND
+        response.responseBodyAsString =~ "SPACE_DOES_NOT_EXIST"
+    }
+
+    def "should throw 404 when committing not existing transaction"() {
+        when:
+        commitTransaction(spaceName, "notExistingTransactionId")
+
+        then:
+        def response = thrown(HttpClientErrorException)
+        response.statusCode == HttpStatus.NOT_FOUND
+        response.responseBodyAsString =~ "TRANSACTION_DOES_NOT_EXIST"
     }
 }

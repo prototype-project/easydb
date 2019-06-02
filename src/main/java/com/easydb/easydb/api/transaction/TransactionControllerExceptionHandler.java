@@ -15,7 +15,7 @@ class TransactionControllerExceptionHandler extends ResponseEntityExceptionHandl
 
     @ExceptionHandler(value = {TransactionDoesNotExistException.class})
     ResponseEntity<ApiError> handleTransactionDoesNotExistException(TransactionDoesNotExistException ex) {
-        return mapError(ApiError.of("TRANSACTION_DOES_NOT_EXISTS", HttpStatus.NOT_FOUND, ex.getMessage()));
+        return mapError(ApiError.of("TRANSACTION_DOES_NOT_EXIST", HttpStatus.NOT_FOUND, ex.getMessage()));
     }
 
     @ExceptionHandler(value = {TransactionAbortedException.class})

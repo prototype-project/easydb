@@ -9,34 +9,28 @@ import java.util.Map;
 
 public class Transaction {
 
-    private final String id;
-    private String spaceName;
+    private final TransactionKey transactionKey;
     private final List<Operation> operations;
     private final Map<String, Long> readElements;
 
     public Transaction(String spaceName, String id,
                         List<Operation> operations,
                         Map<String, Long> readElements) {
-        this.spaceName = spaceName;
+        this.transactionKey = TransactionKey.of(spaceName,id);
         this.operations = operations;
         this.readElements = readElements;
-        this.id = id;
     }
 
     Transaction(String spaceName, String id) {
         this(spaceName, id, new ArrayList<>(), new HashMap<>());
     }
 
-    public String getId() {
-        return id;
+    public TransactionKey getKey() {
+        return transactionKey;
     }
 
     public List<Operation> getOperations() {
         return operations;
-    }
-
-    public String getSpaceName() {
-        return spaceName;
     }
 
     public Map<String, Long> getReadElements() {

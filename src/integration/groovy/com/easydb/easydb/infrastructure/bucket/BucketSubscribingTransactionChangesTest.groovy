@@ -8,6 +8,7 @@ import com.easydb.easydb.domain.bucket.ElementField
 import com.easydb.easydb.domain.space.UUIDProvider
 import com.easydb.easydb.domain.transactions.Operation
 import com.easydb.easydb.domain.transactions.PersistentTransactionManager
+import com.easydb.easydb.domain.transactions.TransactionKey
 import org.springframework.beans.factory.annotation.Autowired
 import reactor.core.publisher.Flux
 
@@ -138,17 +139,17 @@ class BucketSubscribingTransactionChangesTest extends IntegrationWithCleanedData
 
         String transactionId = transactionManager.beginTransaction(TEST_BUCKET_NAME.spaceName)
 
-        transactionManager.addOperation(transactionId,
+        transactionManager.addOperation(TransactionKey.of(TEST_BUCKET_NAME.spaceName, transactionId),
                 Operation.of(Operation.OperationType.CREATE, TEST_BUCKET_NAME.name, danielFaderski.id, danielFaderski.fields))
 
-        transactionManager.addOperation(transactionId,
+        transactionManager.addOperation(TransactionKey.of(TEST_BUCKET_NAME.spaceName, transactionId),
                 Operation.of(Operation.OperationType.DELETE, TEST_BUCKET_NAME.name, janBrzechwa.id))
 
-        transactionManager.addOperation(transactionId,
+        transactionManager.addOperation(TransactionKey.of(TEST_BUCKET_NAME.spaceName, transactionId),
                 Operation.of(Operation.OperationType.UPDATE, TEST_BUCKET_NAME.name, jurekOgorek.id, jurekOgorek.fields))
 
         Executors.newSingleThreadScheduledExecutor().schedule({
-            transactionManager.commitTransaction(transactionId)
+            transactionManager.commitTransaction(TransactionKey.of(TEST_BUCKET_NAME.spaceName, transactionId))
         }, 300, TimeUnit.MILLISECONDS)
     }
 }

@@ -25,7 +25,6 @@ public class TransactionConstraintsValidator {
 
     void ensureOperationConstraints(String spaceName, Operation operation) {
         BucketName bucketName = new BucketName(spaceName, operation.getBucketName());
-
         if (!operation.getType().equals(Operation.OperationType.CREATE)) {
             elementService.getElement(bucketName, operation.getElementId());
         } else {
@@ -34,5 +33,4 @@ public class TransactionConstraintsValidator {
             }
         }
     }
-
 }
