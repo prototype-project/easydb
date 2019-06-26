@@ -12,10 +12,10 @@ RUN apt-get -y update && \
 
 # install zookeeper
 RUN apt-get install -y wget && \
-    wget https://www-eu.apache.org/dist/zookeeper/zookeeper-${ZOOKEEPER_VERSION}/apache-zookeeper-${ZOOKEEPER_VERSION}.tar.gz && \
-    tar -xf apache-zookeeper-${ZOOKEEPER_VERSION}.tar.gz -C /opt/ && \
-    mv /opt/apache-zookeeper-${ZOOKEEPER_VERSION} /opt/zookeeper && \
-    rm apache-zookeeper-${ZOOKEEPER_VERSION}.tar.gz
+    wget https://www-eu.apache.org/dist/zookeeper/zookeeper-${ZOOKEEPER_VERSION}/apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz && \
+    tar -xf apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz -C /opt/ && \
+    mv /opt/apache-zookeeper-${ZOOKEEPER_VERSION}-bin /opt/zookeeper && \
+    rm apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz
 
 ADD files/zookeeper.cfg /opt/zookeeper/conf/zookeeper.cfg
 

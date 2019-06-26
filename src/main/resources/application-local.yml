@@ -1,8 +1,11 @@
 zookeeper:
-  retryTimeoutMillis: 100
-  retrySleepMillis: 100
+  connectionString: "localhost:2181"
 
-spring:
-  data:
-    mongodb:
-      uri: "mongodb://localhost/easydb"
+mongo:
+  databaseName: easydb
+  hosts: "localhost:27017"
+  username: easydb
+  password: 123456
+  adminDatabaseName: admin
+  adminUsername: admin
+  adminPassword: 123456

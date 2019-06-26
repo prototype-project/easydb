@@ -14,6 +14,15 @@ management:
       exposure:
         include: '*'
 
+  endpoint:
+    metrics:
+      enabled: true
+      prometheus:
+        enabled: true
+      export:
+        prometheus:
+          enabled: true
+
 mongo:
   databaseName: easydb
   hosts: "mongo-router1:27017,mongo-router2:27017"

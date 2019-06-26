@@ -54,13 +54,13 @@ dependencies {
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
     compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
     compile group: 'ch.qos.logback', name: 'logback-core', version: '1.2.3'
-    compile group: 'org.springframework.boot', name: 'spring-boot-actuator', version: project.springBootVersion
-    compile group: 'io.micrometer', name: 'micrometer-registry-prometheus', version: '1.0.4'
-    compile group: 'org.apache.curator', name: 'curator-framework', version: '4.0.1'
-    compile group: 'org.apache.curator', name: 'curator-recipes', version: '4.0.1'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: project.springBootVersion
+    compile group: 'io.micrometer', name: 'micrometer-registry-prometheus', version: '1.1.3'
+    compile group: 'org.apache.curator', name: 'curator-framework', version: '4.2.0'
+    compile group: 'org.apache.curator', name: 'curator-recipes', version: '4.2.0'
     compile group: 'net.sf.jopt-simple', name: 'jopt-simple', version: '5.0.4'
     compile group: 'org.springframework.retry', name: 'spring-retry', version: '1.2.2.RELEASE'
-    compile group: 'org.apache.curator', name: 'curator-x-discovery', version: '4.0.1'
+    compile group: 'org.apache.curator', name: 'curator-x-discovery', version: '4.2.0'
     compile group: 'com.graphql-java', name: 'graphql-java', version: '11.0'
     compile group: 'com.graphql-java-kickstart', name: 'graphql-java-tools', version: '5.5.0'
     compile group: 'io.projectreactor', name: 'reactor-core', version: '3.2.8.RELEASE'
@@ -69,7 +69,7 @@ dependencies {
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.23.0'
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: project.springBootVersion
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-webflux', version: project.springBootVersion
-    testCompile group: 'org.apache.curator', name: 'curator-test', version: '4.1.0'
+    testCompile group: 'org.apache.curator', name: 'curator-test', version: '4.2.0'
     testCompile group: 'cglib', name: 'cglib-nodep', version: '3.2.4'
     testCompile 'org.codehaus.groovy:groovy-all:2.4.4'
     testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'

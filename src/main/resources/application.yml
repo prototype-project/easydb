@@ -34,5 +34,7 @@ mongo:
   adminDatabaseName: admin
   adminUsername: admin
   adminPassword: 123456
+
 server:
   max-http-header-size: 65536
+

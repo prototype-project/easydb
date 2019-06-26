@@ -1,8 +1,3 @@
 language: java
-deploy:
-  provider: heroku
-  api_key:
-    secure: D8/a1EqB+oxvsmNnfC+YgIlBuVRhdck/vUUh55Tc/SXnrG3V6tXWGBGXVt2R6y9H6Gm++JiYJ08mgZgWndep8wg11tvRnogSFbhjezXBRLvP9poIZNz86EkZDTBm5Fy0xu/lD4Zt4mWkBxesg3p7XGkEtcLydUaXA+l1i369Q+MWDtx3/yJQGoBIMt94uo2rh6q8irKiSFvmauWAexBcLx8qaWtKLeXV0pUqPN7syDZJ1gaJDZgmLi6jeX0V/FFZ2wjBPZzouikADtitMSAA8d0Su/6zO5Wmrdo9UM4papLTcuEcgYoQIhJpi71okeAOgAaJ8jBuR9hVcfeVIyEsbl2wdayTmwJZgLX69fly25X2+ovaLBB121cev2M4ZerrsCOXZ0sHRihsaffn093On5kxCm/JeCgYVz7qm/D7Ncmw4O1e8lgHyiViNmBGMksdlnFkNwkFjuDHzWfMEsSM9h6tbYkXPBifQo/uyraG7chxEMDV/EnsYOFrWSLyvdSjaQ9WKNGpWOWm0060b6L0t3axm1pAoV2N7e8NI0d1AcmqfwhUJDyJkd/Px3o13LcT7OkZTt8w6AQQ15P0K/USa9gW/sCaT4xYUlLph6Pxl1klcV7EP15PlNM8Ji5GaAXqMdsKzl1EJdKA3r3ctS3nWSxI+KGN2LlyNbXQBE5dQdc=
-  app: easy-db
-  on:
-    repo: prototype-project/easydb
+
+script: ./gradlew test integrationTest
