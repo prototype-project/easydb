@@ -7,6 +7,7 @@ mv ./build/easydb-0.0.1-SNAPSHOT/bin ./build/
 mv ./build/easydb-0.0.1-SNAPSHOT/lib ./build/
 rm -rf ./build/easydb-0.0.1-SNAPSHOT
 rsync -av --exclude "application*.yml" ../src/main/resources ./build/
+mv ./build ../.docker/build
 
 docker login --username $DOCKER_USER --password $DOCKER_PASS
 if [ "$TRAVIS_BRANCH" = "master" ]; then
