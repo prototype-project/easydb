@@ -5,4 +5,4 @@ script:
   - ./gradlew test integrationTest
 
 after_success:
-  - sh travis/publish.sh
+  - sh .travis/publish.sh
