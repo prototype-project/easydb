@@ -16,8 +16,8 @@ export TAG="$TRAVIS_BRANCH"
 fi
 
 docker-compose -f ../.docker/docker-compose.yml build
-docker tag easydb/discovery_scraper $DOCKER_REPO-discovery_scraper:$TAG
-docker tag easydb/load_balancer $DOCKER_REPO-load_balancer:$TAG
+docker tag easydb/discovery_scraper $DOCKER_REPO-discovery-scraper:$TAG
+docker tag easydb/load_balancer $DOCKER_REPO-load-balancer:$TAG
 docker tag easydb/app $DOCKER_REPO-app:$TAG
 docker tag easydb/monitoring $DOCKER_REPO-monitoring:$TAG
 docker tag easydb/zookeeper $DOCKER_REPO-zookeeper:$TAG
@@ -25,8 +25,8 @@ docker tag easydb/zookeeper $DOCKER_REPO-zookeeper:$TAG
 docker-compose -f ../.docker/docker-mongo-compose.yml build
 docker tag easydb/mongo $DOCKER_REPO-mongo:$TAG
 
-docker push $DOCKER_REPO-discovery_scraper
-docker push $DOCKER_REPO-load_balancer
+docker push $DOCKER_REPO-discovery-scraper
+docker push $DOCKER_REPO-load-balancer
 docker push $DOCKER_REPO-app
 docker push $DOCKER_REPO-monitoring
 docker push $DOCKER_REPO-zookeeper
