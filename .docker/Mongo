@@ -2,7 +2,7 @@ FROM ubuntu:18.04
 
 ENV MONGO_VERSION 4.0.2
 
-    # install mongodb
+# install mongodb
 RUN apt-get -y update && \
     apt-get -y install software-properties-common && \
     apt-get install -y gnupg && \

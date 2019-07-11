@@ -38,8 +38,8 @@ stop-mongo:
 	@echo "Killing running easydb docker processes..."
 	@docker kill `docker ps --filter "label=type=Mongo Cluster" -q` 2> /dev/null || true
 
-	@echo "Clearing easydb docker processes traces..."
-	@docker rm `docker ps -a --filter "label=type=Easydb Cluster"  -q` -f 2> /dev/null || true
+	@echo "Clearing mongo docker processes traces..."
+	@docker rm `docker ps -a --filter "label=type=Mongo Cluster"  -q` -f 2> /dev/null || true
 
 clean:
 	rm -rf ./logs

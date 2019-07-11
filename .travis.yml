@@ -3,3 +3,6 @@ jdk: oraclejdk8
 
 script:
   - ./gradlew test integrationTest
+
+after_success:
+  - sh travis/publish.sh

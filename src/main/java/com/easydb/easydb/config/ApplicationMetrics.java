@@ -172,11 +172,11 @@ public class ApplicationMetrics {
     }
 
     private Timer buildSpaceTimer(String path, String spaceName) {
-        return buildTimer(path, "space", spaceName);
+        return buildTimer(path);
     }
 
     private Timer buildBucketTimer(String path, BucketName bucketName) {
-        return buildTimer(path, "space", bucketName.getSpaceName(), "bucket", bucketName.getName());
+        return buildTimer(path);
     }
 
     private Counter buildCounter(String path, String... tags) {
@@ -187,6 +187,8 @@ public class ApplicationMetrics {
 
     private Timer buildTimer(String path, String... tags) {
         return Timer.builder(path)
+                .publishPercentiles(0.5, 0.95, 0.99)
+                .publishPercentileHistogram()
                 .tags(tags)
                 .register(meterRegistry);
     }

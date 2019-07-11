@@ -9,18 +9,6 @@ management:
   security:
     enabled: false
 
-  metrics:
-    distribution:
-      percentiles:
-        "[spaceUnlockingTime]": 0.95, 0.99
-        "[spaceLockingTime]": 0.95, 0.99
-        "[bucketUnlockingTime]": 0.95, 0.99
-        "[bucketLockingTime]": 0.95, 0.99
-        "[elementUnlockingTime]": 0.95, 0.99
-        "[elementLockingTime]": 0.95, 0.99
-        "[compoundTransactionTime]": 0.95, 0.99
-        "[singleElementTransactionTime]": 0.95, 0.99
-
   endpoints:
     web:
       exposure:
