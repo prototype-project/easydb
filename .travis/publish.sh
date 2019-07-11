@@ -1,4 +1,3 @@
-rm -rf ./build
 ../gradlew clean distZip -p ../
 mkdir -p build
 cp ../build/distributions/*.zip ./build
