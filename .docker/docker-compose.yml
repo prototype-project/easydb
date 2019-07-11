@@ -7,6 +7,9 @@ services:
       labels:
         - "type=Easydb Cluster"
     image: "easydb/discovery_scraper:$TAG"
+    depends_on:
+      - zookeeper
+      - nginx
     networks:
       - easydb
     volumes:
@@ -19,6 +22,8 @@ services:
       labels:
         - "type=Easydb Cluster"
     image: "easydb/load_balancer:$TAG"
+    depends_on:
+      - easydb
     networks:
       - easydb
     ports:
@@ -32,6 +37,9 @@ services:
       labels:
         - "type=Easydb Cluster"
     image: "easydb/app:$TAG"
+    depends_on:
+      - monitoring
+      - zookeeper
     networks:
       - easydb
 

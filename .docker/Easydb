@@ -18,10 +18,10 @@ RUN mkdir -p /var/log/easydb && \
     mkdir -p /opt/easydb/dist && \
     mkdir -p /opt/easydb/resources
 
-ADD build/bin /opt/easydb/dist/bin
-ADD build/lib /opt/easydb/dist/lib
-ADD build/resources /opt/easydb/resources
-ADD files/application.yml /opt/easydb/resources/application.yml
+ADD ./build/bin /opt/easydb/dist/bin
+ADD ./build/lib /opt/easydb/dist/lib
+ADD ./build/resources /opt/easydb/resources
+ADD ./files/application.yml /opt/easydb/resources/application.yml
 
 EXPOSE 9000
 
