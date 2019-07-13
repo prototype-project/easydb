@@ -1,3 +1,3 @@
 build:
   docker:
-    web: ../.docker/Mongo
+    web: faderskd/easydb-mongo
