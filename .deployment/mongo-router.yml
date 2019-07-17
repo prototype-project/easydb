@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-ROUTERX
+  labels:
+    name: mongo-ROUTERX
+spec:
+  ports:
+    - port: 27017
+      protocol: TCP
+  selector:
+    role: mongo-ROUTERX
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: mongo-ROUTERX
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        role: mongo-ROUTERX
+        tier: routers
+    spec:
+      containers:
+        - name: mongo-router-CONTAINERX
+          image: faderskd/easydb-mongo
+          command:
+            - "mongos"
+            - "--port"
+            - "27017"
+            - "--bind_ip"
+            - "0.0.0.0"
+            - "--configdb"
+            - "mongo-config-server/mongo-config-server1:27017,mongo-config-server2:27017,mongo-config-server3:27017"
+          resources:
+            limits:
+              cpu: 0.1
+              memory: 100Mi
+          ports:
+            - containerPort: 27017

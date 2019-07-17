@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-SHARDX
+  labels:
+    name: mongo-SHARDX
+spec:
+  ports:
+    - port: 27017
+      targetPort: 27017
+  selector:
+    role: mongo-SHARDX
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo-SHARDX
+spec:
+  selector:
+    matchLabels:
+      role: mongo-SHARDX # has to match .spec.template.metadata.labels
+  serviceName: mongo-SHARDX
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        role: mongo-SHARDX
+        tier: shard
+    spec:
+      containers:
+        - name: mongodb-shard-CONTAINERX
+          image: faderskd/easydb-mongo
+          command:
+            - "mongod"
+            - "--port"
+            - "27017"
+            - "--bind_ip"
+            - "0.0.0.0"
+            - "--replSet"
+            - "mongo-replicaset"
+            - "--dbpath"
+            - "/data/db"
+          resources:
+            limits:
+              cpu: 0.1
+              memory: 100Mi
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongo-SHARDX-persistent-storage
+              mountPath: /data/db
+      volumes:
+        - name: mongo-SHARDX-persistent-storage

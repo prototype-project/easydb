@@ -3,7 +3,7 @@ services:
   discovery-scraper:
     build:
       context: ""
-      dockerfile: DiscoveryScraper
+      dockerfile: Dockerfile.discoveryscraper
       labels:
         - "type=Easydb Cluster"
     image: "easydb/discovery_scraper:$TAG"
@@ -18,7 +18,7 @@ services:
   nginx:
     build:
       context: ""
-      dockerfile: Nginx
+      dockerfile: Dockerfile.nginx
       labels:
         - "type=Easydb Cluster"
     image: "easydb/load_balancer:$TAG"
@@ -33,7 +33,7 @@ services:
   easydb:
     build:
       context: ""
-      dockerfile: Easydb
+      dockerfile: Dockerfile.easydb
       labels:
         - "type=Easydb Cluster"
     image: "easydb/app:$TAG"
@@ -46,7 +46,7 @@ services:
   monitoring:
     build:
       context: ""
-      dockerfile: Monitoring
+      dockerfile: Dockerfile.monitoring
       labels:
         - "type=Easydb Cluster"
     image: "easydb/monitoring:$TAG"
@@ -61,7 +61,7 @@ services:
   zookeeper:
     build:
       context: ""
-      dockerfile: Zookeeper
+      dockerfile: Dockerfile.zookeeper
       labels:
         - "type=Easydb Cluster"
     image: "easydb/zookeeper:$TAG"

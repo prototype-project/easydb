@@ -6,7 +6,7 @@ services:
     container_name: mongo-replicaset-node1
     build:
       context: ""
-      dockerfile: Mongo
+      dockerfile: Dockerfile.mongo
       labels:
         - "type=Mongo Cluster"
     image: easydb/mongo
@@ -25,7 +25,7 @@ services:
     container_name: mongo-replicaset-node2
     build:
       context: ""
-      dockerfile: Mongo
+      dockerfile: Dockerfile.mongo
       labels:
         - "type=Mongo Cluster"
     image: easydb/mongo
@@ -44,7 +44,7 @@ services:
     container_name: mongo-replicaset-node3
     build:
       context: ""
-      dockerfile: Mongo
+      dockerfile: Dockerfile.mongo
       labels:
         - "type=Mongo Cluster"
     image: easydb/mongo
@@ -64,7 +64,7 @@ services:
     container_name: mongo-configserver-node1
     build:
       context: ""
-      dockerfile: Mongo
+      dockerfile: Dockerfile.mongo
       labels:
         - "type=Mongo Cluster"
     image: easydb/mongo
@@ -80,7 +80,7 @@ services:
     container_name: mongo-configserver-node2
     build:
       context: ""
-      dockerfile: Mongo
+      dockerfile: Dockerfile.mongo
       labels:
         - "type=Mongo Cluster"
     image: easydb/mongo
@@ -96,7 +96,7 @@ services:
     container_name: mongo-configserver-node3
     build:
       context: ""
-      dockerfile: Mongo
+      dockerfile: Dockerfile.mongo
       labels:
         - "type=Mongo Cluster"
     image: easydb/mongo
@@ -113,7 +113,7 @@ services:
     container_name: mongo-router1
     build:
       context: ""
-      dockerfile: Mongo
+      dockerfile: Dockerfile.mongo
       labels:
         - "type=Mongo Cluster"
     image: easydb/mongo
@@ -132,7 +132,7 @@ services:
     container_name: mongo-router2
     build:
       context: ""
-      dockerfile: Mongo
+      dockerfile: Dockerfile.mongo
       labels:
         - "type=Mongo Cluster"
     image: easydb/mongo

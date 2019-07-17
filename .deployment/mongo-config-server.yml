@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-config-SERVERX
+  labels:
+    name: mongo-config-SERVERX
+spec:
+  ports:
+    - port: 27019
+      targetPort: 27019
+  selector:
+    role: mongo-config-SERVERX
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo-config-SERVERX
+spec:
+  selector:
+    matchLabels:
+      role: mongo-config-SERVERX # has to match .spec.template.metadata.labels
+  serviceName: mongo-config-SERVERX
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        role: mongo-config-SERVERX
+        tier: config-server
+    spec:
+      containers:
+        - name: mongo-config-server-CONTAINERX
+          image: faderskd/easydb-mongo
+          command:
+            - "mongod"
+            - "--configsvr"
+            - "--port"
+            - "27019"
+            - "--dbpath"
+            - "/data/db"
+            - "--bind_ip"
+            - "0.0.0.0"
+            - "--replSet"
+            - "mongo-config-server"
+          resources:
+            limits:
+              cpu: 0.2
+              memory: 100Mi
+          ports:
+            - containerPort: 27019
+          volumeMounts:
+            - name: mongodb-config-SERVERX-persistent-storage
+              mountPath: /data/db
+      volumes:
+        - name: mongodb-config-SERVERX-persistent-storage

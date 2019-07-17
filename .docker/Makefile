@@ -1,4 +1,5 @@
 build_images: prepare_easydb_executable
+	export TAG="latest"
 	docker-compose build
 	docker-compose -f docker-mongo-compose.yml build
 
