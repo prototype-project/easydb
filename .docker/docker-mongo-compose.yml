@@ -139,6 +139,7 @@ services:
     depends_on:
       - mongo-configserver-node1
       - mongo-configserver-node2
+      - mongo-configserver-node3
     command: mongos --configdb mongo-config-server/mongo-configserver-node1:27017,mongo-configserver-node2:27017,mongo-configserver-node3:27017 --port 27017 --bind_ip 0.0.0.0
     ports:
       - 27020:27017

@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: easydb
+  labels:
+    run: easydb
+spec:
+  ports:
+    - port: 9000
+      protocol: TCP
+  selector:
+    run: easydb
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: easydb
+spec:
+  selector:
+    matchLabels:
+      name: easydb
+      run: easydb
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        name: easydb
+        run: easydb
+    spec:
+      hostname: easydb
+      containers:
+        - image: faderskd/easydb-app
+          name: easydb-container
+          ports:
+            - containerPort: 9000
+
