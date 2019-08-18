@@ -30,7 +30,7 @@ spec:
       hostname: mongo-SHARDX
       containers:
         - image: faderskd/easydb-mongo
-          name: mongodb-shard-CONTAINERX
+          name: mongodb-shard-SHARDX
           ports:
             - containerPort: 27017
           command:
@@ -48,3 +48,5 @@ spec:
               mountPath: /data/db
       volumes:
         - name: mongo-SHARDX-persistent-storage
+          persistentVolumeClaim:
+            claimName: local-storage-CLAIMX

@@ -47,3 +47,5 @@ spec:
               mountPath: /data/db
       volumes:
         - name: mongodb-config-SERVERX-persistent-storage
+          persistentVolumeClaim:
+            claimName: local-storage-CLAIMX

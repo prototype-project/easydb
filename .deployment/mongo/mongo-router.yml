@@ -29,7 +29,7 @@ spec:
     spec:
       hostname: mongo-ROUTERX
       containers:
-        - name: mongo-router-CONTAINERX
+        - name: mongo-router-ROUTERX
           image: faderskd/easydb-mongo
           command:
             - "mongos"
