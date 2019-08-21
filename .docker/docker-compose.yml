@@ -4,74 +4,28 @@ services:
     build:
       context: ""
       dockerfile: Dockerfile.discoveryscraper
-      labels:
-        - "type=Easydb Cluster"
     image: "easydb/discovery_scraper:$TAG"
-    depends_on:
-      - zookeeper
-      - nginx
-    networks:
-      - easydb
-    volumes:
-      - "targets:/etc/prometheus/targets"
 
   nginx:
     build:
       context: ""
       dockerfile: Dockerfile.nginx
-      labels:
-        - "type=Easydb Cluster"
     image: "easydb/load_balancer:$TAG"
-    depends_on:
-      - easydb
-    networks:
-      - easydb
-    ports:
-      - "8000:80"
-      - "8001:8081"
 
   easydb:
     build:
       context: ""
       dockerfile: Dockerfile.easydb
-      labels:
-        - "type=Easydb Cluster"
     image: "easydb/app:$TAG"
-    depends_on:
-      - monitoring
-      - zookeeper
-    networks:
-      - easydb
 
   monitoring:
     build:
       context: ""
       dockerfile: Dockerfile.monitoring
-      labels:
-        - "type=Easydb Cluster"
     image: "easydb/monitoring:$TAG"
-    networks:
-      - easydb
-    ports:
-      - "9090:9090"
-      - "9095:9095"
-    volumes:
-      - "targets:/etc/prometheus/targets"
 
   zookeeper:
     build:
       context: ""
       dockerfile: Dockerfile.zookeeper
-      labels:
-        - "type=Easydb Cluster"
     image: "easydb/zookeeper:$TAG"
-    networks:
-      - easydb
-    ports:
-      - "2181:2181"
-
-networks:
-  easydb:
-
-volumes:
-  targets:

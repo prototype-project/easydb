@@ -23,7 +23,7 @@ docker tag easydb/app $DOCKER_REPO-app:$TAG
 docker tag easydb/monitoring $DOCKER_REPO-monitoring:$TAG
 docker tag easydb/zookeeper $DOCKER_REPO-zookeeper:$TAG
 
-docker-compose -f ../.docker/docker-mongo-compose.yml build
+docker build -t easydb/mongo:$TAG -f ../.docker/Dockerfile.mongo .
 docker tag easydb/mongo $DOCKER_REPO-mongo:$TAG
 
 docker push $DOCKER_REPO-discovery-scraper

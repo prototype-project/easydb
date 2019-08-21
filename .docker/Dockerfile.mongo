@@ -10,9 +10,3 @@ RUN apt-get -y update && \
     echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-4.0.list && \
     apt-get -y update && \
     apt-get -y install mongodb-org=${MONGO_VERSION} mongodb-org-server=${MONGO_VERSION} mongodb-org-shell=${MONGO_VERSION} mongodb-org-mongos=${MONGO_VERSION} mongodb-org-tools=${MONGO_VERSION}
-
-ADD files/mongo/mongoCreateUser.js /tmp/mongoCreateUser.js
-ADD files/mongo/mongoCreateAdminUser.js /tmp/mongoCreateAdminUser.js
-ADD files/mongo/initConfigServers.js /tmp/initConfigServers.js
-ADD files/mongo/initRouters.js /tmp/initRouters.js
-ADD files/mongo/initShardedReplica.js /tmp/initShardedReplica.js

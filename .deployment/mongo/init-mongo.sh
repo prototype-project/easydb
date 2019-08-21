@@ -1,4 +1,11 @@
 #config-servers
+
+EASYDB_USERNAME="easydb"
+EASYDB_PASSWORD="123456"
+
+EASYDB_ADMIN_USERNAME="admin"
+EASYDB_ADMIN_PASSWORD="123456"
+
 echo "Waiting for config server containers"
 kubectl get pods | grep "mongo-config" | grep "ContainerCreating"
 
@@ -75,8 +82,8 @@ done
 
 echo "Creating database users"
 
-CMD='db.getSiblingDB("easydb").runCommand({createUser: "easydb",pwd: "123456",roles: ["dbOwner"]});'
+CMD='db.getSiblingDB("easydb").runCommand({createUser: "'$EASYDB_USERNAME'",pwd: "'$EASYDB_PASSWORD'",roles: ["dbOwner"]});'
 kubectl exec -it $POD_NAME -- bash -c "mongo localhost:27017 --eval '$CMD'"
 
-CMD='db.getSiblingDB("admin").runCommand({createUser: "admin",pwd: "123456",roles: [ { role: "userAdminAnyDatabase", db: "admin" }, "readWriteAnyDatabase" ]});'
+CMD='db.getSiblingDB("admin").runCommand({createUser: "'$EASYDB_ADMIN_USERNAME'",pwd: "'$EASYDB_ADMIN_PASSWORD'",roles: [ { role: "userAdminAnyDatabase", db: "admin" }, "readWriteAnyDatabase" ]});'
 kubectl exec -it $POD_NAME -- bash -c "mongo localhost:27017 --eval '$CMD'"
