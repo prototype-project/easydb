@@ -33,4 +33,11 @@ spec:
           name: easydb-container
           ports:
             - containerPort: 9000
+          volumeMounts:
+            - name: config-volume
+              mountPath: /opt/easydb/resources
+      volumes:
+        - name: config-volume
+          configMap:
+            name: easydb-config
 

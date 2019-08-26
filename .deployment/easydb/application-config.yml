@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: easydb-config
+  namespace: default
+data:
+  application.yml: |
+    spring:
+      application:
+        name: easydb
+      metrics:
+        prometheus:
+          enabled: true
+
+    management:
+      security:
+        enabled: false
+
+      endpoints:
+        web:
+          exposure:
+            include: '*'
+
+      endpoint:
+        metrics:
+          enabled: true
+          prometheus:
+            enabled: true
+          export:
+            prometheus:
+              enabled: true
+
+    mongo:
+      databaseName: easydb
+      hosts: "mongo-router1:27017,mongo-router2:27017"
+      username: MONGO_USERNAME
+      password: MONGO_PASSWORD
+      adminDatabaseName: admin
+      adminUsername: MONGO_ADMIN_USERNAME
+      adminPassword: MONGO_ADMIN_PASSWORD
+
+    zookeeper:
+      connectionString: "zookeeper:2181"

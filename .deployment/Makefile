@@ -24,6 +24,7 @@ stop: stop-app stop-mongo
 
 stop-app:
 	kubectl delete -f easydb/tmp.yml || true
+	kubectl delete -f easydb/config-map-tmp.yml || true
 
 stop-mongo:
 	kubectl delete -f mongo/tmp.yml || true
