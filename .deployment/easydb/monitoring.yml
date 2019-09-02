@@ -42,6 +42,11 @@ spec:
           volumeMounts:
             - name: targets
               mountPath: /etc/prometheus/targets
+        - image: faderskd/easydb-discovery-scraper
+          name: discovery-scraper-container
+          volumeMounts:
+            - name: targets
+              mountPath: /etc/prometheus/targets
       volumes:
         - name: targets
 

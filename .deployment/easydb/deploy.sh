@@ -9,9 +9,6 @@ MONGO_ADMIN_PASSWORD="123456"
 echo "" > tmp.yml
 echo "" > config-map-tmp.yml
 
-cat discovery-scraper.yml >> tmp.yml
-echo "---" >> tmp.yml
-
 cat easydb.yml >> tmp.yml
 echo "---" >> tmp.yml
 
