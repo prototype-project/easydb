@@ -22,9 +22,8 @@ docker tag easydb/load_balancer $DOCKER_REPO-load-balancer:$TAG
 docker tag easydb/app $DOCKER_REPO-app:$TAG
 docker tag easydb/monitoring $DOCKER_REPO-monitoring:$TAG
 docker tag easydb/zookeeper $DOCKER_REPO-zookeeper:$TAG
-
-docker build -t easydb/mongo:$TAG -f ../.docker/Dockerfile.mongo .
 docker tag easydb/mongo $DOCKER_REPO-mongo:$TAG
+docker tag easydb/testcontainer $DOCKER_REPO-testcontainer:$TAG
 
 docker push $DOCKER_REPO-discovery-scraper
 docker push $DOCKER_REPO-load-balancer
@@ -32,3 +31,4 @@ docker push $DOCKER_REPO-app
 docker push $DOCKER_REPO-monitoring
 docker push $DOCKER_REPO-zookeeper
 docker push $DOCKER_REPO-mongo
+docker push $DOCKER_REPO-testcontainer

@@ -1,0 +1,49 @@
+FROM ubuntu:18.04
+
+ENV ZOOKEEPER_VERSION 3.5.5
+ENV JAVA_HOME "/usr/lib/jvm/java-8-openjdk-amd64"
+ENV MONGO_VERSION 4.0.2
+ENV SPRING_CONFIG_LOCATION "/opt/easydb/resources/application_testcontainer.yml"
+ENV JAVA_OPTS "-Xmx500m -XX:+UseG1GC"
+
+    # install java8
+RUN apt-get -y update && \
+    apt-get -y install software-properties-common && \
+    add-apt-repository ppa:openjdk-r/ppa 2>/dev/null && \
+    apt-get -y update && \
+    apt-get -y install openjdk-8-jdk
+
+# install zookeeper
+RUN apt-get install -y wget && \
+    wget https://www-eu.apache.org/dist/zookeeper/zookeeper-${ZOOKEEPER_VERSION}/apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz && \
+    tar -xf apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz -C /opt/ && \
+    mv /opt/apache-zookeeper-${ZOOKEEPER_VERSION}-bin /opt/zookeeper && \
+    rm apache-zookeeper-${ZOOKEEPER_VERSION}-bin.tar.gz
+
+# install mongodb
+RUN apt-get -y update && \
+    apt-get -y install software-properties-common && \
+    apt-get install -y gnupg && \
+    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4 && \
+    echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-4.0.list && \
+    apt-get -y update && \
+    apt-get -y install mongodb-org=${MONGO_VERSION} mongodb-org-server=${MONGO_VERSION} mongodb-org-shell=${MONGO_VERSION} mongodb-org-mongos=${MONGO_VERSION} mongodb-org-tools=${MONGO_VERSION} && \
+    mkdir -p /data/db
+
+ # install easydb
+RUN mkdir -p /var/log/easydb && \
+ touch /var/log/easydb/easydb.log && \
+ mkdir -p /opt/easydb/dist && \
+ mkdir -p /opt/easydb/resources
+
+ADD build/bin /opt/easydb/dist/bin
+ADD build/lib /opt/easydb/dist/lib
+ADD build/resources /opt/easydb/resources
+ADD files/application_testcontainer.yml /opt/easydb/resources/application_testcontainer.yml
+
+ADD files/init_dev_mongo.js /opt/init_dev_mongo.js
+ADD files/testcontainer_starter.sh /opt/testcontainer_starter.sh
+
+EXPOSE 9000
+
+CMD sh /opt/testcontainer_starter.sh

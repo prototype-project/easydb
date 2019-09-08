@@ -29,3 +29,15 @@ services:
       context: ""
       dockerfile: Dockerfile.zookeeper
     image: "easydb/zookeeper:$TAG"
+
+  testcontainer:
+    build:
+      context: ""
+      dockerfile: Dockerfile.testcontainer
+    image: "easydb/testcontainer:$TAG"
+
+  mongo:
+    build:
+      context: ""
+      dockerfile: Dockerfile.mongo
+    image: "easydb/mongo:$TAG"

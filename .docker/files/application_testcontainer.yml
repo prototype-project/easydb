@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: easydb
+  metrics:
+    prometheus:
+      enabled: true
+
+management:
+  security:
+    enabled: false
+
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+  endpoint:
+    metrics:
+      enabled: true
+      prometheus:
+        enabled: true
+      export:
+        prometheus:
+          enabled: true
+
+mongo:
+  databaseName: easydb
+  hosts: "localhost:27017"
+  username: easydb
+  password: easydb
+  adminDatabaseName: admin
+  adminUsername: admin
+  adminPassword: admin
+
+zookeeper:
+  connectionString: "localhost:2181"
