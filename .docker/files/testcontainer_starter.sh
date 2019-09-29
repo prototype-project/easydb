@@ -1,8 +1,8 @@
 #!/bin/bash
 
 mongod &
-mongo localhost:27017/easydb < /opt/easydb/resources/init_dev_mongo.js; \
+mongo localhost:27017/easydb < /opt/easydb/resources/init_dev_mongo.js
 
-/bin/bash /opt/zookeeper/bin/zkServer.sh start /opt/zookeeper/conf/zoo_sample.cfg; \
+/bin/bash /opt/zookeeper/bin/zkServer.sh start /opt/zookeeper/conf/zoo_sample.cfg
 
 /opt/easydb/dist/bin/easydb -port 9000 -environment local;
