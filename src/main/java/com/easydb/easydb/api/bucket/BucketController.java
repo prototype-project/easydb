@@ -60,7 +60,8 @@ class BucketController {
             @PathVariable("spaceName") String spaceName,
             @PathVariable("bucketName") String bucketName,
             @RequestBody @Valid ElementCrudDto toCreate) {
-        Element element = toCreate.toDomain(uuidProvider.generateUUID(), new BucketName(spaceName, bucketName));
+        String id = toCreate.getId().orElse(uuidProvider.generateUUID());
+        Element element = toCreate.toDomain(id, new BucketName(spaceName, bucketName));
         bucketService.addElement(element);
 
         metrics.addElementRequestsCounter(new BucketName(spaceName, bucketName)).increment();

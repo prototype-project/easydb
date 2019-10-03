@@ -29,9 +29,9 @@ trait TestHttpOperations {
                 PaginatedElementsDto.class)
     }
 
-    ElementQueryDto getElement(String spaceName, String bucketName, String id) {
+    ResponseEntity<ElementQueryDto> getElement(String spaceName, String bucketName, String id) {
         restTemplate.getForEntity(
-                buildElementUrl(spaceName, bucketName, id), ElementQueryDto).body
+                buildElementUrl(spaceName, bucketName, id), ElementQueryDto)
     }
 
     ResponseEntity<ElementQueryDto> addElementToTestBucket(String spaceName, String body) {
@@ -120,9 +120,9 @@ trait TestHttpOperations {
     }
 
     String buildElementBody(ElementCrudDto element) {
-        JsonOutput.toJson([
-                fields: element.fields.collect { ["name": it.name, "value": it.value] }
-        ])
+        Map<String, Object> bodyAsMap = [fields: element.fields.collect { ["name": it.name, "value": it.value] }]
+        element.id.ifPresent({ id -> bodyAsMap.put("id", id) })
+        JsonOutput.toJson(bodyAsMap)
     }
 
     String buildOperationBody(OperationDto operation) {

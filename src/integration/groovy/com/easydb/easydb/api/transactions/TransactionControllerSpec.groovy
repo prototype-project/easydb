@@ -232,7 +232,7 @@ class TransactionControllerSpec extends ApiIntegrationWithAutoCreatedSpace {
 
         then:
         getElementsFromTestBucket(spaceName).results.size() == 1
-        getElement(spaceName, TEST_BUCKET_NAME, element1Id).fields.toSet() ==
+        getElement(spaceName, TEST_BUCKET_NAME, element1Id).body.fields.toSet() ==
                 [new ElementFieldDto("name", "Tadzik"), new ElementFieldDto("age", "30")].toSet()
     }
 

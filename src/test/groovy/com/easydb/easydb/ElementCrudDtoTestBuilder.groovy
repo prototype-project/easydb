@@ -10,6 +10,7 @@ class ElementCrudDtoTestBuilder {
             new ElementFieldDto('firstName', 'John'),
             new ElementFieldDto('lastName', 'Smith'),
     ]
+    private String id = null
 
     ElementCrudDtoTestBuilder fields(List<ElementFieldDto> fields) {
         this.fields = fields
@@ -26,8 +27,13 @@ class ElementCrudDtoTestBuilder {
         return this
     }
 
+    ElementCrudDtoTestBuilder addId(String id) {
+        this.id = id
+        return this
+    }
+
     ElementCrudDto build() {
-        return new ElementCrudDto(fields)
+        return new ElementCrudDto(fields, id)
     }
 
     static ElementCrudDtoTestBuilder builder() {
