@@ -50,7 +50,9 @@ public class MongoBucketRepository implements BucketRepository {
 
     @Override
     public void createBucket(BucketName name) {
-        createShardedCollection(name);
+        if (mongoProperties.getShardingEnabled()) {
+            createShardedCollection(name);
+        }
         mongoTemplate.createCollection(NamesResolver.resolve(name));
     }
 

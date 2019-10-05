@@ -11,6 +11,7 @@ public class MongoProperties {
     private String adminDatabaseName;
     private String adminUsername;
     private String adminPassword;
+    private boolean shardingEnabled = false;
 
     public String getDatabaseName() {
         return databaseName;
@@ -66,5 +67,13 @@ public class MongoProperties {
 
     public void setAdminPassword(String adminPassword) {
         this.adminPassword = adminPassword;
+    }
+
+    public boolean getShardingEnabled() {
+        return shardingEnabled;
+    }
+
+    public void setShardingEnabled(boolean shardingEnabled) {
+        this.shardingEnabled = shardingEnabled;
     }
 }

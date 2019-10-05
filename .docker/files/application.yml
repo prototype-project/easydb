@@ -31,6 +31,7 @@ mongo:
   adminDatabaseName: admin
   adminUsername: admin
   adminPassword: 123456
+  shardingEnabled: true
 
 zookeeper:
   connectionString: "zookeeper:2181"
