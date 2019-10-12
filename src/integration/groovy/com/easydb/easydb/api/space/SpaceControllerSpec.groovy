@@ -11,7 +11,7 @@ class SpaceControllerSpec extends IntegrationDatabaseSpec implements TestHttpOpe
 
     def "should create new space"() {
         when:
-        ResponseEntity<SpaceDefinitionDto> response = addSampleSpace()
+        ResponseEntity<SpaceDefinitionCreateDto> response = addSampleSpace()
 
         then:
         response.statusCode == HttpStatus.CREATED
@@ -28,7 +28,7 @@ class SpaceControllerSpec extends IntegrationDatabaseSpec implements TestHttpOpe
         restTemplate.delete(buildSpaceUrl(spaceName))
 
         and:
-        restTemplate.getForEntity(localUrl("/api/v1/spaces/" + spaceName), SpaceDefinitionDto)
+        restTemplate.getForEntity(localUrl("/api/v1/spaces/" + spaceName), SpaceDefinitionCreateDto)
 
         then:
         def response = thrown(HttpClientErrorException)
@@ -38,21 +38,22 @@ class SpaceControllerSpec extends IntegrationDatabaseSpec implements TestHttpOpe
     def "should get space"() {
         given:
         String spaceName = addSampleSpace().getBody().spaceName
+        createBucket(spaceName, "testBucket")
 
         when:
-        ResponseEntity<SpaceDefinitionDto> response = restTemplate.getForEntity(
-                buildSpaceUrl(spaceName), SpaceDefinitionDto)
+        ResponseEntity<SpaceDetailsDto> response = restTemplate.getForEntity(
+                buildSpaceUrl(spaceName), SpaceDetailsDto)
 
         then:
         response.statusCode == HttpStatus.OK
 
-        response.body.spaceName == spaceName
+        response.body.buckets == ["testBucket"]
     }
 
     def "should return 404 when get not existing space"() {
         when:
         restTemplate.getForEntity(
-                buildSpaceUrl("notExisting"), SpaceDefinitionDto)
+                buildSpaceUrl("notExisting"), SpaceDefinitionCreateDto)
 
         then:
         def response = thrown(HttpClientErrorException)

@@ -34,11 +34,11 @@ class SpaceController {
 
     @PostMapping
     @ResponseStatus(value = HttpStatus.CREATED)
-    SpaceDefinitionDto createSpace() {
+    SpaceDefinitionCreateDto createSpace() {
         Space spaceDefinition = Space.of(uuidProvider.generateUUID());
         spaceRepository.save(spaceDefinition);
         metrics.createSpaceRequestsCounter().increment();
-        return new SpaceDefinitionDto(spaceDefinition.getName());
+        return new SpaceDefinitionCreateDto(spaceDefinition.getName());
     }
 
     @DeleteMapping(path = "/{spaceName}")
@@ -49,9 +49,9 @@ class SpaceController {
     }
 
     @GetMapping(path = "/{spaceName}")
-    SpaceDefinitionDto getSpace(@PathVariable("spaceName") String spaceName) {
+    SpaceDetailsDto getSpace(@PathVariable("spaceName") String spaceName) {
         Space fromDb = spaceRepository.get(spaceName);
         metrics.getSpaceRequestsCounter().increment();
-        return new SpaceDefinitionDto(fromDb.getName());
+        return SpaceDetailsDto.of(fromDb);
     }
 }

@@ -6,7 +6,7 @@ import com.easydb.easydb.api.bucket.ElementQueryDto
 import com.easydb.easydb.api.transaction.OperationDto
 import com.easydb.easydb.api.transaction.OperationResultDto
 import com.easydb.easydb.api.bucket.PaginatedElementsDto
-import com.easydb.easydb.api.space.SpaceDefinitionDto
+import com.easydb.easydb.api.space.SpaceDefinitionCreateDto
 import com.easydb.easydb.api.transaction.TransactionDto
 import groovy.json.JsonOutput
 import groovy.transform.SelfType
@@ -89,11 +89,11 @@ trait TestHttpOperations {
                         .build())
     }
 
-    ResponseEntity<SpaceDefinitionDto> addSampleSpace() {
+    ResponseEntity<SpaceDefinitionCreateDto> addSampleSpace() {
         return restTemplate.postForEntity(
                 buildSpaceUrl(),
                 Void,
-                SpaceDefinitionDto.class)
+                SpaceDefinitionCreateDto.class)
     }
 
     ResponseEntity<TransactionDto> beginTransaction(String spaceName) {
