@@ -138,6 +138,19 @@ class CrudBucketElementsSpec extends ApiIntegrationWithAutoCreatedSpace implemen
 
         and:
         ex.statusCode == HttpStatus.NOT_FOUND
+        ex.responseBodyAsString =~ "BUCKET_DOES_NOT_EXIST"
+    }
+
+    def "should return 404 when trying to add element to nonexistent space"() {
+        when:
+        addSampleElementToTestBucket("nonExistentSpace")
+
+        then:
+        HttpClientErrorException ex = thrown()
+
+        and:
+        ex.statusCode == HttpStatus.NOT_FOUND
+        ex.responseBodyAsString =~ "SPACE_DOES_NOT_EXIST"
     }
 
     def "should return 404 when trying to update element in nonexistent bucket"() {
@@ -155,6 +168,23 @@ class CrudBucketElementsSpec extends ApiIntegrationWithAutoCreatedSpace implemen
 
         and:
         ex.statusCode == HttpStatus.NOT_FOUND
+        ex.responseBodyAsString =~ "BUCKET_DOES_NOT_EXIST"
+    }
+
+    def "should return 404 when trying to update element in nonexistent space"() {
+        when:
+        restTemplate.exchange(
+                buildElementUrl("nonExistentSpace", TEST_BUCKET_NAME, someForSureExistingElementId),
+                HttpMethod.PUT,
+                httpJsonEntity(sampleUpdateElementBody()),
+                Void.class)
+
+        then:
+        HttpClientErrorException ex = thrown()
+
+        and:
+        ex.statusCode == HttpStatus.NOT_FOUND
+        ex.responseBodyAsString =~ "SPACE_DOES_NOT_EXIST"
     }
 
     def "should return 404 when trying to update nonexistent element"() {
@@ -176,12 +206,9 @@ class CrudBucketElementsSpec extends ApiIntegrationWithAutoCreatedSpace implemen
     }
 
     def "should return 404 when trying to get element from nonexistent bucket"() {
-        given:
-        deleteTestBucket(spaceName)
-
         when:
         restTemplate.exchange(
-                buildElementUrl(spaceName, TEST_BUCKET_NAME, someForSureExistingElementId),
+                buildElementUrl(spaceName, "nonExistentBucket", someForSureExistingElementId),
                 HttpMethod.GET,
                 null,
                 ElementQueryDto.class)
@@ -191,6 +218,23 @@ class CrudBucketElementsSpec extends ApiIntegrationWithAutoCreatedSpace implemen
 
         and:
         response.statusCode == HttpStatus.NOT_FOUND
+        response.responseBodyAsString =~ "BUCKET_DOES_NOT_EXIST"
+    }
+
+    def "should return 404 when trying to get element from nonexistent space"() {
+        when:
+        restTemplate.exchange(
+                buildElementUrl("nonExistentSpace", TEST_BUCKET_NAME, someForSureExistingElementId),
+                HttpMethod.GET,
+                null,
+                ElementQueryDto.class)
+
+        then:
+        def response = thrown(HttpClientErrorException)
+
+        and:
+        response.statusCode == HttpStatus.NOT_FOUND
+        response.responseBodyAsString =~ "SPACE_DOES_NOT_EXIST"
     }
 
     def "should return 404 when trying to get nonexistent element"() {

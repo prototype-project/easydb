@@ -27,6 +27,16 @@ class CrudBucketSpec extends ApiIntegrationWithAutoCreatedSpace {
         response.getStatusCode() == HttpStatus.CREATED
     }
 
+    def "should return 404 when trying to create bucket in not existing space"() {
+        when:
+        createBucket("notExisting", "exampleBucket")
+
+        then:
+        def response = thrown(HttpClientErrorException)
+        response.statusCode == HttpStatus.NOT_FOUND
+        response.responseBodyAsString =~ "SPACE_DOES_NOT_EXIST"
+    }
+
     def "should throw error when trying to create already existing bucket"() {
         given:
         createBucket(spaceName, "existingBucket")
@@ -61,5 +71,16 @@ class CrudBucketSpec extends ApiIntegrationWithAutoCreatedSpace {
 
         and:
         ex.statusCode == HttpStatus.NOT_FOUND
+        ex.responseBodyAsString =~ "BUCKET_DOES_NOT_EXIST"
+    }
+
+    def "should return 404 when trying to remove bucket in not existing space"() {
+        when:
+        restTemplate.delete(buildBucketUrl("notExisting", "exampleBucket"))
+
+        then:
+        def response = thrown(HttpClientErrorException)
+        response.statusCode == HttpStatus.NOT_FOUND
+        response.responseBodyAsString =~ "SPACE_DOES_NOT_EXIST"
     }
 }

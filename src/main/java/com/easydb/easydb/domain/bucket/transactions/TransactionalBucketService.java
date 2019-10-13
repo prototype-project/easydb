@@ -75,13 +75,12 @@ public class TransactionalBucketService implements BucketService {
 
     @Override
     public void createBucket(BucketName bucketName) {
+        Space space = spaceRepository.get(bucketName.getSpaceName());
         if (bucketExists(bucketName)) {
             throw new BucketAlreadyExistsException(bucketName.getName());
         }
 
-        Space space = spaceRepository.get(bucketName.getSpaceName());
         space.getBuckets().add(bucketName.getName());
-
         lockerRetryer.performWithRetries(() -> spaceLocker.lockSpace(bucketName.getSpaceName()));
         try {
             spaceRepository.update(space);
@@ -93,12 +92,14 @@ public class TransactionalBucketService implements BucketService {
 
     @Override
     public void addElement(Element element) {
+        ensureSpaceExists(element.getBucketName().getSpaceName());
         elementService.addElement(element);
         emit(new ElementEvent(element, ElementEvent.Type.CREATE));
     }
 
     @Override
     public Element getElement(BucketName bucketName, String id) {
+        ensureSpaceExists(bucketName.getSpaceName());
         return elementService.getElement(bucketName, id).toSimpleElement();
     }
 
@@ -135,5 +136,9 @@ public class TransactionalBucketService implements BucketService {
 
     private void emit(ElementEvent event) {
         observersContainer.get(event.getElement().getBucketName()).ifPresent(observer -> observer.addEvent(event));
+    }
+
+    private void ensureSpaceExists(String spaceName) {
+        spaceRepository.get(spaceName);
     }
 }
