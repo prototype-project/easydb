@@ -1,7 +1,5 @@
 build_images: prepare_easydb_executable
-	export TAG="latest"
-	docker-compose build
-	docker build -t easydb/mongo:${TAG} -f Dockerfile.mongo .
+	export TAG="latest" && docker-compose build
 
 prepare_easydb_executable:
 	rm -rf ./build

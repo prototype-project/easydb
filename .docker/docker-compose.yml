@@ -41,3 +41,9 @@ services:
       context: ""
       dockerfile: Dockerfile.mongo
     image: "easydb/mongo:$TAG"
+
+  local-dependencies:
+    build:
+      context: ""
+      dockerfile: Dockerfile.localdependencies
+    image: "easydb/local_dependencies:$TAG"

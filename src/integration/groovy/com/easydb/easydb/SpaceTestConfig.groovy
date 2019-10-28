@@ -8,6 +8,9 @@ import org.springframework.context.annotation.Bean
 import org.springframework.data.mongodb.MongoDbFactory
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory
+import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter
+import org.springframework.data.mongodb.core.mapping.MongoMappingContext
 import org.testcontainers.containers.GenericContainer
 
 import static org.mockito.ArgumentMatchers.any
@@ -27,8 +30,12 @@ class SpaceTestConfig {
     }
 
     @Bean
-    MongoTemplate mongoTemplate(MongoClient mongoClient) {
-        return new MongoTemplate(mongoClient, DB_NAME)
+    MongoTemplate mongoTemplate(MongoDbFactory mongoDbFactory) {
+        MappingMongoConverter converter =
+                new MappingMongoConverter(mongoDbFactory, new MongoMappingContext())
+        converter.setTypeMapper(new DefaultMongoTypeMapper(null))
+
+        return new MongoTemplate(mongoDbFactory, converter)
     }
 
     @Bean

@@ -12,8 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 
 @Configuration
 @EnableConfigurationProperties(MongoProperties.class)
@@ -30,8 +34,12 @@ public class MongoConfiguration extends AbstractMongoConfiguration {
 
     @NotNull
     @Bean
-    public MongoTemplate mongoTemplate() throws Exception {
-        return new MongoTemplate(mongoClient(), getDatabaseName());
+    public MongoTemplate mongoTemplate(MongoDbFactory mongoDbFactory) throws Exception {
+        MappingMongoConverter converter =
+                new MappingMongoConverter(mongoDbFactory(), new MongoMappingContext());
+        converter.setTypeMapper(new DefaultMongoTypeMapper(null));
+
+        return new MongoTemplate(mongoDbFactory, converter);
     }
 
     @NotNull

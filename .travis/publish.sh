@@ -24,6 +24,7 @@ docker tag easydb/monitoring $DOCKER_REPO-monitoring:$TAG
 docker tag easydb/zookeeper $DOCKER_REPO-zookeeper:$TAG
 docker tag easydb/mongo $DOCKER_REPO-mongo:$TAG
 docker tag easydb/testcontainer $DOCKER_REPO-testcontainer:$TAG
+docker tag easydb/local_dependencies $DOCKER_REPO-local-dependencies:$TAG
 
 docker push $DOCKER_REPO-discovery-scraper
 docker push $DOCKER_REPO-load-balancer

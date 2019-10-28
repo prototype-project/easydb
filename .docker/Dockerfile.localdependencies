@@ -3,8 +3,6 @@ FROM ubuntu:18.04
 ENV ZOOKEEPER_VERSION 3.5.5
 ENV JAVA_HOME "/usr/lib/jvm/java-8-openjdk-amd64"
 ENV MONGO_VERSION 4.0.2
-ENV SPRING_CONFIG_LOCATION "/opt/easydb/resources/application-testcontainer.yml"
-ENV JAVA_OPTS "-Xmx500m -XX:+UseG1GC"
 
     # install java8
 RUN apt-get -y update && \
@@ -30,21 +28,9 @@ RUN apt-get -y update && \
     apt-get -y install mongodb-org=${MONGO_VERSION} mongodb-org-server=${MONGO_VERSION} mongodb-org-shell=${MONGO_VERSION} mongodb-org-mongos=${MONGO_VERSION} mongodb-org-tools=${MONGO_VERSION} && \
     mkdir -p /data/db
 
- # install easydb
-RUN mkdir -p /var/log/easydb && \
- touch /var/log/easydb/easydb.log && \
- mkdir -p /opt/easydb/dist && \
- mkdir -p /opt/easydb/resources
-
-ADD build/bin /opt/easydb/dist/bin
-ADD build/lib /opt/easydb/dist/lib
-ADD build/resources /opt/easydb/resources
-ADD files/application-testcontainer.yml /opt/easydb/resources/application-testcontainer.yml
-
 ADD files/init_dev_mongo.js /opt/easydb/resources/init_dev_mongo.js
 ADD files/testcontainer_starter.sh /opt/testcontainer_starter.sh
 
-EXPOSE 9000
+EXPOSE 27017 2181
 
-CMD sh /opt/testcontainer_starter.sh
-CMD /opt/easydb/dist/bin/easydb -port 9000 -environment local
+CMD sh /opt/testcontainer_starter.sh && /bin/bash
