@@ -46,5 +46,4 @@ ADD files/testcontainer_starter.sh /opt/testcontainer_starter.sh
 
 EXPOSE 9000
 
-CMD sh /opt/testcontainer_starter.sh
-CMD /opt/easydb/dist/bin/easydb -port 9000 -environment local
+CMD sh /opt/testcontainer_starter.sh && /opt/easydb/dist/bin/easydb -port 9000 -environment local
