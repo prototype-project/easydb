@@ -33,3 +33,4 @@ docker push $DOCKER_REPO-monitoring
 docker push $DOCKER_REPO-zookeeper
 docker push $DOCKER_REPO-mongo
 docker push $DOCKER_REPO-testcontainer
+docker push $DOCKER_REPO-local-dependencies
