@@ -76,12 +76,13 @@ public class TransactionalBucketService implements BucketService {
     @Override
     public void createBucket(BucketName bucketName) {
         Space space = spaceRepository.get(bucketName.getSpaceName());
+        lockerRetryer.performWithRetries(() -> spaceLocker.lockSpace(bucketName.getSpaceName()));
+
         if (bucketExists(bucketName)) {
             throw new BucketAlreadyExistsException(bucketName.getName());
         }
 
         space.getBuckets().add(bucketName.getName());
-        lockerRetryer.performWithRetries(() -> spaceLocker.lockSpace(bucketName.getSpaceName()));
         try {
             spaceRepository.update(space);
             bucketRepository.createBucket(bucketName);
